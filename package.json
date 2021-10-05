@@ -1,0 +1,47 @@
+{
+  "name": "tradew1nd",
+  "version": "1.0.0",
+  "description": "N0rthWestW1nd with only music functions.",
+  "main": "out/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/North-West-Wind/TradeW1nd.git"
+  },
+  "author": "NorthWestWind",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/North-West-Wind/TradeW1nd/issues"
+  },
+  "homepage": "https://github.com/North-West-Wind/TradeW1nd#readme",
+  "devDependencies": {
+    "@types/request-promise-native": "^1.0.18",
+    "@types/spotify-web-api-node": "^5.0.3",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.6.0",
+    "@types/moment-duration-format": "^2.2.3",
+    "cheerio": "^1.0.0-rc.10",
+    "discord.js": "^13.2.0",
+    "dotenv": "^10.0.0",
+    "fetch-retry-ts": "^1.1.24",
+    "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
+    "musescore-metadata": "^1.0.3",
+    "music-metadata": "^7.11.4",
+    "mysql2": "^2.3.0",
+    "node-fetch": "^3.0.0",
+    "puppeteer-core": "^10.4.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
+    "sanitize-filename": "^1.6.3",
+    "soundcloud-downloader": "^1.0.0",
+    "spotify-web-api-node": "^5.0.2",
+    "ytdl-core": "^4.9.1",
+    "ytpl": "^2.2.3",
+    "ytsr": "^3.5.3"
+  }
+}
