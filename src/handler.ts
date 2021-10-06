@@ -12,7 +12,7 @@ import common from "./common";
 import { init } from "./helpers/addTrack";
 
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
-
+var inited = false;
 export class Handler {
     static async setup(client: NorthClient, token: string) {
         await common(client);
@@ -48,37 +48,33 @@ export class Handler {
         client.user.setPresence({ activities: [{ name: "AFK", type: "PLAYING" }], status: "idle", afk: true });
     }
 
-    async readServers(client: NorthClient, con: Connection) {
-        var [results] = <[RowDataPacket[]]><unknown>await con.query("SELECT * FROM servers WHERE id <> '622311594654695434'");
-        results.forEach(async result => {
-            try {
-                await client.guilds.fetch(result.id);
-            } catch (err: any) {
-                await con.query(`DELETE FROM servers WHERE id = '${result.id}'`);
-                return console.log("Removed left servers");
-            }
-            if (result.queue || result.looping || result.repeating) {
+    async readServers(client: NorthClient) {
+        const con = await client.pool.getConnection();
+        const [results] = <RowDataPacket[][]><unknown>await con.query("SELECT * FROM servers WHERE id <> '622311594654695434'");
+        for (const result of results) {
+            if (!inited && (result.queue || result.looping || result.repeating)) {
                 var queue = [];
                 try { if (result.queue) queue = JSON.parse(unescape(result.queue)); }
                 catch (err: any) { console.error(`Error parsing queue of ${result.id}`); }
                 setQueue(result.id, queue, !!result.looping, !!result.repeating);
             }
-            NorthClient.storage.guilds[result.id] = new GuildConfig(result);
-        });
+            if (!inited) NorthClient.storage.guilds[result.id] = new GuildConfig(result);
+            else NorthClient.storage.guilds[result.id].prefix = result.prefix;
+        }
+        inited = true;
         console.log(`[${client.id}] Set ${results.length} configurations`);
+        con.release();
+        setTimeout(async () => this.readServers(client), 3600000);
     }
 
     async ready(client: NorthClient) {
-        const pool = client.pool;
         const id = client.id;
         console.log(`[${id}] Ready!`);
         this.setPresence(client);
-        const con = await pool.getConnection();
         try {
             init();
-            await this.readServers(client, con);
+            await this.readServers(client);
         } catch (err: any) { console.error(err); };
-        con.release();
     }
 
     async guildCreate(guild: Guild) {
