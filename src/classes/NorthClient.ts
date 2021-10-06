@@ -10,7 +10,6 @@ export class NorthClient extends Client {
     id: number;
     prefix: string;
     pool: Pool;
-    log: Snowflake;
     version: string;
     static storage: ClientStorage;
 

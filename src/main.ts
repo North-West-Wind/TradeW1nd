@@ -11,7 +11,7 @@ const client = new NorthClient({
         MessageManager: 50,
         PresenceManager: 0
     }),
-    partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER', 'GUILD_MEMBER'],
+    partials: ['MESSAGE'],
     intents: [
         Intents.FLAGS.DIRECT_MESSAGES,
         Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
@@ -22,7 +22,6 @@ const client = new NorthClient({
         Intents.FLAGS.GUILD_VOICE_STATES
     ]
 });
-client.log = "678847137391312917";
 NorthClient.storage = new ClientStorage();
 
 client.prefix = prefix0;

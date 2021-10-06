@@ -7,6 +7,10 @@
     "start": "node --optimize_for_size --max_old_space_size=1024 --gc_interval=100 --trace-warnings out/main.js",
     "tsc": "tsc"
   },
+  "engines": {
+    "node": "16.x",
+    "npm": "7.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/North-West-Wind/TradeW1nd.git"
