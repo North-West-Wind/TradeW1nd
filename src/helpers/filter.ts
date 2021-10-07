@@ -47,6 +47,15 @@ export async function all(command: Command, message: Message | CommandInteractio
     }, 10000);
     return true;
 }
+
+export async function information(_command: Command, message: Message | CommandInteraction) {
+    if (!message.guild) return true;
+    try {
+        if (await message.guild.members.fetch("649611982428962819")) return false;
+    } catch (err) {}
+    return true;
+}
+
 export async function music(_command: Command, message: Message | CommandInteraction) {
     if (!message.guild) {
         await msgOrRes(message, "You can only use music commands in server!");
