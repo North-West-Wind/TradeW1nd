@@ -8,7 +8,7 @@ class RandomCommand implements SlashCommand {
     name = "random"
     description = "Plays the queue randomly."
     aliases = ["rnd"]
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         if (!interaction.guild) return await interaction.reply("This command only works on server.");

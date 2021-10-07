@@ -190,7 +190,7 @@ class PlayCommand implements SlashCommand {
   description = "Plays music with the link or keywords provided."
   aliases = ["p"]
   usage = "[link | keywords]"
-  category = 8
+  category = 0
   options = [{
     name: "link",
     description: "The link of the soundtrack or keywords to search for.",

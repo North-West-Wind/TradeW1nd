@@ -13,7 +13,7 @@ class SeekCommand implements SlashCommand {
     description = "Skips to the time specified for the current playing soundtrack."
     usage = "<time>"
     aliases = ["skipto"]
-    category = 8
+    category = 0
     options = [{
         name: "time",
         description: "The position to skip to.",

@@ -7,7 +7,7 @@ import { getQueues, setQueue, updateQueue } from "../../helpers/music";
 class ClearCommand implements SlashCommand {
     name = "clear"
     description = "Clears the queue and stop the playing soundtrack. Also resets the volume to 100%."
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         if (!interaction.guild) return await interaction.reply("This command only works on server.");

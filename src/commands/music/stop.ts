@@ -8,7 +8,7 @@ class StopCommand implements SlashCommand {
     name = "stop"
     description = "Stops the music and disconnect the bot from the voice channel."
     aliases = ["end", "disconnect", "dis"]
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         await this.stop(interaction);

@@ -11,7 +11,7 @@ class UnSkipCommand implements SlashCommand {
     description = "Goes to the previous soundtrack in the queue."
     usage = "[amount]"
     aliases = ["us"]
-    category = 8
+    category = 0
     options = [{
         name: "amount",
         description: "The amount of soundtrack to go back.",

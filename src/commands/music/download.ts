@@ -13,7 +13,7 @@ class DownloadCommand implements SlashCommand {
     description = "Downloads the soundtrack from the server queue or online."
     usage = "[index | link | keywords]"
     aliases = ["dl"]
-    category = 8
+    category = 0
     options = [{
         name: "keywords",
         description: "Index/Link/Keywords of soundtrack.",

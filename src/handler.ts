@@ -3,13 +3,13 @@ import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import { RowDataPacket } from "mysql2";
-import { fixGuildRecord } from "./function";
+import { fixGuildRecord, messagePrefix } from "./function";
 import { setQueue, stop } from "./helpers/music";
 import { NorthClient, GuildConfig } from "./classes/NorthClient";
-import { Connection } from "mysql2/promise";
 import * as filter from "./helpers/filter";
 import common from "./common";
 import { init } from "./helpers/addTrack";
+import { categories } from "./commands/information/help";
 
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
 var inited = false;
@@ -34,7 +34,8 @@ export class Handler {
         const command = NorthClient.storage.commands.get(interaction.commandName);
         if (!command) return;
         try {
-            if(await filter.all(command, interaction) && await filter.music(command, interaction)) await command.execute(interaction);
+            const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
+            if (await filter.all(command, interaction) && (catFilter ? await catFilter(command, interaction) : true)) await command.execute(interaction);
         } catch (err: any) {
             try {
                 if (interaction.replied || interaction.deferred) await interaction.editReply(error);
@@ -109,20 +110,17 @@ export class Handler {
         } else NorthClient.storage.guilds[guild.id].exit = false;
     }
 
-    messagePrefix(message: Message, client: NorthClient): string {
-        return NorthClient.storage.guilds[message.guildId]?.prefix || client.prefix;
-    }
-
     async message(message: Message) {
         const client = <NorthClient>message.client;
-        const prefix = this.messagePrefix(message, client);
+        const prefix = messagePrefix(message, client);
         if (!message.content.startsWith(prefix)) return;
         const args = message.content.slice(prefix.length).split(/ +/);
         const commandName = args.shift().toLowerCase();
         const command = NorthClient.storage.commands.get(commandName) || NorthClient.storage.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
         if (!command) return;
         try {
-            if (await filter.all(command, message, args) && await filter.music(command, message)) await command.run(message, args);
+            const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
+            if (await filter.all(command, message, args) && (catFilter ? await catFilter(command, message) : true)) await command.run(message, args);
         } catch (err: any) {
             console.error(command.name + ": " + err);
             try {

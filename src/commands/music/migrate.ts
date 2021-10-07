@@ -56,7 +56,7 @@ export async function migrate(message: Message | CommandInteraction) {
 class MigrateCommand implements SlashCommand {
     name = "migrate"
     description = "Moves the bot to the channel you are in. Use when changing voice channel."
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         await interaction.deferReply();

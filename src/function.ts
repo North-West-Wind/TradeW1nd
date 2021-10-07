@@ -273,3 +273,7 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
     }
     return NorthClient.storage.guilds[id];
 }
+
+export function messagePrefix(message: Discord.Message, client: NorthClient): string {
+    return NorthClient.storage.guilds[message.guildId]?.prefix || client.prefix;
+}

@@ -9,7 +9,7 @@ class ReverseCommand implements SlashCommand {
     name = "reverse"
     description = "Reverses the order of the server queue."
     aliases = ["rev"]
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         await this.reverse(interaction);

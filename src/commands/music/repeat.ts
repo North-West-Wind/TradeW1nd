@@ -8,7 +8,7 @@ class RepeatCommand implements SlashCommand {
     name = "repeat"
     description = "Toggles repeat of a soundtrack."
     aliases = ["rep", "rp"]
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         await this.repeat(interaction);

@@ -7,7 +7,7 @@ import { msgOrRes } from "../../function";
 class PauseCommand implements SlashCommand {
     name = "pause"
     description = "Pauses the current music."
-    category = 8
+    category = 0
 
     async execute(interaction: CommandInteraction) {
         await this.pause(interaction);

@@ -11,7 +11,7 @@ class SkipCommand implements SlashCommand {
     description = "Skips soundtrack(s) in the queue."
     usage = "[amount]"
     aliases = ["s"]
-    category = 8
+    category = 0
     options = [{
         name: "amount",
         description: "The amount of soundtrack to skip.",

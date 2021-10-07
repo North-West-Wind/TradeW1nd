@@ -9,7 +9,7 @@ class VolumeCommand implements SlashCommand {
     description = "Turns the volume of music up or down by percentage."
     usage = "[percentage]"
     aliases = ["vol"]
-    category = 8
+    category = 0
     options = [
         {
             name: "percentage",
