@@ -63,7 +63,6 @@ export class Handler {
             else NorthClient.storage.guilds[result.id].prefix = result.prefix;
         }
         inited = true;
-        console.log(`[${client.id}] Set ${results.length} configurations`);
         con.release();
         setTimeout(async () => this.readServers(client), 3600000);
     }
