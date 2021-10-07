@@ -45,7 +45,7 @@ class HelpCommand implements SlashCommand {
             await interaction.reply({ embeds: [await this.getAllCommands(interaction)] });
             await wait(60000);
             await interaction.editReply({
-                content: "This is the **[manual](https://northwestwind.ml/n0rthwestw1nd/manual.pdf)**, my friend.",
+                content: "This is the **[manual](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd)**, my friend.",
                 embeds: []
             });
             return;
@@ -58,7 +58,7 @@ class HelpCommand implements SlashCommand {
     async run(message: Discord.Message, args: string[]) {
         if (!args.length) {
             const msg = await message.channel.send({ embeds: [await this.getAllCommands(message)] });
-            setTimeout(() => msg.edit({ content: "This is the **manual**, my friend:\nhttps://northwestwind.ml/n0rthwestw1nd/manual.pdf", embeds: [] }).catch(() => { }), 60000);
+            setTimeout(() => msg.edit({ content: "This is the **manual**, my friend:\nhttps://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd", embeds: [] }).catch(() => { }), 60000);
             return;
         }
         const name = args[0].toLowerCase();
@@ -72,7 +72,7 @@ class HelpCommand implements SlashCommand {
         const Embed = new Discord.MessageEmbed()
             .setColor(color())
             .setTitle("Command list is here!")
-            .setDescription(`[**Click this**](https://northwestwind.ml/n0rthwestw1nd/manual.pdf) for the user manual.\nIf you need any support, you can join the [**Support Server**](https://discord.gg/S44PNSh)\n\nI don't know if you need but [**here's me**](https://top.gg/bot/649611982428962819) in [**Discord bot List**](https://top.gg)!`)
+            .setDescription(`[**Click this**](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd) for the user manual.\nIf you need any support, you can join the [**Support Server**](https://discord.gg/S44PNSh)\n\nI don't know if you need but [**here's N0rthWestW1nd**](https://top.gg/bot/649611982428962819) in [**Discord bot List**](https://top.gg)!`)
             .setThumbnail(message.client.user.displayAvatarURL())
             .setTimestamp()
             .setFooter("Have a nice day! :)", message.client.user.displayAvatarURL());
