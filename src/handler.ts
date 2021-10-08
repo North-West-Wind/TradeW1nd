@@ -60,7 +60,7 @@ export class Handler {
                 setQueue(result.id, queue, !!result.looping, !!result.repeating);
             }
             if (!inited) NorthClient.storage.guilds[result.id] = new GuildConfig(result);
-            else NorthClient.storage.guilds[result.id].prefix = result.prefix;
+            else if (NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id].prefix = result.prefix;
         }
         inited = true;
         con.release();
