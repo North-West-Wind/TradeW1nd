@@ -30,7 +30,7 @@ export function stop(guild: Discord.Guild) {
     serverQueue.textChannel = null;
 }
 export function setQueue(guild: Discord.Snowflake, tracks: SoundTrack[], loopStatus: boolean, repeatStatus: boolean) {
-	tracks = tracks.map(track => {
+	tracks = tracks.filter(track => !!track).map(track => {
 		if (typeof track.time === "string") track.time = track.time === "∞" ? 0 : humanDurationToNum(track.time);
 		return track;
 	})
