@@ -3,6 +3,7 @@ import * as Discord from "discord.js";
 import { GatewayVoiceServerUpdateDispatchData, GatewayVoiceStateUpdateDispatchData } from "discord-api-types/v9";
 import { ServerQueue, SoundTrack } from "../classes/NorthClient";
 import { globalClient as client } from "../common";
+import { humanDurationToNum } from "../function";
 const queue = new Discord.Collection<Discord.Snowflake, ServerQueue>();
 
 export function getQueues() { return queue; }
@@ -28,8 +29,12 @@ export function stop(guild: Discord.Guild) {
     serverQueue.voiceChannel = null;
     serverQueue.textChannel = null;
 }
-export function setQueue(guild: Discord.Snowflake, songs: SoundTrack[], loopStatus: boolean, repeatStatus: boolean) {
-    const queueContruct = new ServerQueue(songs, loopStatus, repeatStatus);
+export function setQueue(guild: Discord.Snowflake, tracks: SoundTrack[], loopStatus: boolean, repeatStatus: boolean) {
+	tracks = tracks.map(track => {
+		if (typeof track.time === "string") track.time = track.time === "∞" ? 0 : humanDurationToNum(track.time);
+		return track;
+	})
+    const queueContruct = new ServerQueue(tracks, loopStatus, repeatStatus);
     queue.set(guild, queueContruct);
     return queueContruct;
 }

@@ -8,7 +8,7 @@ import scdl from 'soundcloud-downloader/dist/index';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
-import { getFetch, decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes } from "../function";
+import { getFetch, decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum } from "../function";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
 
@@ -47,12 +47,11 @@ export async function addAttachment(message: Message) {
             return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
         }
         const length = Math.round(metadata.format.duration);
-        const songLength = moment.duration(length, "seconds").format();
         songs.push({
             title: (file.name ? file.name.split(".").slice(0, -1).join(".") : file.url.split("/").slice(-1)[0].split(".").slice(0, -1).join(".")).replace(/_/g, " "),
             url: file.url,
             type: 2,
-            time: songLength,
+            time: length,
             volume: 1,
             thumbnail: "https://www.flaticon.com/svg/static/icons/svg/2305/2305904.svg",
             isLive: false
@@ -74,7 +73,7 @@ export async function addYTPlaylist(link: string) {
         title: video.title,
         url: video.shortUrl,
         type: 0,
-        time: video.duration,
+        time: video.durationSec,
         thumbnail: video.bestThumbnail.url,
         volume: 1,
         isLive: !!video?.isLive
@@ -95,7 +94,6 @@ export async function addYTURL(link: string, type: number = 0) {
         return { error: true, message: "Failed to get video data!", msg: null, songs: [] };
     }
     var length = parseInt(songInfo.videoDetails.lengthSeconds);
-    var songLength = length == 0 ? "∞" : moment.duration(length, "seconds").format();
     const thumbnails = songInfo.videoDetails.thumbnails;
     var thumbUrl = thumbnails[thumbnails.length - 1].url;
     var maxWidth = 0;
@@ -110,7 +108,7 @@ export async function addYTURL(link: string, type: number = 0) {
             title: decodeHtmlEntity(songInfo.videoDetails.title),
             url: songInfo.videoDetails.video_url,
             type: type,
-            time: songLength,
+            time: length,
             thumbnail: thumbUrl,
             volume: 1,
             isPastLive: !!songInfo?.videoDetails?.isLiveContent
@@ -162,14 +160,13 @@ export async function addSPURL(message: Message | Discord.CommandInteraction, li
                         s = results.length - 1;
                     }
                     if (s + 1 == results.length) {
-                        const songLength = !results[o].live ? results[o].duration : "∞";
                         songs.push({
                             title: track.track.name,
                             url: results[o].link,
                             type: 1,
                             spot: track.track.external_urls.spotify,
                             thumbnail: track.track.album.images[0]?.url,
-                            time: songLength,
+                            time: !results[o].live ? humanDurationToNum(results[o].duration) : 0,
                             volume: 1,
                             isLive: !!results[o]?.live
                         });
@@ -226,7 +223,7 @@ export async function addSPURL(message: Message | Discord.CommandInteraction, li
                             type: 1,
                             spot: track.external_urls.spotify,
                             thumbnail: highlight ? track.album.images[o]?.url : image,
-                            time: songLength,
+                            time: !results[o].live ? humanDurationToNum(results[o].duration) : 0,
                             volume: 1,
                             isLive: !!results[o]?.live
                         });
@@ -264,7 +261,7 @@ export async function addSPURL(message: Message | Discord.CommandInteraction, li
                             type: 1,
                             spot: track.external_urls.spotify,
                             thumbnail: track.album.images[o].url,
-                            time: songLength,
+                            time: !resultss[o].live ? humanDurationToNum(resultss[o].duration) : 0,
                             volume: 1,
                             isLive: !!resultss[o]?.live
                         });
@@ -284,12 +281,11 @@ export async function addSCURL(link: string) {
     if (data.kind == "playlist") {
         for (const track of data.tracks) {
             const length = Math.round(track.duration / 1000);
-            const songLength = moment.duration(length, "seconds").format();
             songs.push({
                 title: track.title,
                 type: 3,
                 id: track.id,
-                time: songLength,
+                time: length,
                 thumbnail: track.artwork_url,
                 url: track.permalink_url,
                 volume: 1,
@@ -298,12 +294,11 @@ export async function addSCURL(link: string) {
         }
     } else {
         const length = Math.round(data.duration / 1000);
-        const songLength = moment.duration(length, "seconds").format();
         songs.push({
             title: data.title,
             type: 3,
             id: data.id,
-            time: songLength,
+            time: length,
             thumbnail: data.artwork_url,
             url: data.permalink_url,
             volume: 1,
@@ -357,19 +352,17 @@ export async function addGDURL(link: string) {
         return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
     }
     if (!metadata) return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
-    var length = Math.round(metadata.format.duration);
-    var songLength = moment.duration(length, "seconds").format();
-    var song = {
+    const length = Math.round(metadata.format.duration);
+    const song = {
         title: title,
         url: dl,
         type: 4,
-        time: songLength,
+        time: length,
         volume: 1,
         thumbnail: "https://drive-thirdparty.googleusercontent.com/256/type/audio/mpeg",
         isLive: false
     };
-    var songs = [song];
-    return { error: false, songs: songs, msg: null, message: null };
+    return { error: false, songs: [song], msg: null, message: null };
 }
 export async function addGDFolderURL(link: string, cb: Function = async () => { }) {
     const songs = [];
@@ -410,19 +403,16 @@ export async function addMSURL(link: string) {
     } catch (err: any) {
         return { error: true, message: "Failed to fetch metadata of the score!", msg: null, songs: [] };
     }
-    var songLength = data.duration;
-    if (moment.duration(songLength).asHours() > 1) return { error: true, songs: [], msg: null, message: "Please don't play music longer than an hour." }
-    var song = {
+    const song = {
         title: data.title,
         url: link,
         type: 5,
-        time: songLength,
+        time: humanDurationToNum(data.duration),
         volume: 1,
         thumbnail: "https://pbs.twimg.com/profile_images/1155047958326517761/IUgssah__400x400.jpg",
         isLive: false
     };
-    var songs = [song];
-    return { error: false, songs: songs, msg: null, message: null };
+    return { error: false, songs: [song], msg: null, message: null };
 }
 
 export async function addURL(link: string) {
@@ -436,18 +426,16 @@ export async function addURL(link: string) {
     }
     if (!metadata || !stream) return { error: true, message: "There was an error while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
     const length = Math.round(metadata.format.duration);
-    const songLength = moment.duration(length, "seconds").format();
     const song = {
         title: title,
         url: link,
         type: 2,
-        time: songLength,
+        time: length,
         volume: 1,
         thumbnail: "https://www.flaticon.com/svg/static/icons/svg/2305/2305904.svg",
         isLive: false
     };
-    const songs = [song];
-    return { error: false, songs: songs, msg: null, message: null };
+    return { error: false, songs: [song], msg: null, message: null };
 }
 export async function search(message: Message | Discord.CommandInteraction, link: string) {
     const allEmbeds = [];
@@ -469,7 +457,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
         title: decodeHtmlEntity(x.title),
         url: x.url,
         type: 0,
-        time: !x.isLive ? x.duration : "∞",
+        time: !x.isLive ? humanDurationToNum(x.duration) : 0,
         thumbnail: x.bestThumbnail?.url,
         volume: 1,
         isLive: x.isLive
@@ -477,7 +465,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
     var num = 0;
     if (ytResults.length > 0) {
         results.push(ytResults);
-        Embed.setDescription("Type **soundcloud** / **sc** to show the search results from SoundCloud.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${x.time}**`).slice(0, 10).join("\n"));
+        Embed.setDescription("Type **soundcloud** / **sc** to show the search results from SoundCloud.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : moment.duration(x.time, "seconds").format()}**`).slice(0, 10).join("\n"));
         allEmbeds.push(Embed);
     }
     const scEm = new Discord.MessageEmbed()
@@ -501,14 +489,14 @@ export async function search(message: Message | Discord.CommandInteraction, link
         title: x.title,
         url: x.permalink_url,
         type: 3,
-        time: moment.duration(Math.floor(x.duration / 1000), "seconds").format(),
+        time: Math.floor(x.duration / 1000),
         thumbnail: x.artwork_url,
         volume: 1,
         isLive: false
     })).filter(x => !!x.url);
     if (scResults.length > 0) {
         results.push(scResults);
-        scEm.setDescription("Type **youtube** / **yt** to show the search results from Youtube.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + scResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${x.time}**`).slice(0, 10).join("\n"));
+        scEm.setDescription("Type **youtube** / **yt** to show the search results from Youtube.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + scResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : moment.duration(x.time, "seconds").format()}**`).slice(0, 10).join("\n"));
         allEmbeds.push(scEm);
     }
     if (allEmbeds.length < 1) {
@@ -543,11 +531,12 @@ export async function search(message: Message | Discord.CommandInteraction, link
                 collector.emit("end");
                 return;
             }
+            const length = !results[s][o].time ? "∞" : moment.duration(results[s][o].time, "seconds").format()
             const chosenEmbed = new Discord.MessageEmbed()
                 .setColor(color())
                 .setTitle("Music chosen:")
                 .setThumbnail(results[s][o].thumbnail)
-                .setDescription(`**[${decodeHtmlEntity(results[s][o].title)}](${results[s][o].url})** : **${results[s][o].time}**`)
+                .setDescription(`**[${decodeHtmlEntity(results[s][o].title)}](${results[s][o].url})** : **${length}**`)
                 .setTimestamp()
                 .setFooter("Have a nice day :)", message.client.user.displayAvatarURL());
             await msg.edit({ embeds: [chosenEmbed] });

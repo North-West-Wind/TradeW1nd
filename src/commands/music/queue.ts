@@ -1,5 +1,7 @@
 import { Message } from "discord.js";
-
+import * as moment from "moment";
+import formatSetup from "moment-duration-format";
+formatSetup(moment);
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient";
 import * as Discord from "discord.js";
 import { color, createEmbedScrolling, msgOrRes } from "../../function";
@@ -110,7 +112,7 @@ class QueueCommand implements SlashCommand {
             if (index == 0 || !serverQueue.random) return ++index;
             return "???";
         }
-        const songArray = serverQueue.songs.map(song => `**${getIndex()} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${song.time}**`);
+        const songArray = serverQueue.songs.map(song => `**${getIndex()} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**`);
         const allEmbeds = [];
         for (let i = 0; i < Math.ceil(songArray.length / 10); i++) {
             const pageArray = songArray.slice(i * 10, i * 10 + 10);
@@ -185,8 +187,9 @@ class QueueCommand implements SlashCommand {
             var queueNum = 0;
             var pageArray = queue.map(song => {
                 var str: string;
-                if (song.type === 1) str = `**${++queueNum} - ** **[${song.title}](${song.spot})** : **${song.time}**`;
-                else str = `**${++queueNum} - ** **[${song.title}](${song.url})** : **${song.time}**`;
+                const songLength = !song.time ? "∞" : moment.duration(song.time, "seconds").format();
+                if (song.type === 1) str = `**${++queueNum} - ** **[${song.title}](${song.spot})** : **${songLength}**`;
+                else str = `**${++queueNum} - ** **[${song.title}](${song.url})** : **${songLength}**`;
                 return str;
             }).slice(0, 10);
             const queueEmbed = new Discord.MessageEmbed()

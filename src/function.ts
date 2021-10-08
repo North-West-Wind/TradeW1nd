@@ -277,3 +277,16 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
 export function messagePrefix(message: Discord.Message, client: NorthClient): string {
     return NorthClient.storage.guilds[message.guildId]?.prefix || client.prefix;
 }
+
+export function humanDurationToNum(duration: string) {
+    const splitted = duration.split(".");
+    const rest = splitted[0];
+    const splitted1 = rest.split(":");
+    var sec = 0;
+    for (let i = splitted1.length - 1; i > 0; i--) {
+        let parsed;
+        if (isNaN(parsed = parseInt(splitted1[1]))) continue;
+        sec += parsed * Math.pow(60, i);
+    }
+    return sec;
+}

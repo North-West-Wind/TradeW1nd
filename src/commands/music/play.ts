@@ -6,12 +6,13 @@ import { migrate as music } from "./migrate.js";
 import ytdl from "ytdl-core";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import { getQueues, updateQueue, setQueue, createDiscordJSAdapter } from "../../helpers/music.js";
-import moment from "moment";
+import * as moment from "moment";
+import formatSetup from "moment-duration-format";
+formatSetup(moment);
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
-const fetch = getFetch();
 const ffmpeg = require('fluent-ffmpeg');
 
 function createPlayer(guild: Discord.Guild) {
@@ -64,11 +65,12 @@ async function probeAndCreateResource(readableStream: Stream.Readable) {
 }
 
 export function createEmbed(songs: SoundTrack[]) {
+  const songLength = songs[0].time == 0 ? "∞" : moment.duration(songs[0].time, "seconds").format();
   const Embed = new Discord.MessageEmbed()
     .setColor(color())
     .setTitle("New track added:")
     .setThumbnail(songs[0].thumbnail)
-    .setDescription(`**[${songs[0].title}](${songs[0].url})**\nLength: **${songs[0].time}**`)
+    .setDescription(`**[${songs[0].title}](${songs[0].url})**\nLength: **${songLength}**`)
     .setTimestamp()
     .setFooter("Have a nice day! :)", client.user.displayAvatarURL());
   if (songs.length > 1) Embed.setDescription(`**${songs.length}** tracks were added.`).setThumbnail(undefined);
@@ -176,7 +178,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack, seek: number 
       .setColor(color())
       .setTitle("Now playing:")
       .setThumbnail(song.thumbnail)
-      .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${song.time}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
+      .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
       .setTimestamp()
       .setFooter("Have a nice day! :)", guild.client.user.displayAvatarURL());
     const msg = await serverQueue.textChannel.send({embeds: [Embed]});
