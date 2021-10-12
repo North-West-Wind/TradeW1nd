@@ -1,8 +1,6 @@
 import { GuildConfig, NorthClient } from "./classes/NorthClient";
 import { globalClient } from "./common";
 import * as Discord from "discord.js";
-import originalFetch from "node-fetch";
-import fetchBuilder from "fetch-retry-ts";
 import superms from "ms";
 import * as fs from "fs";
 import * as path from "path";
@@ -13,7 +11,6 @@ import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
 import { RowDataPacket } from "mysql2/promise";
 import { setQueue } from "./helpers/music";
-const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
 
 export function twoDigits(d) {
     if (0 <= d && d < 10) return "0" + d.toString();
@@ -221,10 +218,6 @@ export function deepReaddir(dir) {
         }
     };
     return next();
-}
-
-export function getFetch() {
-    return fetch;
 }
 
 export function mutate(array: any[], fromIndex: number, toIndex: number) {

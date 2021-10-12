@@ -8,7 +8,7 @@ import scdl from 'soundcloud-downloader/dist/index';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
-import { getFetch, decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream } from "../function";
+import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream } from "../function";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
 
@@ -19,8 +19,9 @@ import { TrackInfo } from "soundcloud-downloader/dist/info";
 import { SoundTrack } from "../classes/NorthClient";
 import { getMP3 } from "./musescore";
 import { updateQueue } from "./music";
-
-const fetch = getFetch();
+import originalFetch from "node-fetch";
+import fetchBuilder from "fetch-retry-ts";
+const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
 var spotifyApi: SpotifyWebApi;
 
 export function init() {
