@@ -8,7 +8,7 @@ import scdl from 'soundcloud-downloader/dist/index';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
-import { getFetch, decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum } from "../function";
+import { getFetch, decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream } from "../function";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
 
@@ -16,6 +16,9 @@ import rp from "request-promise-native";
 import * as cheerio from "cheerio";
 import * as Discord from "discord.js";
 import { TrackInfo } from "soundcloud-downloader/dist/info";
+import { SoundTrack } from "../classes/NorthClient";
+import { getMP3 } from "./musescore";
+import { updateQueue } from "./music";
 
 const fetch = getFetch();
 var spotifyApi: SpotifyWebApi;
@@ -557,4 +560,56 @@ export async function search(message: Message | Discord.CommandInteraction, link
             resolve(val);
         });
     });
+}
+
+export async function getStream(track: SoundTrack, data: any) {
+    var stream: Stream.Readable;
+    switch (track.type) {
+      case 2:
+      case 4:
+        var a: Stream.Readable;
+        if (!track.time) {
+          const { error, message, songs } = await addGDURL(track.url);
+          if (error) throw new Error(message);
+          track = songs[0];
+          a = <Stream.Readable>(await requestStream(track.url)).data;
+          if (data.type === "server") {
+            data.serverQueue.songs[0] = track;
+            updateQueue(data.guild.id, data.serverQueue);
+          } else if (data.type === "radio") data.tracks[0] = track;
+        } else a = <Stream.Readable>(await requestStream(track.url)).data;
+        stream = a;
+        break;
+      case 3:
+        stream = await scdl.download(track.url);
+        break;
+      case 5:
+        const c = await getMP3(track.url);
+        if (c.error) throw new Error(c.message);
+        if (c.url.startsWith("https://www.youtube.com/embed/")) {
+          const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
+          const options = <any> { highWaterMark: 1 << 25, filter: "audioonly", dlChunkSize: 0 };
+          if (process.env.COOKIE) {
+            options.requestOptions = {};
+            options.requestOptions.headers = { cookie: process.env.COOKIE };
+            if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
+          }
+          stream = <Stream.Readable> ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
+        } else stream = <Stream.Readable> (await requestStream(c.url)).data;
+        break;
+      default:
+        const options = <any> {};
+        if (process.env.COOKIE) {
+          options.requestOptions = {};
+          options.requestOptions.headers = { cookie: process.env.COOKIE };
+          if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
+        }
+        if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 25 });
+        else Object.assign(options, { highWaterMark: 1 << 25 });
+        if (!track.url) throw new Error("This soundtrack is missing URL! Please remove and add this track again to make it function.");
+        stream = ytdl(track.url, options);
+        if (!stream) throw new Error("Failed to get YouTube video stream.");
+        break;
+    }
+    return stream;
 }

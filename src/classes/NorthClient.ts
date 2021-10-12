@@ -1,6 +1,8 @@
-import { AudioPlayer, AudioPlayerStatus, AudioResource, VoiceConnection } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
 import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { Pool, RowDataPacket } from "mysql2/promise";
+import { probeAndCreateResource } from "../commands/music/play";
+import { getStream } from "../helpers/addTrack";
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -89,6 +91,7 @@ export class ServerQueue {
     repeating: boolean;
     random: boolean;
     startTime?: number;
+    errorCounter?: number;
 
     getPlaybackDuration() {
         if (this.player?.state?.status != AudioPlayerStatus.Playing) return 0;
@@ -122,4 +125,32 @@ export class SoundTrack {
     isLive: boolean;
     isPastLive?: boolean;
     spot?: string;
+}
+
+export class RadioSoundTrack extends SoundTrack {
+    looped?: number;
+}
+
+export class RadioChannel {
+    player: AudioPlayer;
+    tracks: RadioSoundTrack[];
+
+    constructor(tracks: RadioSoundTrack[]) {
+        this.tracks = tracks;
+        this.player = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause
+            }
+        }).on(AudioPlayerStatus.Idle, async () => {
+            const finished = this.tracks.shift();
+            if (!finished.looped) finished.looped = 1;
+            else finished.looped++;
+            if (finished.looped <= 3) this.tracks.push(finished);
+            if (this.tracks[0]) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+        });
+    }
+
+    add(tracks: RadioSoundTrack[]) {
+        
+    }
 }

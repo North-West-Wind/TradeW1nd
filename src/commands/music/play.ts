@@ -9,7 +9,7 @@ import { getQueues, updateQueue, setQueue, createDiscordJSAdapter } from "../../
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
-import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
+import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
@@ -36,6 +36,7 @@ function createPlayer(guild: Discord.Guild) {
         needSetVolume = false;
       }
     }
+    if (serverQueue.errorCounter) serverQueue.errorCounter--;
     updateQueue(guild.id, serverQueue, false);
   }).on(AudioPlayerStatus.Idle, async () => {
     serverQueue = getQueues().get(guild.id);
@@ -54,12 +55,17 @@ function createPlayer(guild: Discord.Guild) {
     }
   }).on("error", async error => {
     console.error(error.message);
-    serverQueue?.textChannel?.send("There was an error trying to play the soundtrack!");
-    serverQueue?.destroy();
+    if (serverQueue) {
+      serverQueue.textChannel?.send("There was an error trying to play the soundtrack!");
+      if (!serverQueue.errorCounter) serverQueue.errorCounter = 1;
+      else serverQueue.errorCounter = 3;
+      if (serverQueue.errorCounter >= 3) serverQueue?.destroy();
+      else await play(guild, serverQueue.songs[0]);
+    }
   });
 }
 
-async function probeAndCreateResource(readableStream: Stream.Readable) {
+export async function probeAndCreateResource(readableStream: Stream.Readable) {
 	const { stream, type } = await demuxProbe(readableStream);
 	return createAudioResource(stream, { inputType: type, inlineVolume: true });
 }
@@ -115,52 +121,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack, seek: number 
   if (serverQueue.connection) serverQueue.startTime = streamTime - seek * 1000;
   else serverQueue.startTime = -seek * 1000;
   try {
-    var stream: Stream.Readable;
-    switch (song.type) {
-      case 2:
-      case 4:
-        var a: Stream.Readable;
-        if (!song.time) {
-          const { error, message, songs } = await addGDURL(song.url);
-          if (error) throw new Error(message);
-          song = songs[0];
-          a = <Stream.Readable>(await requestStream(song.url)).data;
-          serverQueue.songs[0] = song;
-          updateQueue(guild.id, serverQueue);
-        } else a = <Stream.Readable>(await requestStream(song.url)).data;
-        stream = a;
-        break;
-      case 3:
-        stream = await scdl.download(song.url);
-        break;
-      case 5:
-        const c = await getMP3(song.url);
-        if (c.error) throw new Error(c.message);
-        if (c.url.startsWith("https://www.youtube.com/embed/")) {
-          const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
-          const options = <any> { highWaterMark: 1 << 25, filter: "audioonly", dlChunkSize: 0 };
-          if (process.env.COOKIE) {
-            options.requestOptions = {};
-            options.requestOptions.headers = { cookie: process.env.COOKIE };
-            if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
-          }
-          stream = <Stream.Readable> ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
-        } else stream = <Stream.Readable> (await requestStream(c.url)).data;
-        break;
-      default:
-        const options = <any> {};
-        if (process.env.COOKIE) {
-          options.requestOptions = {};
-          options.requestOptions.headers = { cookie: process.env.COOKIE };
-          if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
-        }
-        if (!song?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 25 });
-        else Object.assign(options, { highWaterMark: 1 << 25 });
-        if (!song.url) throw new Error("This soundtrack is missing URL! Please remove and add this track again to make it function.");
-        stream = ytdl(song.url, options);
-        if (!stream) throw new Error("Failed to get YouTube video stream.");
-        break;
-    }
+    const stream = await getStream(song, { type: "server", guild, serverQueue });
     if (seek) {
       const command = ffmpeg(stream);
       const transform = new Stream.Transform();

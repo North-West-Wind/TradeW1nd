@@ -29,7 +29,7 @@ class SeekCommand implements SlashCommand {
             const percentage = Number(parsed.slice(0, -1));
             if (isNaN(percentage) || percentage > 100 || percentage < 0) return await interaction.reply("The given percentage is not valid!");
             parsed = serverQueue.songs[0].time * (percentage / 100);
-        }
+        } else parsed = Math.floor(parsed / 1000);
         await this.seek(interaction, serverQueue, parsed);
     }
 
@@ -42,7 +42,7 @@ class SeekCommand implements SlashCommand {
             const percentage = Number(args.join(" ").slice(0, -1));
             if (isNaN(percentage) || percentage > 100 || percentage < 0) return await message.channel.send("The given percentage is not valid!");
             parsed = serverQueue.songs[0].time * (percentage / 100);
-        }
+        } else parsed = Math.floor(parsed / 1000);
         await this.seek(message, serverQueue, parsed);
     }
 
