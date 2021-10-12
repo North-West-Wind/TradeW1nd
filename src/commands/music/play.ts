@@ -1,9 +1,6 @@
 import * as Discord from "discord.js";
-import { getFetch, validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, requestStream, moveArray, color, validGDDLURL, bufferToStream, msgOrRes, wait } from "../../function.js";
-import { getMP3 } from "../../helpers/musescore";
-import scdl from 'soundcloud-downloader/dist/index';
+import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, requestStream, moveArray, color, validGDDLURL, bufferToStream, msgOrRes, wait } from "../../function.js";
 import { migrate as music } from "./migrate.js";
-import ytdl from "ytdl-core";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import { getQueues, updateQueue, setQueue, createDiscordJSAdapter } from "../../helpers/music.js";
 import * as moment from "moment";
