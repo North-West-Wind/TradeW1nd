@@ -599,6 +599,7 @@ export async function getStream(track: SoundTrack, data: any) {
                 if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
               }
               stream = <Stream.Readable> ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
+              cacheFound = true;
             } else stream = <Stream.Readable> (await requestStream(c.url)).data;
             break;
           default:
@@ -613,6 +614,7 @@ export async function getStream(track: SoundTrack, data: any) {
             if (!track.url) throw new Error("This soundtrack is missing URL! Please remove and add this track again to make it function.");
             stream = ytdl(track.url, options);
             if (!stream) throw new Error("Failed to get YouTube video stream.");
+            cacheFound = true;
             break;
         }
     }
