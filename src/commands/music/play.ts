@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, requestStream, moveArray, color, validGDDLURL, bufferToStream, msgOrRes, wait } from "../../function.js";
 import { migrate as music } from "./migrate.js";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
-import { getQueues, updateQueue, setQueue, createDiscordJSAdapter } from "../../helpers/music.js";
+import { getQueues, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
@@ -20,8 +20,24 @@ function createPlayer(guild: Discord.Guild) {
   }
   var track: SoundTrack;
   var needResource = true, needSetVolume = true;
+  async function next() {
+    if (serverQueue.looping) serverQueue.songs.push(track);
+    if (!serverQueue.repeating) serverQueue.songs.shift();
+    updateQueue(guild.id, serverQueue);
+    needResource = true;
+    needSetVolume = true;
+    if (!serverQueue.random) await play(guild, serverQueue.songs[0]);
+    else {
+      const int = Math.floor(Math.random() * serverQueue.songs.length);
+      const pending = serverQueue.songs[int];
+      serverQueue.songs = moveArray(serverQueue.songs, int);
+      updateQueue(guild.id, serverQueue);
+      await play(guild, pending);
+    }
+  }
   return serverQueue.player.on(AudioPlayerStatus.Playing, async (_oldState, newState) => {
     track = serverQueue.songs[0];
+    addUsing(track.id);
     if (needResource) {
       serverQueue.resource = newState.resource;
       needResource = !!serverQueue.resource;
@@ -36,28 +52,18 @@ function createPlayer(guild: Discord.Guild) {
     if (serverQueue.errorCounter) serverQueue.errorCounter--;
     updateQueue(guild.id, serverQueue, false);
   }).on(AudioPlayerStatus.Idle, async () => {
+    removeUsing(track.id);
     serverQueue = getQueues().get(guild.id);
-    if (serverQueue.looping) serverQueue.songs.push(track);
-    if (!serverQueue.repeating) serverQueue.songs.shift();
-    updateQueue(guild.id, serverQueue);
-    needResource = true;
-    needSetVolume = true;
-    if (!serverQueue.random) await play(guild, serverQueue.songs[0]);
-    else {
-      const int = Math.floor(Math.random() * serverQueue.songs.length);
-      const pending = serverQueue.songs[int];
-      serverQueue.songs = moveArray(serverQueue.songs, int);
-      updateQueue(guild.id, serverQueue);
-      await play(guild, pending);
-    }
+    await next();
   }).on("error", async error => {
     console.error(error.message);
     if (serverQueue) {
+      removeUsing(track.id);
       serverQueue.textChannel?.send("There was an error trying to play the soundtrack!");
       if (!serverQueue.errorCounter) serverQueue.errorCounter = 1;
       else serverQueue.errorCounter = 3;
       if (serverQueue.errorCounter >= 3) serverQueue?.destroy();
-      else await play(guild, serverQueue.songs[0]);
+      else await next();
     }
   });
 }

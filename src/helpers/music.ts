@@ -1,45 +1,73 @@
 import { DiscordGatewayAdapterCreator, DiscordGatewayAdapterLibraryMethods } from "@discordjs/voice";
 import * as Discord from "discord.js";
+import * as Stream from 'stream';
+import * as fs from "fs";
+import * as path from "path";
 import { GatewayVoiceServerUpdateDispatchData, GatewayVoiceStateUpdateDispatchData } from "discord-api-types/v9";
 import { ServerQueue, SoundTrack } from "../classes/NorthClient";
 import { globalClient as client } from "../common";
 import { humanDurationToNum } from "../function";
 const queue = new Discord.Collection<Discord.Snowflake, ServerQueue>();
+const using: { [key: string]: number } = {};
 
 export function getQueues() { return queue; }
 export function getQueue(id: Discord.Snowflake) {
-    return queue.get(id);
+	return queue.get(id);
 }
 export async function updateQueue(id: Discord.Snowflake, serverQueue: ServerQueue, update: boolean = true) {
-    if (!serverQueue) queue.delete(id);
-    else queue.set(id, serverQueue);
-    if (!update) return;
-    try {
-        await client.pool.query(`UPDATE servers SET looping = ${serverQueue?.looping ? 1 : "NULL"}, repeating = ${serverQueue?.repeating ? 1 : "NULL"}, random = ${serverQueue?.random ? 1 : "NULL"}, queue = ${!serverQueue?.songs?.length || !Array.isArray(serverQueue.songs) ? "NULL" : `'${escape(JSON.stringify(serverQueue.songs))}'`} WHERE id = '${id}'`);
-    } catch (err: any) {
-        console.error(err);
-    }
+	if (!serverQueue) queue.delete(id);
+	else queue.set(id, serverQueue);
+	if (!update) return;
+	try {
+		await client.pool.query(`UPDATE servers SET looping = ${serverQueue?.looping ? 1 : "NULL"}, repeating = ${serverQueue?.repeating ? 1 : "NULL"}, random = ${serverQueue?.random ? 1 : "NULL"}, queue = ${!serverQueue?.songs?.length || !Array.isArray(serverQueue.songs) ? "NULL" : `'${escape(JSON.stringify(serverQueue.songs))}'`} WHERE id = '${id}'`);
+	} catch (err: any) {
+		console.error(err);
+	}
 }
 export function stop(guild: Discord.Guild) {
-    const serverQueue = queue.get(guild.id);
-    if (!serverQueue) return;
-    serverQueue.destroy();
-    serverQueue.playing = false;
-    serverQueue.connection = null;
-    serverQueue.voiceChannel = null;
-    serverQueue.textChannel = null;
+	const serverQueue = queue.get(guild.id);
+	if (!serverQueue) return;
+	serverQueue.destroy();
+	serverQueue.playing = false;
+	serverQueue.connection = null;
+	serverQueue.voiceChannel = null;
+	serverQueue.textChannel = null;
 }
 export function setQueue(guild: Discord.Snowflake, tracks: SoundTrack[], loopStatus: boolean, repeatStatus: boolean) {
 	tracks = tracks.filter(track => !!track).map(track => {
 		if (typeof track.time === "string") track.time = track.time === "∞" ? 0 : humanDurationToNum(track.time);
 		return track;
 	})
-    const queueContruct = new ServerQueue(tracks, loopStatus, repeatStatus);
-    queue.set(guild, queueContruct);
-    return queueContruct;
+	const queueContruct = new ServerQueue(tracks, loopStatus, repeatStatus);
+	queue.set(guild, queueContruct);
+	return queueContruct;
 }
 export function checkQueue() {
-    return queue.size > 0;
+	return queue.size > 0;
+}
+export function findCache(hashed: string) {
+	const filePath = path.join(__dirname, "cached", hashed);
+	if (!fs.existsSync(filePath)) return null;
+	return fs.createReadStream(filePath);
+}
+export async function cacheTrack(hashed: string, stream: Stream.Readable) {
+	const filePath = path.join(__dirname, "cached", hashed);
+	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
+	return fs.createReadStream(filePath);
+}
+export function isUsing(hashed: string) {
+	return !!using[hashed];
+}
+export function addUsing(hashed: string) {
+	if (hashed) using[hashed]++;
+}
+export function removeUsing(hashed: string) {
+	if (!hashed || !using[hashed]) return;
+	if (!(using[hashed] -= 1))
+		setTimeout(() => {
+			const filePath = path.join(__dirname, "cached", hashed);
+			if (!isUsing(hashed) && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+		}, 10000);
 }
 
 // Copied from discord.js example: https://github.com/discordjs/voice/tree/main/examples/basic
@@ -51,7 +79,7 @@ const trackedClients = new Set<Discord.Client>();
  * Tracks a Discord.js client, listening to VOICE_SERVER_UPDATE and VOICE_STATE_UPDATE events.
  * @param client - The Discord.js Client to track
  */
- function trackClient(client: Discord.Client) {
+function trackClient(client: Discord.Client) {
 	if (trackedClients.has(client)) return;
 	trackedClients.add(client);
 	client.ws.on(Discord.Constants.WSEvents.VOICE_SERVER_UPDATE, (payload: GatewayVoiceServerUpdateDispatchData) => {
@@ -59,7 +87,7 @@ const trackedClients = new Set<Discord.Client>();
 	});
 	client.ws.on(Discord.Constants.WSEvents.VOICE_STATE_UPDATE, (payload: GatewayVoiceStateUpdateDispatchData) => {
 		if (payload.guild_id && payload.session_id && payload.user_id === client.user?.id) {
-			adapters.get(payload.guild_id)?.onVoiceStateUpdate(<any> payload);
+			adapters.get(payload.guild_id)?.onVoiceStateUpdate(<any>payload);
 		}
 	});
 	client.on(Discord.Constants.Events.SHARD_DISCONNECT, (_, shardID) => {
