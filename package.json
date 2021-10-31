@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.6.0",
-    "@discordjs/voice": "^0.6.0",
+    "@discordjs/voice": "^0.7.2",
     "@types/moment-duration-format": "^2.2.3",
     "cheerio": "^1.0.0-rc.10",
     "discord.js": "^13.1.0",
