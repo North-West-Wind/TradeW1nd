@@ -21,8 +21,10 @@ function createPlayer(guild: Discord.Guild) {
   var track: SoundTrack;
   var needResource = true, needSetVolume = true;
   async function next() {
-    if (serverQueue.looping) serverQueue.songs.push(track);
-    if (!serverQueue.repeating) serverQueue.songs.shift();
+    if (!serverQueue.isSkipping) {
+      if (serverQueue.looping) serverQueue.songs.push(track);
+      if (!serverQueue.repeating) serverQueue.songs.shift();
+    } else serverQueue.isSkipping = false;
     updateQueue(guild.id, serverQueue);
     needResource = true;
     needSetVolume = true;
