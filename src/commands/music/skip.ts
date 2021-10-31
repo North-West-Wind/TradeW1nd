@@ -44,7 +44,10 @@ class SkipCommand implements SlashCommand {
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue!");
         serverQueue.stop();
         if (serverQueue.repeating) skip = 0;
-        for (var i = 0; i < skip; i++) if (serverQueue.looping) serverQueue.songs.push(serverQueue.songs.shift());
+        for (var i = 0; i < skip; i++) {
+            if (serverQueue.looping) serverQueue.songs.push(serverQueue.songs.shift());
+            else serverQueue.songs.shift();
+        }
         updateQueue(message.guild.id, serverQueue);
         await msgOrRes(message, `Skipped **${Math.max(1, skip)}** track${skip > 1 ? "s" : ""}!`);
         if (member.voice.channel && serverQueue.playing) {
