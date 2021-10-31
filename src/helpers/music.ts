@@ -48,12 +48,12 @@ export function checkQueue() {
 export function findCache(hashed: string) {
 	const filePath = `./cached/${hashed}`;
 	if (!fs.existsSync(filePath)) return null;
-	return fs.createReadStream(filePath);
+	return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
 export async function cacheTrack(hashed: string, stream: Stream.Readable) {
 	const filePath = `./cached/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
-	return fs.createReadStream(filePath);
+	return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
 export function isUsing(hashed: string) {
 	return !!using[hashed];
@@ -67,7 +67,7 @@ export function removeUsing(hashed: string) {
 		setTimeout(() => {
 			const filePath = `./cached/${hashed}`;
 			if (!isUsing(hashed) && fs.existsSync(filePath)) fs.unlinkSync(filePath);
-		}, 10000);
+		}, 3600000);
 }
 
 // Copied from discord.js example: https://github.com/discordjs/voice/tree/main/examples/basic

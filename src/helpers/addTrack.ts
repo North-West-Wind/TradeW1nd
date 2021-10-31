@@ -592,7 +592,7 @@ export async function getStream(track: SoundTrack, data: any) {
             if (c.error) throw new Error(c.message);
             if (c.url.startsWith("https://www.youtube.com/embed/")) {
               const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
-              const options = <any> { highWaterMark: 1 << 25, filter: "audioonly", dlChunkSize: 0 };
+              const options = <any> { highWaterMark: 1 << 22, filter: "audioonly", dlChunkSize: 0 };
               if (process.env.COOKIE) {
                 options.requestOptions = {};
                 options.requestOptions.headers = { cookie: process.env.COOKIE };
@@ -608,8 +608,8 @@ export async function getStream(track: SoundTrack, data: any) {
               options.requestOptions.headers = { cookie: process.env.COOKIE };
               if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
             }
-            if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 25 });
-            else Object.assign(options, { highWaterMark: 1 << 25 });
+            if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 22 });
+            else Object.assign(options, { highWaterMark: 1 << 22 });
             if (!track.url) throw new Error("This soundtrack is missing URL! Please remove and add this track again to make it function.");
             stream = ytdl(track.url, options);
             if (!stream) throw new Error("Failed to get YouTube video stream.");
