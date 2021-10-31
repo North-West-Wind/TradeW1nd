@@ -46,12 +46,12 @@ export function checkQueue() {
 	return queue.size > 0;
 }
 export function findCache(hashed: string) {
-	const filePath = path.join(__dirname, "cached", hashed);
+	const filePath = `./cached/${hashed}`;
 	if (!fs.existsSync(filePath)) return null;
 	return fs.createReadStream(filePath);
 }
 export async function cacheTrack(hashed: string, stream: Stream.Readable) {
-	const filePath = path.join(__dirname, "cached", hashed);
+	const filePath = `./cached/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
 	return fs.createReadStream(filePath);
 }
@@ -65,7 +65,7 @@ export function removeUsing(hashed: string) {
 	if (!hashed || !using[hashed]) return;
 	if (!(using[hashed] -= 1))
 		setTimeout(() => {
-			const filePath = path.join(__dirname, "cached", hashed);
+			const filePath = `./cached/${hashed}`;
 			if (!isUsing(hashed) && fs.existsSync(filePath)) fs.unlinkSync(filePath);
 		}, 10000);
 }

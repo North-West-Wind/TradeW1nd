@@ -1,8 +1,12 @@
 import { NorthClient, SlashCommand } from "./classes/NorthClient";
 import { deepReaddir } from "./function";
 import * as mysql from "mysql2";
+import * as fs from "fs";
 const { version } = require("../package.json");
 var globalClient: NorthClient;
+
+process.on('unhandledRejection', (reason, promise) => console.error('Unhandled Rejection at:', promise, 'reason:', reason));
+process.on('exit', () => fs.rmSync("./cached", { recursive: true, force: true }));
 
 export default async (client: NorthClient) => {
   const mysql_config = {
@@ -22,6 +26,7 @@ export default async (client: NorthClient) => {
     NorthClient.storage.commands.set(command.name, command);
     if (command.init) command.init();
   }
+  if (!fs.existsSync("./cached")) fs.mkdirSync("./cached");
 
   var pool = mysql.createPool(mysql_config).promise();
   pool.on("connection", con => con.on("error", async err => {
