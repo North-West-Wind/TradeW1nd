@@ -3,6 +3,7 @@ import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowfla
 import { Pool, RowDataPacket } from "mysql2/promise";
 import { probeAndCreateResource } from "../commands/music/play";
 import { getStream } from "../helpers/addTrack";
+import { removeUsing } from "../helpers/music";
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -102,6 +103,7 @@ export class ServerQueue {
         try {
             this.player?.stop();
             this.connection?.destroy();
+            removeUsing(this.songs[0].id);
         } catch (err: any) { }
         this.player = null;
         this.connection = null;
