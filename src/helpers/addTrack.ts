@@ -11,7 +11,7 @@ import ytsr, { Video } from "ytsr";
 import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream } from "../function";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
-
+import * as crypto from "crypto";
 import rp from "request-promise-native";
 import * as cheerio from "cheerio";
 import * as Discord from "discord.js";
@@ -564,6 +564,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
 }
 
 export async function getStream(track: SoundTrack, data: any) {
+    if (!track.id) track.id = crypto.createHash("md5").update(`${track.title};${track.url}`).digest("hex");
     var stream: Stream.Readable;
     var cacheFound = true;
     if (!(stream = findCache(track.id))) {
