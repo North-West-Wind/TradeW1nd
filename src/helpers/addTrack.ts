@@ -511,7 +511,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
     var s = 0;
     var msg = <Message>await msgOrRes(message, allEmbeds[0]);
     const filter = x => x.author.id === (message instanceof Message ? message.author : message.user).id;
-    const collector = await msg.channel.createMessageCollector({ filter, idle: 60000 });
+    const collector = msg.channel.createMessageCollector({ filter, idle: 60000 });
     collector.on("collect", async collected => {
         collected.delete().catch(() => { });
         if (isNaN(parseInt(collected.content))) {
@@ -570,53 +570,60 @@ export async function getStream(track: SoundTrack, data: any) {
     if (!(stream = findCache(track.id))) {
         cacheFound = false;
         switch (track.type) {
-          case 2:
-          case 4:
-            var a: Stream.Readable;
-            if (!track.time) {
-              const { error, message, songs } = await addGDURL(track.url);
-              if (error) throw new Error(message);
-              track = songs[0];
-              a = <Stream.Readable>(await requestStream(track.url)).data;
-              if (data.type === "server") {
-                data.serverQueue.songs[0] = track;
-                updateQueue(data.guild.id, data.serverQueue);
-              } else if (data.type === "radio") data.tracks[0] = track;
-            } else a = <Stream.Readable>(await requestStream(track.url)).data;
-            stream = a;
-            break;
-          case 3:
-            stream = await scdl.download(track.url);
-            break;
-          case 5:
-            const c = await getMP3(track.url);
-            if (c.error) throw new Error(c.message);
-            if (c.url.startsWith("https://www.youtube.com/embed/")) {
-              const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
-              const options = <any> { highWaterMark: 1 << 22, filter: "audioonly", dlChunkSize: 0 };
-              if (process.env.COOKIE) {
-                options.requestOptions = {};
-                options.requestOptions.headers = { cookie: process.env.COOKIE };
-                if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
-              }
-              stream = <Stream.Readable> ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
-              cacheFound = true;
-            } else stream = <Stream.Readable> (await requestStream(c.url)).data;
-            break;
-          default:
-            const options = <any> {};
-            if (process.env.COOKIE) {
-              options.requestOptions = {};
-              options.requestOptions.headers = { cookie: process.env.COOKIE };
-              if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
-            }
-            if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 22 });
-            else Object.assign(options, { highWaterMark: 1 << 22 });
-            if (!track.url) throw new Error("This soundtrack is missing URL! Please remove and add this track again to make it function.");
-            stream = ytdl(track.url, options);
-            if (!stream) throw new Error("Failed to get YouTube video stream.");
-            cacheFound = true;
-            break;
+            case 2:
+            case 4:
+                var a: Stream.Readable;
+                if (!track.time) {
+                    const { error, message, songs } = await addGDURL(track.url);
+                    if (error) throw new Error(message);
+                    track = songs[0];
+                    a = <Stream.Readable>(await requestStream(track.url)).data;
+                    if (data.type === "server") {
+                        data.serverQueue.songs[0] = track;
+                        updateQueue(data.guild.id, data.serverQueue);
+                    } else if (data.type === "radio") data.tracks[0] = track;
+                } else a = <Stream.Readable>(await requestStream(track.url)).data;
+                stream = a;
+                break;
+            case 3:
+                stream = await scdl.download(track.url);
+                break;
+            case 5:
+                const c = await getMP3(track.url);
+                if (c.error) throw new Error(c.message);
+                if (c.url.startsWith("https://www.youtube.com/embed/")) {
+                    const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
+                    const options = <any>{ highWaterMark: 1 << 22, filter: "audioonly", dlChunkSize: 0 };
+                    if (process.env.COOKIE) {
+                        options.requestOptions = {};
+                        options.requestOptions.headers = { cookie: process.env.COOKIE };
+                        if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
+                    }
+                    stream = <Stream.Readable>ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
+                    cacheFound = true;
+                } else stream = <Stream.Readable>(await requestStream(c.url)).data;
+                break;
+            default:
+                const options = <any>{};
+                if (process.env.COOKIE) {
+                    options.requestOptions = {};
+                    options.requestOptions.headers = { cookie: process.env.COOKIE };
+                    if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
+                }
+                if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 22 });
+                else Object.assign(options, { highWaterMark: 1 << 22 });
+                if (!track.url) {
+                    const index = data.serverQueue.songs.indexOf(track);
+                    if (index !== -1) {
+                        data.serverQueue.songs.splice(index, 1);
+                        updateQueue(data.guild.id, data.serverQueue);
+                    }
+                    throw new Error("This soundtrack is missing URL! It is being removed automatically.");
+                }
+                stream = ytdl(track.url, options);
+                if (!stream) throw new Error("Failed to get YouTube video stream.");
+                cacheFound = true;
+                break;
         }
     }
     if (!cacheFound) stream = await cacheTrack(track.id, stream);
