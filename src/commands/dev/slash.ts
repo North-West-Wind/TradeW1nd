@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
-import { NorthClient, SlashCommand } from "../classes/NorthClient";
-import { msgOrRes } from "../function";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient";
+import { msgOrRes } from "../../function";
 
 class DevSlashCommand implements SlashCommand {
     name = "slash";
