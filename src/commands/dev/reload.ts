@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import { NorthClient, SlashCommand } from "../classes/NorthClient";
-import { categories } from "../commands/information/help";
-import { msgOrRes } from "../function";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient";
+import { categories } from "../../commands/information/help";
+import { msgOrRes } from "../../function";
 
 class ReloadCommand implements SlashCommand {
     name = "reload";
