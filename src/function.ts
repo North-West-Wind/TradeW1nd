@@ -286,3 +286,8 @@ export function humanDurationToNum(duration: string) {
     }
     return sec;
 }
+
+export async function getOwner() {
+	if (!globalClient.application?.owner) await globalClient.application?.fetch();
+    return globalClient.application?.owner.id;
+}

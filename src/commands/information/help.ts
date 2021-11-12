@@ -2,7 +2,7 @@ import { NorthClient, SlashCommand } from "../../classes/NorthClient";
 import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function";
 import * as Discord from "discord.js";
 
-export const categories = ["Music", "Information"];
+export const categories = ["Music", "Information", "Dev"];
 
 class HelpCommand implements SlashCommand {
     name = "help"

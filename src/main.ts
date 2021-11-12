@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { Handler } from "./handler";
 import { NorthClient, ClientStorage } from "./classes/NorthClient";
 import { Intents, Options } from "discord.js";
+import express from "express";
 dotenv.config();
 
 const { prefix0 } = require("../config.json");
@@ -27,3 +28,11 @@ NorthClient.storage = new ClientStorage();
 client.prefix = prefix0;
 client.id = 0;
 Handler.setup(client, process.env.TOKEN0);
+
+const app = express();
+
+app.get("/", (_req, res) => {
+    res.json({ size: client.guilds.cache.size, lastReady: client.readyAt.getTime(), uptime: client.uptime });
+});
+
+app.listen(process.env.PORT || 3000);

@@ -1,6 +1,6 @@
 import { CommandInteraction, GuildMember, Message, Permissions, TextChannel } from "discord.js";
 import { Command } from "../classes/NorthClient";
-import { genPermMsg, msgOrRes } from "../function";
+import { genPermMsg, getOwner, msgOrRes } from "../function";
 
 var timeout: NodeJS.Timeout;
 
@@ -59,6 +59,14 @@ export async function information(_command: Command, message: Message | CommandI
 export async function music(_command: Command, message: Message | CommandInteraction) {
     if (!message.guild) {
         await msgOrRes(message, "You can only use music commands in server!");
+        return false;
+    }
+    return true;
+}
+
+export async function dev(_command: Command, message: Message | CommandInteraction) {
+    if ((message instanceof Message ? message.author : message.user).id != await getOwner()) {
+        await msgOrRes(message, "Please don't use Dev Commands.");
         return false;
     }
     return true;

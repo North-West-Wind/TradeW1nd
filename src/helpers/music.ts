@@ -50,10 +50,10 @@ export function findCache(hashed: string) {
 	if (!fs.existsSync(filePath)) return null;
 	return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
-export async function cacheTrack(hashed: string, stream: Stream.Readable) {
+export async function cacheTrack(hashed: string, stream: Stream.Readable, noReturn: boolean = false) {
 	const filePath = `./cached/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
-	return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
+	if (!noReturn) return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
 export function isUsing(hashed: string) {
 	return !!using[hashed];
