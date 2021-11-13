@@ -10,8 +10,8 @@ import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, 
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
-import { FfmpegCommand } from "fluent-ffmpeg";
 import * as mm from "music-metadata";
+const ffmpeg = require("fluent-ffmpeg");
 
 function createPlayer(guild: Discord.Guild) {
   var serverQueue = getQueues().get(guild.id);
@@ -133,7 +133,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   try {
     const stream = await getStream(song, { type: "server", guild, serverQueue });
     if (seek) {
-      const command = new FfmpegCommand(stream);
+      const command = ffmpeg(stream);
       const passthru = new Stream.PassThrough();
       command.seekInput(seek).format((await mm.parseStream(stream)).format.container ?? "mp3").output(passthru, { end: true }).run();
       serverQueue.player?.play(await probeAndCreateResource(passthru));
