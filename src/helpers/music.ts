@@ -46,12 +46,12 @@ export function checkQueue() {
 	return queue.size > 0;
 }
 export function findCache(hashed: string) {
-	const filePath = `./cached/${hashed}`;
+	const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 	if (!fs.existsSync(filePath)) return null;
 	return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
 export async function cacheTrack(hashed: string, stream: Stream.Readable, noReturn: boolean = false) {
-	const filePath = `./cached/${hashed}`;
+	const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
 	if (!noReturn) return fs.createReadStream(filePath, { highWaterMark: 1 << 22 });
 }
@@ -65,9 +65,17 @@ export function removeUsing(hashed: string) {
 	if (!hashed || !using[hashed]) return;
 	if (!(using[hashed] -= 1))
 		setTimeout(() => {
-			const filePath = `./cached/${hashed}`;
-			if (!isUsing(hashed) && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+			const filePath = `${process.env.CACHE_DIR}/${hashed}`;
+			if (isUsing(hashed)) waitHalfMin(hashed);
+			else if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 		}, 3600000);
+}
+function waitHalfMin(hashed: string) {
+	if (isUsing(hashed)) setTimeout(() => waitHalfMin(hashed), 30000);
+	else {
+		const filePath = `${process.env.CACHE_DIR}/${hashed}`
+		if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+	}
 }
 
 // Copied from discord.js example: https://github.com/discordjs/voice/tree/main/examples/basic

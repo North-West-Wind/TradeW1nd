@@ -13,7 +13,7 @@ import { RowDataPacket } from "mysql2/promise";
 import { setQueue } from "./helpers/music";
 import originalFetch from "node-fetch";
 import fetchBuilder from "fetch-retry-ts";
-const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
+export const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
 
 export function twoDigits(d) {
     if (0 <= d && d < 10) return "0" + d.toString();
