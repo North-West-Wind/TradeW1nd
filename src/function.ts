@@ -110,7 +110,7 @@ export async function createEmbedScrolling(message: Discord.Message | Discord.Co
     await msg.react("⏹");
     const collector = msg.createReactionCollector({ filter, idle: 60000 });
     collector.on("collect", function (reaction, user) {
-        reaction.users.remove(user.id);
+        reaction.users.remove(user.id).catch(() => {});
         switch (reaction.emoji.name) {
             case "⏮":
                 s = 0;
