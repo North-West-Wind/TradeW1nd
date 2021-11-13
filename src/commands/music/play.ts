@@ -139,7 +139,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
       } catch (err) {}
       const command = ffmpeg(stream);
       const passthru = new Stream.PassThrough();
-      command.seekInput(seek).format(format).output(passthru, { end: true }).run();
+      command.on("error", console.error).seekInput(seek).format(format).output(passthru, { end: true }).run();
       serverQueue.player?.play(await probeAndCreateResource(passthru));
     } else serverQueue.player?.play(await probeAndCreateResource(stream));
     if (!serverQueue.player) return;
