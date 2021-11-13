@@ -39,10 +39,11 @@ export async function migrate(message: Message | CommandInteraction) {
         serverQueue.voiceChannel = voiceChannel;
         serverQueue.playing = true;
         serverQueue.textChannel = <TextChannel>message.channel;
+        serverQueue.seek = seek;
         migrating.splice(migrating.indexOf(message.guild.id));
         msg.edit(`Moved from **${oldChannel.name}** to **${voiceChannel.name}**`).catch(() => { });
         updateQueue(message.guild.id, serverQueue, false);
-        if (!serverQueue.random) play(message.guild, serverQueue.songs[0], seek);
+        if (!serverQueue.random) play(message.guild, serverQueue.songs[0]);
         else {
             const int = Math.floor(Math.random() * serverQueue.songs.length);
             const pending = serverQueue.songs[int];
