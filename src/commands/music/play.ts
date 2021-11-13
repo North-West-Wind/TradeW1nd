@@ -57,13 +57,13 @@ function createPlayer(guild: Discord.Guild) {
     if (serverQueue.errorCounter) serverQueue.errorCounter--;
     updateQueue(guild.id, serverQueue, false);
   }).on(AudioPlayerStatus.Idle, async () => {
-    removeUsing(track.id);
+    removeUsing(track?.id);
     serverQueue = getQueues().get(guild.id);
     await next();
   }).on("error", async error => {
     console.error(error.message);
     if (serverQueue) {
-      removeUsing(track.id);
+      removeUsing(track?.id);
       serverQueue.textChannel?.send("There was an error trying to play the soundtrack!").then(msg => setTimeout(() => msg.delete().catch(() => {}), 10000));
       if (!serverQueue.errorCounter) serverQueue.errorCounter = 1;
       else serverQueue.errorCounter = 3;
