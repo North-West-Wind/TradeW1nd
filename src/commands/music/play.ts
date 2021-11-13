@@ -132,10 +132,14 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   else serverQueue.startTime = -seek * 1000;
   try {
     const stream = await getStream(song, { type: "server", guild, serverQueue });
+    var format = "mp3";
+    try {
+      format = (await mm.parseStream(stream)).format.container;
+    } catch (err) {}
     if (seek) {
       const command = ffmpeg(stream);
       const passthru = new Stream.PassThrough();
-      command.seekInput(seek).format((await mm.parseStream(stream)).format.container ?? "mp3").output(passthru, { end: true }).run();
+      command.seekInput(seek).format(format).output(passthru, { end: true }).run();
       serverQueue.player?.play(await probeAndCreateResource(passthru));
     } else serverQueue.player?.play(await probeAndCreateResource(stream));
     if (!serverQueue.player) return;

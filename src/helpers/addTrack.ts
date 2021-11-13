@@ -618,7 +618,6 @@ export async function getStream(track: SoundTrack, data: any) {
                     throw new Error("This soundtrack is missing URL! It is being removed automatically.");
                 }
                 stream = ytdl(track.url, options);
-                cacheTrack(track.id, stream, true).catch(() => {});
                 if (!stream) throw new Error("Failed to get YouTube video stream.");
                 cacheFound = true;
                 break;
