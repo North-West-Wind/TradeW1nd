@@ -1,12 +1,13 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
 import { ServerQueue, SlashCommand } from "../../classes/NorthClient";
 import { ms, msgOrRes } from "../../function";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
-import { getQueues, setQueue } from "../../helpers/music";
+import { createDiscordJSAdapter, getQueues, setQueue } from "../../helpers/music";
 formatSetup(moment);
 import { play } from "./play";
+import { joinVoiceChannel } from "@discordjs/voice";
 
 class SeekCommand implements SlashCommand {
     name = "seek"
@@ -52,9 +53,11 @@ class SeekCommand implements SlashCommand {
         if (serverQueue.songs[0].time === 0) return await msgOrRes(message, "This command does not work for live videos.");
         if (!seek) return await msgOrRes(message, "The given time is not valid!");
         if (seek > serverQueue.songs[0].time) return await msgOrRes(message, "The time specified should not be larger than the maximum length of the soundtrack!");
-        serverQueue.stop();
+        serverQueue.player?.stop();
+        serverQueue.isSkipping = true;
         await msgOrRes(message, `Seeked to **${seek == 0 ? "0:00" : moment.duration(seek, "seconds").format()}**`);
-        await play(message.guild, serverQueue.songs[0], seek);
+        const member = <GuildMember> message.member;
+        if (member.voice.channel && serverQueue.playing && !serverQueue.connection) serverQueue.connection = joinVoiceChannel({ channelId: member.voice.channel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(<VoiceChannel> member.voice.channel) });
     }
 }
 
