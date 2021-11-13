@@ -22,14 +22,16 @@ function createPlayer(guild: Discord.Guild) {
   var track: SoundTrack;
   var needResource = true, needSetVolume = true;
   async function next() {
+    var randomized = false;
     if (!serverQueue.isSkipping) {
       if (serverQueue.looping) serverQueue.songs.push(track);
       if (!serverQueue.repeating) serverQueue.songs.shift();
+      randomized = serverQueue.random;
     } else serverQueue.isSkipping = false;
     updateQueue(guild.id, serverQueue);
     needResource = true;
     needSetVolume = true;
-    if (!serverQueue.random) await play(guild, serverQueue.songs[0]);
+    if (!randomized) await play(guild, serverQueue.songs[0]);
     else {
       const int = Math.floor(Math.random() * serverQueue.songs.length);
       const pending = serverQueue.songs[int];
@@ -62,7 +64,7 @@ function createPlayer(guild: Discord.Guild) {
     console.error(error.message);
     if (serverQueue) {
       removeUsing(track.id);
-      serverQueue.textChannel?.send("There was an error trying to play the soundtrack!");
+      serverQueue.textChannel?.send("There was an error trying to play the soundtrack!").then(msg => setTimeout(() => msg.delete().catch(() => {}), 10000));
       if (!serverQueue.errorCounter) serverQueue.errorCounter = 1;
       else serverQueue.errorCounter = 3;
       if (serverQueue.errorCounter >= 3) serverQueue?.destroy();
@@ -89,7 +91,7 @@ export function createEmbed(songs: SoundTrack[]) {
   return Embed;
 }
 
-export async function play(guild: Discord.Guild, song: SoundTrack, seek: number = 0) {
+export async function play(guild: Discord.Guild, song: SoundTrack) {
   const queue = getQueues();
   const serverQueue = queue.get(guild.id);
   if (!serverQueue.voiceChannel && guild.me.voice?.channel) serverQueue.voiceChannel = <Discord.VoiceChannel> guild.me.voice.channel;
@@ -124,6 +126,8 @@ export async function play(guild: Discord.Guild, song: SoundTrack, seek: number 
     }
   }
   const streamTime = serverQueue.getPlaybackDuration();
+  const seek = serverQueue.seek;
+  if (seek) serverQueue.seek = undefined;
   if (serverQueue.connection) serverQueue.startTime = streamTime - seek * 1000;
   else serverQueue.startTime = -seek * 1000;
   try {

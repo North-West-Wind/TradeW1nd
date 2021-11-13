@@ -93,6 +93,7 @@ export class ServerQueue {
     startTime?: number;
     errorCounter?: number;
     isSkipping?: boolean;
+    seek?: number;
 
     getPlaybackDuration() {
         if (this.player?.state?.status != AudioPlayerStatus.Playing) return 0;

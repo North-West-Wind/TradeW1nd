@@ -42,13 +42,13 @@ class SkipCommand implements SlashCommand {
         if (!serverQueue || !Array.isArray(serverQueue?.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if ((member.voice.channelId !== guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to skip the music when the bot is playing!");
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue!");
-        serverQueue.player?.stop();
         if (serverQueue.repeating) skip = 0;
         for (var i = 0; i < skip; i++) {
             if (serverQueue.looping) serverQueue.songs.push(serverQueue.songs.shift());
             else serverQueue.songs.shift();
         }
         serverQueue.isSkipping = true;
+        serverQueue.player?.stop();
         await msgOrRes(message, `Skipped **${Math.max(1, skip)}** track${skip > 1 ? "s" : ""}!`);
         if (member.voice.channel && serverQueue.playing && !serverQueue.connection) serverQueue.connection = joinVoiceChannel({ channelId: member.voice.channel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(<VoiceChannel> member.voice.channel) });
     }

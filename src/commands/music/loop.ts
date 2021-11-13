@@ -27,7 +27,7 @@ class LoopCommand implements SlashCommand {
             await msgOrRes(message, "Disabled repeating to prevent conflict.");
         }
         try {
-            updateQueue(message.guild.id, serverQueue, true);
+            updateQueue(message.guild.id, serverQueue);
             if (serverQueue.looping) await msgOrRes(message, "The queue is now being looped.");
             else await msgOrRes(message, "The queue is no longer being looped.");
         } catch (err: any) {

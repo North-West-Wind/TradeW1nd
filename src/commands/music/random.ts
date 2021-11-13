@@ -23,6 +23,10 @@ class RandomCommand implements SlashCommand {
         var serverQueue = getQueues().get(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.random = !serverQueue.random;
+        if (serverQueue.repeating && serverQueue.random) {
+            serverQueue.repeating = false;
+            await msgOrRes(message, "Disabled repeating to prevent conflict.");
+        }
         try {
             updateQueue(message.guild.id, serverQueue);
             if (serverQueue.random) await msgOrRes(message, "The queue will be played randomly.");

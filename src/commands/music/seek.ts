@@ -53,8 +53,9 @@ class SeekCommand implements SlashCommand {
         if (serverQueue.songs[0].time === 0) return await msgOrRes(message, "This command does not work for live videos.");
         if (!seek) return await msgOrRes(message, "The given time is not valid!");
         if (seek > serverQueue.songs[0].time) return await msgOrRes(message, "The time specified should not be larger than the maximum length of the soundtrack!");
-        serverQueue.player?.stop();
         serverQueue.isSkipping = true;
+        serverQueue.seek = seek;
+        serverQueue.player?.stop();
         await msgOrRes(message, `Seeked to **${seek == 0 ? "0:00" : moment.duration(seek, "seconds").format()}**`);
         const member = <GuildMember> message.member;
         if (member.voice.channel && serverQueue.playing && !serverQueue.connection) serverQueue.connection = joinVoiceChannel({ channelId: member.voice.channel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(<VoiceChannel> member.voice.channel) });
