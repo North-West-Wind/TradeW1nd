@@ -6,7 +6,6 @@ const { version } = require("../package.json");
 var globalClient: NorthClient;
 
 process.on('unhandledRejection', (reason, promise) => console.error('Unhandled Rejection at:', promise, 'reason:', reason));
-process.on('exit', () => fs.rmSync(process.env.CACHE_DIR, { recursive: true, force: true }));
 
 export default async (client: NorthClient) => {
   const mysql_config = {
