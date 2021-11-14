@@ -2,7 +2,7 @@
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
-import scdl from 'soundcloud-downloader';
+import scdl from 'soundcloud-downloader/dist/index';
 import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function";
 import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search } from "../../helpers/addTrack";
 import { getQueues, setQueue, updateQueue } from "../../helpers/music";
@@ -49,7 +49,7 @@ class DownloadCommand implements SlashCommand {
         try {
             if (song?.isLive) {
                 const result = await addYTURL(song.url, song.type);
-                if (result.error) throw "Failed to find video";
+                if (result.error) throw new Error("Failed to find video");
                 if (!isEquivalent(result.songs[0], song)) {
                     song = result.songs[0];
                     serverQueue.songs[0] = song;

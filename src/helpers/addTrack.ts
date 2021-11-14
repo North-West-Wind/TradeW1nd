@@ -4,7 +4,7 @@ import { Message } from "discord.js";
 formatSetup(moment);
 import * as mm from "music-metadata";
 import muse from "musescore-metadata";
-import scdl from 'soundcloud-downloader';
+import scdl from 'soundcloud-downloader/dist/index';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
@@ -18,7 +18,7 @@ import * as Discord from "discord.js";
 import { SoundTrack } from "../classes/NorthClient";
 import { getMP3 } from "./musescore";
 import { cacheTrack, findCache, updateQueue } from "./music";
-import { TrackInfo } from "soundcloud-downloader/src/info";
+import { TrackInfo } from "soundcloud-downloader/dist/info";
 var spotifyApi: SpotifyWebApi;
 
 export function init() {
