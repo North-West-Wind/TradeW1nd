@@ -2,7 +2,7 @@
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
-import scdl from 'soundcloud-downloader/dist/index';
+import scdl from 'soundcloud-downloader';
 import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function";
 import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search } from "../../helpers/addTrack";
 import { getQueues, setQueue, updateQueue } from "../../helpers/music";

@@ -4,7 +4,7 @@ import { Message } from "discord.js";
 formatSetup(moment);
 import * as mm from "music-metadata";
 import muse from "musescore-metadata";
-import scdl from 'soundcloud-downloader/dist/index';
+import scdl from 'soundcloud-downloader';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
@@ -15,10 +15,10 @@ import * as crypto from "crypto";
 import rp from "request-promise-native";
 import * as cheerio from "cheerio";
 import * as Discord from "discord.js";
-import { TrackInfo } from "soundcloud-downloader/dist/info";
 import { SoundTrack } from "../classes/NorthClient";
 import { getMP3 } from "./musescore";
 import { cacheTrack, findCache, updateQueue } from "./music";
+import { TrackInfo } from "soundcloud-downloader/src/info";
 var spotifyApi: SpotifyWebApi;
 
 export function init() {
@@ -274,7 +274,7 @@ export async function addSPURL(message: Message | Discord.CommandInteraction, li
     return { error: false, songs: songs, msg: null, message: null };
 }
 export async function addSCURL(link: string) {
-    const res = await fetch(`https://api.soundcloud.com/resolve?url=${link}&client_id=${process.env.SCID}`);
+    const res = await fetch(`https://api-v2.soundcloud.com/resolve?url=${encodeURIComponent(link)}&client_id=${await scdl.getClientID()}`);
     if (!res.ok) return { error: true, message: "A problem occured while fetching the track information! Status Code: " + res.status, msg: null, songs: [] };
     const data = <any>await res.json();
     if (data.kind == "user") return { error: true, message: "What do you think you can do with a user?", msg: null, songs: [] };
