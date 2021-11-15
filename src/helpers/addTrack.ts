@@ -15,7 +15,7 @@ import * as crypto from "crypto";
 import rp from "request-promise-native";
 import * as cheerio from "cheerio";
 import * as Discord from "discord.js";
-import { SoundTrack } from "../classes/NorthClient";
+import { ServerQueue, SoundTrack } from "../classes/NorthClient";
 import { getMP3 } from "./musescore";
 import { cacheTrack, findCache, updateQueue } from "./music";
 import { TrackInfo } from "soundcloud-downloader/dist/info";
@@ -335,12 +335,12 @@ export async function addGDURL(link: string) {
     }
     var f = await fetch(dl);
     if (!f.ok) return { error: true, message: `Received HTTP Status: ${f.status}`, msg: null, songs: [] };
-    const matches = decodeHtmlEntity(await f.text()).match(/<a id="uc-download-link" class="goog-inline-block jfk-button jfk-button-action" href="(?<link>[\/\w&\?=]+)">/);
+    /*const matches = decodeHtmlEntity(await f.text()).match(/<a id="uc-download-link" class="goog-inline-block jfk-button jfk-button-action" href="(?<link>[\/\w&\?=]+)">/);
     if (matches?.groups?.link) {
         dl = "https://drive.google.com" + matches.groups.link;
         f = await fetch(dl);
         if (!f.ok) return { error: true, message: `Received HTTP Status: ${f.status}`, msg: null, songs: [] };
-    }
+    }*/
     const stream = <Stream.Readable>f.body;
     var title = "No Title";
     try {
@@ -350,9 +350,9 @@ export async function addGDURL(link: string) {
         const $ = cheerio.load(html);
         title = metadata.common.title ? metadata.common.title : $("title").text().split(" - ").slice(0, -1).join(" - ").split(".").slice(0, -1).join(".");
     } catch (err: any) {
-        return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
+        return { error: true, message: "An error occured while parsing the audio file into stream! Note that the file cannot be too large!", msg: null, songs: [] };
     }
-    if (!metadata) return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
+    if (!metadata) return { error: true, message: "An error occured while parsing the audio file into stream! Note that the file cannot be too large!", msg: null, songs: [] };
     const length = Math.round(metadata.format.duration);
     const song = {
         title: title,
@@ -560,7 +560,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
     });
 }
 
-export async function getStream(track: SoundTrack, data: any) {
+export async function getStream(track: SoundTrack, data: { type: string, guild?: Discord.Guild, serverQueue?: ServerQueue, tracks?: SoundTrack[] }) {
     if (!track.id) track.id = crypto.createHash("md5").update(`${track.title};${track.url}`).digest("hex");
     var stream: Stream.Readable;
     var cacheFound = true;

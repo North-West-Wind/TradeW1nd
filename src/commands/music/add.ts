@@ -53,7 +53,7 @@ class AddCommand implements SlashCommand {
             else serverQueue.songs = serverQueue.songs.concat(songs);
             updateQueue(message.guild.id, serverQueue);
             var msg: Message;
-            if (result.msg) msg = await result.msg.edit({ content: null, embed: Embed });
+            if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
             else msg = await msgOrRes(message, Embed);
             await wait(30000);
             await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0].title}]**` });

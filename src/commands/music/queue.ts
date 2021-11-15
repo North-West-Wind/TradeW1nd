@@ -108,11 +108,7 @@ class QueueCommand implements SlashCommand {
             updateQueue(message.guild.id, serverQueue);
         }
         var index = 0;
-        function getIndex() {
-            if (index == 0 || !serverQueue.random) return ++index;
-            return "???";
-        }
-        const songArray = serverQueue.songs.map(song => `**${getIndex()} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**`);
+        const songArray = serverQueue.songs.map(song => `**${++index} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**`);
         const allEmbeds = [];
         for (let i = 0; i < Math.ceil(songArray.length / 10); i++) {
             const pageArray = songArray.slice(i * 10, i * 10 + 10);

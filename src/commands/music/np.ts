@@ -49,7 +49,7 @@ class NPCommand implements SlashCommand {
         for (let i = 0; i < 20; i++) processBar.push("═");
         var progress = 0;
         const isLive = !!serverQueue?.songs[0]?.isLive;
-        const length = isLive ? 0 : (serverQueue.songs[0].time ?? 1);
+        const length = isLive ? 0 : (serverQueue.songs[0].time || 1);
         if (isLive) {
             processBar.splice(19, 1, "■");
             var positionTime = "∞";
@@ -70,7 +70,7 @@ class NPCommand implements SlashCommand {
         const songLength = !serverQueue.songs[0].time ? "∞" : moment.duration(serverQueue.songs[0].time, "seconds").format();
         if (serverQueue.songs[0].type === 1) info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].spot})**\nLength: **${songLength}**`, serverQueue.songs[0].thumbnail];
         else info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})**\nLive: **${isLive ? "Yes" : "No"}**\nVolume: **${serverQueue.songs[0].volume ? (`${serverQueue.volume * serverQueue.songs[0].volume * 100}% (Local) | ${serverQueue.volume * 100}% (Global)`) : `${serverQueue.volume * 100}%`}**\nType: **${type[serverQueue.songs[0].type]}**`, serverQueue.songs[0].thumbnail];
-        embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength ?? "Unknown"}`).setThumbnail(info[1]);
+        embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength || "Unknown"}`).setThumbnail(info[1]);
         const msg = message instanceof Discord.Message ? await message.channel.send({embeds: [embed]}) : <Discord.Message>await message.reply({ embeds: [embed], fetchReply: true });;
         setTimeout(() => msg.edit({ content: "**[Outdated Now-Playing Information]**", embeds: [] }).catch(() => {}), 60000);
     }

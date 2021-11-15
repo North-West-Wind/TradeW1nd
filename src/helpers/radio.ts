@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import { RadioChannel } from "../classes/NorthClient";
 import { globalClient as client } from "../common";
-export const players = [];
+export const players: RadioChannel[] = [];
 
 export async function makePlayers() {
     const [results] = <RowDataPacket[][]> await client.pool.query("SELECT * FROM radio");

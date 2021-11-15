@@ -154,7 +154,8 @@ export class RadioChannel {
         });
     }
 
-    add(tracks: RadioSoundTrack[]) {
-        
+    async add(tracks: RadioSoundTrack[]) {
+        this.tracks.push(...tracks);
+        if (this.player.state.status == AudioPlayerStatus.Idle ) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
     }
 }
