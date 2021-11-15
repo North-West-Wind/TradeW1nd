@@ -345,7 +345,6 @@ export async function addGDURL(link: string) {
     var title = "No Title";
     try {
         var metadata = await mm.parseStream(stream, {}, { duration: true });
-        console.log(metadata);
         const html = await fetch(link).then(res => res.text());
         const $ = cheerio.load(html);
         title = metadata.common.title ? metadata.common.title : $("title").text().split(" - ").slice(0, -1).join(" - ").split(".").slice(0, -1).join(".");
