@@ -117,7 +117,7 @@ class QueueCommand implements SlashCommand {
                 .setTitle(`Song queue for ${message.guild.name} [${i + 1}/${Math.ceil(songArray.length / 10)}]`)
                 .setDescription(`There are ${songArray.length} tracks in total.\n\n${pageArray.join("\n")}`)
                 .setTimestamp()
-                .setFooter(`Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")}`, message.client.user.displayAvatarURL());
+                .setFooter(`Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")} | LP: ${serverQueue.looping ? "Y" : "N"} | RP: ${serverQueue.repeating ? "Y" : "N"} | RD: ${serverQueue.random ? "Y" : "N"}`, message.client.user.displayAvatarURL());
             allEmbeds.push(queueEmbed);
         }
         if (allEmbeds.length == 1) await msgOrRes(message, allEmbeds[0]).then(msg => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
