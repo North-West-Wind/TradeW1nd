@@ -73,11 +73,11 @@ class RadioCommand implements SlashCommand {
     }
 
     async run(message: Message, args: string[]) {
-        if (!this.subcommands.includes(args[0])) return await message.channel.send("There is no such command!");
+        if (!this.subcommands.includes(args[0])) return await message.channel.send("There is no such subcommand!");
         if (args[0] === "tune") {
             const channel = parseInt(args[1]);
             if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
+            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
             return await this.tune(message, channel);
         } else if (args[0] === "off") return await this.off(message);
         else if (args[0] === "add") {
