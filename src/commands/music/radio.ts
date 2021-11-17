@@ -4,7 +4,7 @@ import { SlashCommand } from "../../classes/NorthClient";
 import { msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
 import { createDiscordJSAdapter } from "../../helpers/music";
-import { players } from "../../helpers/radio";
+import { players, playing } from "../../helpers/radio";
 import { createEmbed } from "./play";
 
 class RadioCommand implements SlashCommand {
@@ -24,7 +24,8 @@ class RadioCommand implements SlashCommand {
                 name: "channel",
                 description: "The radio channel to connect to.",
                 required: true,
-                type: "INTEGER"
+                type: "INTEGER",
+                choices: []
             }]
         },
         {
@@ -100,12 +101,14 @@ class RadioCommand implements SlashCommand {
         const radioCh = players[channel - 1];
         if (!radioCh) return await msgOrRes(message, "That channel is not available!");
         connection.subscribe(radioCh.player);
+        playing.add(message.guildId);
         await msgOrRes(message, "Connected!");
     }
 
     async off(message: Message | CommandInteraction) {
         const connection = getVoiceConnection(message.guildId);
         if (connection) connection.destroy();
+        playing.delete(message.guildId);
         await msgOrRes(message, "Disconnected!");
     }
 

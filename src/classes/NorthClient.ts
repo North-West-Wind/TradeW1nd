@@ -2,6 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, NoSub
 import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { Pool, RowDataPacket } from "mysql2/promise";
 import { probeAndCreateResource } from "../commands/music/play";
+import { globalClient } from "../common";
 import { getStream } from "../helpers/addTrack";
 import { removeUsing } from "../helpers/music";
 
@@ -136,10 +137,12 @@ export class RadioSoundTrack extends SoundTrack {
 }
 
 export class RadioChannel {
+    id: number;
     player: AudioPlayer;
     tracks: RadioSoundTrack[];
 
-    constructor(tracks: RadioSoundTrack[]) {
+    constructor(id: number, tracks: RadioSoundTrack[]) {
+        this.id = id;
         this.tracks = tracks;
         this.player = createAudioPlayer({
             behaviors: {
@@ -150,12 +153,23 @@ export class RadioChannel {
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
             if (finished.looped <= 3) this.tracks.push(finished);
+            this.update();
             if (this.tracks[0]) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
         });
     }
 
     async add(tracks: RadioSoundTrack[]) {
         this.tracks.push(...tracks);
-        if (this.player.state.status == AudioPlayerStatus.Idle ) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+        this.update();
+        if (this.player.state.status == AudioPlayerStatus.Idle) {
+            console.log(`Player #${this.id} is idle. Starting to play after adding some tracks.`);
+            this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+        }
+    }
+
+    async update() {
+        try {
+            await globalClient.pool.query(`UPDATE radio SET queue = "${escape(JSON.stringify(this.tracks))}" WHERE id = ${this.id}`);
+        } catch (err) {}
     }
 }
