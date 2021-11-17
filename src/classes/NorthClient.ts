@@ -161,10 +161,7 @@ export class RadioChannel {
     async add(tracks: RadioSoundTrack[]) {
         this.tracks.push(...tracks);
         this.update();
-        if (this.player.state.status == AudioPlayerStatus.Idle) {
-            console.log(`Player #${this.id} is idle. Starting to play after adding some tracks.`);
-            this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
-        }
+        if (this.player.state.status == AudioPlayerStatus.Idle) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
     }
 
     async update() {
