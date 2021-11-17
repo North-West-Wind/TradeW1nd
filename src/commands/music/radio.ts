@@ -133,7 +133,7 @@ class RadioCommand implements SlashCommand {
             songs = result.songs;
             if (!songs || songs.length < 1) return await msgOrRes(message, "There was an error trying to add the soundtrack!");
             const Embed = createEmbed(songs);
-            await players[channel].add(songs);
+            await players[channel - 1].add(songs);
             var msg: Message;
             if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
             else msg = await msgOrRes(message, Embed);
