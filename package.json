@@ -23,9 +23,9 @@
   "homepage": "https://github.com/North-West-Wind/TradeW1nd#readme",
   "dependencies": {
     "@discordjs/opus": "^0.7.0",
-    "@discordjs/voice": "^0.7.2",
+    "@discordjs/voice": "^0.7.5",
     "cheerio": "^1.0.0-rc.10",
-    "discord.js": "^13.0.1",
+    "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "fetch-retry-ts": "^1.1.24",

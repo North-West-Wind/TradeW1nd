@@ -409,7 +409,7 @@ export async function addMSURL(link: string) {
         type: 5,
         time: humanDurationToNum(data.duration),
         volume: 1,
-        thumbnail: "https://pbs.twimg.com/profile_images/1155047958326517761/IUgssah__400x400.jpg",
+        thumbnail: "http://s.musescore.org/about/images/musescore-mu-logo-bluebg-xl.png",
         isLive: false
     };
     return { error: false, songs: [song], msg: null, message: null };
@@ -432,7 +432,7 @@ export async function addURL(link: string) {
         type: 2,
         time: length,
         volume: 1,
-        thumbnail: "https://www.flaticon.com/svg/static/icons/svg/2305/2305904.svg",
+        thumbnail: "https://cdn-icons-png.flaticon.com/512/651/651758.png",
         isLive: false
     };
     return { error: false, songs: [song], msg: null, message: null };
