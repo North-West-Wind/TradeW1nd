@@ -9,7 +9,7 @@ export async function makePlayers() {
     const [results] = <RowDataPacket[][]> await client.pool.query("SELECT * FROM radio");
     for (let i = 0; i < 10; i++) {
         var tracks = [];
-        if (results[i]) tracks = JSON.parse(unescape(results[i].tracks));
+        if (results[i]) tracks = JSON.parse(unescape(results[i].queue));
         players[i] = new RadioChannel(i + 1, tracks);
     }
 }
