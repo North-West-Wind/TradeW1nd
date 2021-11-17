@@ -66,7 +66,7 @@ class RadioCommand implements SlashCommand {
         } else if (sub === "off") return await this.off(interaction);
         else if (sub === "add") {
             const channel = interaction.options.getInteger("channel");
-            if (this.checkChannel(channel)) return await interaction.reply("The channel number should be an interger between 1 and 10!");
+            if (!this.checkChannel(channel)) return await interaction.reply("The channel number should be an interger between 1 and 10!");
             return await this.add(interaction, interaction.options.getString("track"), channel);
         }
 
@@ -85,7 +85,7 @@ class RadioCommand implements SlashCommand {
             if (!args[2]) return await message.channel.send("No link/keywords/attachments!");
             const channel = parseInt(args[1]);
             if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
+            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
             return await this.add(message, args.slice(2).join(" "), channel);
         }
     }
