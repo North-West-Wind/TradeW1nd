@@ -32,7 +32,20 @@ Handler.setup(client, process.env.TOKEN0);
 const app = express();
 
 app.get("/", (_req, res) => {
-    res.json({ size: client.guilds.cache.size, lastReady: client.readyAt.getTime(), uptime: client.uptime });
+    res.json({ version: client.version, size: client.guilds.cache.size, lastReady: client.readyAt.getTime(), uptime: client.uptime });
+});
+
+app.get("/checkGuild/:guild", async(req, res) => {
+    var isInGuild = false;
+    var id = null;
+    try {
+        const guild = await client.guilds.fetch(req.params.guild);
+        if (guild) {
+            isInGuild = true;
+            id = guild.id;
+        }
+    } catch (err) {}
+    res.json({ guildId: id, isIn: isInGuild });
 });
 
 app.listen(process.env.PORT || 3000);
