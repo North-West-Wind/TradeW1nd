@@ -154,14 +154,19 @@ export class RadioChannel {
             else finished.looped++;
             if (finished.looped <= 3) this.tracks.push(finished);
             this.update();
-            if (this.tracks[0]) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+            await this.start();
         });
+        this.start();
+    }
+
+    async start() {
+        if (this.tracks[0]) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
     }
 
     async add(tracks: RadioSoundTrack[]) {
         this.tracks.push(...tracks);
         this.update();
-        if (this.player.state.status == AudioPlayerStatus.Idle) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+        if (this.player.state.status == AudioPlayerStatus.Idle) await this.start();
     }
 
     async update() {
