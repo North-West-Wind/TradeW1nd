@@ -61,7 +61,7 @@ class RadioCommand implements SlashCommand {
         const sub = interaction.options.getSubcommand();
         if (sub === "tune") {
             const channel = interaction.options.getInteger("channel");
-            if (this.checkChannel(channel)) return await interaction.reply("The channel number should be an interger between 1 and 10!");
+            if (!this.checkChannel(channel)) return await interaction.reply("The channel number should be an interger between 1 and 10!");
             return await this.tune(interaction, channel);
         } else if (sub === "off") return await this.off(interaction);
         else if (sub === "add") {
