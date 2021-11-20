@@ -140,6 +140,7 @@ export class RadioChannel {
     id: number;
     player: AudioPlayer;
     tracks: RadioSoundTrack[];
+    startTime?: number;
 
     constructor(id: number, tracks: RadioSoundTrack[]) {
         this.id = id;
@@ -152,7 +153,7 @@ export class RadioChannel {
             const finished = this.tracks.shift();
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
-            if (finished.looped <= 3) this.tracks.push(finished);
+            if (finished.looped <= 10) this.tracks.push(finished);
             else removeUsing(finished.id);
             this.update();
             await this.start();
@@ -163,6 +164,7 @@ export class RadioChannel {
     async start() {
         if (this.tracks[0]) {
             this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+            this.startTime = this.player.state.status == AudioPlayerStatus.Playing ? this.player.state.playbackDuration : 0;
             addUsing(this.tracks[0].id);
         }
     }

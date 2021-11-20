@@ -61,11 +61,12 @@ export function isUsing(hashed: string) {
 export function addUsing(hashed: string) {
 	if (hashed) using[hashed]++;
 }
-export function removeUsing(hashed: string) {
+export function removeUsing(hashed: string, all: boolean = false) {
 	if (!hashed || !using[hashed]) return;
-	if (!(using[hashed] -= 1))
+	if (all || !(using[hashed] -= 1))
 		setTimeout(() => {
 			const filePath = `${process.env.CACHE_DIR}/${hashed}`;
+			delete using[hashed];
 			if (isUsing(hashed)) waitHalfMin(hashed);
 			else if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 		}, 3600000);

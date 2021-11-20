@@ -153,7 +153,7 @@ class QueueCommand implements SlashCommand {
         if (!name) return await msgOrRes(message, "Please provide the name of the queue.");
         const [results] = <RowDataPacket[][]> await pool.query(`SELECT * FROM queue WHERE name = '${name}' AND user = '${author.id}'`);
         if (results.length == 0) return await msgOrRes(message, "No queue was found!");
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, [], false, false);
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, JSON.parse(unescape(results[0].queue)), false, false);
         else serverQueue.songs = JSON.parse(unescape(results[0].queue));
         updateQueue(guild.id, serverQueue);
         return await msgOrRes(message, `The queue **${results[0].name}** has been loaded.`);
