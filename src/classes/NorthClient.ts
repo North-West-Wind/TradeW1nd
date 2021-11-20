@@ -4,7 +4,7 @@ import { Pool, RowDataPacket } from "mysql2/promise";
 import { probeAndCreateResource } from "../commands/music/play";
 import { globalClient } from "../common";
 import { getStream } from "../helpers/addTrack";
-import { removeUsing } from "../helpers/music";
+import { addUsing, isUsing, removeUsing } from "../helpers/music";
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -153,6 +153,7 @@ export class RadioChannel {
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
             if (finished.looped <= 3) this.tracks.push(finished);
+            else removeUsing(finished.id);
             this.update();
             await this.start();
         });
@@ -160,7 +161,10 @@ export class RadioChannel {
     }
 
     async start() {
-        if (this.tracks[0]) this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+        if (this.tracks[0]) {
+            this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
+            addUsing(this.tracks[0].id);
+        }
     }
 
     async add(tracks: RadioSoundTrack[]) {
