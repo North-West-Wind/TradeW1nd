@@ -169,7 +169,7 @@ export class RadioChannel {
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
             if (finished.looped <= 10) this.tracks.push(finished);
-            else removeUsing(finished.id);
+            else removeUsing(finished.id, true);
             this.update();
             await this.start();
         });
@@ -185,6 +185,7 @@ export class RadioChannel {
         if (this.tracks[0]) {
             const stream = await getStream(this.tracks[0], { type: "radio", tracks: this.tracks });
             if (this.seek) {
+                console.log(`Fast-forwarding radio channel #${this.id + 1} to where we left off (${this.seek}s)`)
                 const command = ffmpeg(stream);
                 const passthru = new Stream.PassThrough();
                 command.on("error", err => console.error(err.message)).seekInput(this.seek).format("wav").output(passthru, { end: true }).run();
