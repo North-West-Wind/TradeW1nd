@@ -160,9 +160,9 @@ export class RadioChannel {
         }).on(AudioPlayerStatus.Playing, async (_oldState, newState) => {
             this.startTime = newState.playbackDuration;
             this.interval = setInterval(() => {
-                this.seek += 30;
+                this.seek = Math.floor(((this.player.state.status == AudioPlayerStatus.Playing ? this.player.state.playbackDuration : this.startTime) - this.startTime) / 1000);
             }, 30000);
-        }).on(AudioPlayerStatus.AutoPaused, () => clearInterval(this.interval)).on(AudioPlayerStatus.Idle, async () => {
+        }).on(AudioPlayerStatus.Idle, async () => {
             clearInterval(this.interval);
             this.seek = 0;
             const finished = this.tracks.shift();

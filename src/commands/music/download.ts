@@ -77,11 +77,11 @@ class DownloadCommand implements SlashCommand {
                     if (mp3.error) throw new Error(mp3.message);
                     if (mp3.url.startsWith("https://www.youtube.com/embed/")) {
                         const ytid = mp3.url.split("/").slice(-1)[0].split("?")[0];
-                        stream = await requestYTDLStream(`https://www.youtube.com/watch?v=${ytid}`, { highWaterMark: 1 << 22, filter: "audioonly", dlChunkSize: 0 });
+                        stream = await requestYTDLStream(`https://www.youtube.com/watch?v=${ytid}`, { highWaterMark: 1 << 26, filter: "audioonly", dlChunkSize: 0 });
                     } else stream = (await requestStream(mp3.url)).data;
                     break;
                 default:
-                    stream = await requestYTDLStream(song.url, { highWaterMark: 1 << 22, filter: "audioonly", dlChunkSize: 0 });
+                    stream = await requestYTDLStream(song.url, { highWaterMark: 1 << 26, filter: "audioonly", dlChunkSize: 0 });
                     break;
             }
             if (!stream) throw new Error("Cannot receive stream");
