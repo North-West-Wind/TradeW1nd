@@ -5,7 +5,7 @@ import { SlashCommand } from "../../classes/NorthClient";
 import { color, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
 import { createDiscordJSAdapter, getQueues, setQueue, updateQueue } from "../../helpers/music";
-import { players, playing } from "../../helpers/radio";
+import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio";
 import { createEmbed } from "./play";
 import { globalClient as client } from "../../common";
 const type = [
@@ -129,7 +129,6 @@ class RadioCommand implements SlashCommand {
     }
 
     async tune(message: Message | CommandInteraction, channel: number) {
-        if (playing.has(message.guildId)) return await msgOrRes(message, "Radio is already connected to this server!");
         var connection = getVoiceConnection(message.guildId);
         if (!connection) {
             const member = <GuildMember>message.member;
@@ -139,15 +138,15 @@ class RadioCommand implements SlashCommand {
         const radioCh = players[channel - 1];
         if (!radioCh) return await msgOrRes(message, "That channel is not available!");
         connection.subscribe(radioCh.player);
-        playing.add(message.guildId);
+        addPlaying(channel, message.guildId);
         await msgOrRes(message, "Connected!");
     }
 
     async off(message: Message | CommandInteraction) {
-        if (!playing.has(message.guildId)) return await msgOrRes(message, "Radio isn't connected to this server!");
+        if (!isPlaying(message.guildId)) return await msgOrRes(message, "Radio isn't connected to this server!");
         const connection = getVoiceConnection(message.guildId);
         if (connection) connection.destroy();
-        playing.delete(message.guildId);
+        removePlaying(message.guildId);
         await msgOrRes(message, "Disconnected!");
     }
 

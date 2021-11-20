@@ -1,10 +1,13 @@
-import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
-import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
+import { Client, ClientOptions, Collection, CommandInteraction, GuildMember, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { Pool, RowDataPacket } from "mysql2/promise";
 import { probeAndCreateResource } from "../commands/music/play";
 import { globalClient } from "../common";
 import { getStream } from "../helpers/addTrack";
-import { addUsing, isUsing, removeUsing } from "../helpers/music";
+import { addUsing, createDiscordJSAdapter, removeUsing } from "../helpers/music";
+import * as Stream from "stream";
+import { msgOrRes } from "../function";
+const ffmpeg = require("fluent-ffmpeg");
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -140,16 +143,28 @@ export class RadioChannel {
     id: number;
     player: AudioPlayer;
     tracks: RadioSoundTrack[];
+    guilds: Set<Snowflake> = new Set();
     startTime?: number;
+    seek: number;
+    private interval: NodeJS.Timer;
 
-    constructor(id: number, tracks: RadioSoundTrack[]) {
+    constructor(id: number, tracks: RadioSoundTrack[], seek: number, guilds: Snowflake[]) {
         this.id = id;
         this.tracks = tracks;
+        this.seek = seek;
+        this.guilds = new Set(guilds);
         this.player = createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Pause
             }
-        }).on(AudioPlayerStatus.Idle, async () => {
+        }).on(AudioPlayerStatus.Playing, async (_oldState, newState) => {
+            this.startTime = newState.playbackDuration;
+            this.interval = setInterval(() => {
+                this.seek += 30;
+            }, 30000);
+        }).on(AudioPlayerStatus.AutoPaused, () => clearInterval(this.interval)).on(AudioPlayerStatus.Idle, async () => {
+            clearInterval(this.interval);
+            this.seek = 0;
             const finished = this.tracks.shift();
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
@@ -158,13 +173,23 @@ export class RadioChannel {
             this.update();
             await this.start();
         });
+        for (const guild of guilds) {
+            var connection = getVoiceConnection(guild);
+            if (!connection) continue;
+            connection.subscribe(this.player);
+        }
         this.start();
     }
 
     async start() {
         if (this.tracks[0]) {
-            this.player.play(await probeAndCreateResource(await getStream(this.tracks[0], { type: "radio", tracks: this.tracks })));
-            this.startTime = this.player.state.status == AudioPlayerStatus.Playing ? this.player.state.playbackDuration : 0;
+            const stream = await getStream(this.tracks[0], { type: "radio", tracks: this.tracks });
+            if (this.seek) {
+                const command = ffmpeg(stream);
+                const passthru = new Stream.PassThrough();
+                command.on("error", err => console.error(err.message)).seekInput(this.seek).format("wav").output(passthru, { end: true }).run();
+                this.player.play(await probeAndCreateResource(passthru));
+            } else this.player.play(await probeAndCreateResource(stream));
             addUsing(this.tracks[0].id);
         }
     }
@@ -178,6 +203,12 @@ export class RadioChannel {
     async update() {
         try {
             await globalClient.pool.query(`UPDATE radio SET queue = "${escape(JSON.stringify(this.tracks))}" WHERE id = ${this.id}`);
+        } catch (err) {}
+    }
+
+    async updateSeek() {
+        try {
+            await globalClient.pool.query(`UPDATE radio SET seek = "${this.seek || 0}" WHERE id = ${this.id}`);
         } catch (err) {}
     }
 }

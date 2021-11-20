@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, Message, Permissions, TextChannel } from "discord.js";
 import { Command } from "../classes/NorthClient";
 import { genPermMsg, getOwner, msgOrRes } from "../function";
-import { playing } from "./radio";
+import { isPlaying } from "./radio";
 
 var timeout: NodeJS.Timeout;
 
@@ -62,7 +62,7 @@ export async function music(command: Command, message: Message | CommandInteract
         await msgOrRes(message, "You can only use music commands in server!");
         return false;
     }
-    if (command.name !== "radio" && playing.has(message.guildId)) {
+    if (command.name !== "radio" && isPlaying(message.guildId)) {
         await msgOrRes(message, "Radio is still connected! Disconnect from radio first to use other commands.");
         return false;
     }

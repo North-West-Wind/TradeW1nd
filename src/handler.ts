@@ -10,7 +10,7 @@ import * as filter from "./helpers/filter";
 import common from "./common";
 import { init } from "./helpers/addTrack";
 import { categories } from "./commands/information/help";
-import { makePlayers, playing } from "./helpers/radio";
+import { makePlayers, isPlaying } from "./helpers/radio";
 
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
 var inited = false;
@@ -100,7 +100,7 @@ export class Handler {
 
     async voiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
         const guild = oldState.guild || newState.guild;
-        if (playing.has(guild.id)) return;
+        if (isPlaying(guild.id)) return;
         const exit = NorthClient.storage.guilds[guild.id]?.exit;
         if ((oldState.id == guild.me.id || newState.id == guild.me.id) && (!guild.me.voice?.channel)) return stop(guild);
         if (!guild.me.voice?.channel || (newState.channelId !== guild.me.voice.channelId && oldState.channelId !== guild.me.voice.channelId)) return;
