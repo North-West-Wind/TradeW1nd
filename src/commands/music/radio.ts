@@ -21,12 +21,12 @@ const type = [
 
 class RadioCommand implements SlashCommand {
     name = "radio";
-    description = "Play music in a channel 24/7!";
+    description = "Plays music in a channel 24/7!";
     usage = "<subcommand>";
     args = 1;
     subcommands = ["tune", "off", "add", "info", "copy"];
     subdesc = ["Connects to one of the radio channels.", "Disconnects from a radio channel and the voice channel.", "Adds a soundtrack to the radio channel queue.", "Retrieves information of a radio channel.", "Copies the radio queue to the current server."]
-    subusage = ["<subcommand> <channel>", null, "<subcommand> <track>"];
+    subusage = ["<subcommand> <channel>", null, "<subcommand> <track>", 0, 0];
     options = [
         {
             name: "tune",

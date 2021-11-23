@@ -19,7 +19,7 @@ function findPlaying(guildId: Snowflake) {
 }
 
 export function isPlaying(guildId: Snowflake) {
-    return !!(findPlaying(guildId) - 1);
+    return !!(findPlaying(guildId) + 1);
 }
 
 export async function addPlaying(channel: number, guildId: Snowflake) {
