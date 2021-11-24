@@ -28,7 +28,7 @@ export async function addPlaying(channel: number, guildId: Snowflake) {
 }
 
 export async function removePlaying(guildId: Snowflake) {
-    const index = findPlaying(guildId);
+    const index = findPlaying(guildId) + 1;
     if (!index) return;
     players[index].guilds.delete(guildId);
     await client.pool.query(`UPDATE radio SET guilds = "${[...players[index].guilds].join()}" WHERE id = ${index + 1}`);
