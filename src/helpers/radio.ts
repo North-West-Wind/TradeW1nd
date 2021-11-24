@@ -9,7 +9,7 @@ export async function makePlayers() {
     for (let i = 0; i < 10; i++) {
         var tracks = [];
         if (results[i]) tracks = JSON.parse(unescape(results[i].queue));
-        players[i] = new RadioChannel(i + 1, tracks, results[i].seek, results[i].guilds.split(","));
+        players[i] = new RadioChannel(i + 1, tracks, results[i].seek, results[i].guilds.split(",").filter(x => !!x));
     }
 }
 
