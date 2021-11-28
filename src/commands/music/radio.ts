@@ -212,7 +212,7 @@ class RadioCommand implements SlashCommand {
             .setColor(color())
             .setTitle("Information of Radio Channel #" + channel)
             .setTimestamp()
-            .setFooter(next, message.client.user.displayAvatarURL());
+            .setFooter(`Coming up next: ${next}`, message.client.user.displayAvatarURL());
 
         const songLength = !radio.tracks[0].time ? "∞" : moment.duration(radio.tracks[0].time, "seconds").format();
         if (radio.tracks[0].type === 1) info = [`**[${radio.tracks[0].title}](${radio.tracks[0].spot})**\nLength: **${songLength}**`, radio.tracks[0].thumbnail];

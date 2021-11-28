@@ -1,11 +1,38 @@
-import { NorthClient, SlashCommand } from "./classes/NorthClient";
+import { ClientStorage, NorthClient, SlashCommand } from "./classes/NorthClient";
 import { deepReaddir } from "./function";
 import * as mysql from "mysql2";
 import * as fs from "fs";
+import { Handler } from "./handler";
+import isOnline from "is-online";
 const { version } = require("../package.json");
 var globalClient: NorthClient;
 
-process.on('unhandledRejection', (reason, promise) => console.error('Unhandled Rejection at:', promise, 'reason:', reason));
+process.on('unhandledRejection', (reason: string) => {
+  console.error('Reason:', reason);
+  if (reason.includes("EAI_AGAIN")) {
+    async function check() {
+      if (await isOnline()) reloadClient();
+      else setTimeout(check, 30000);
+    }
+    check();
+  }
+});
+
+function reloadClient() {
+  const options = globalClient.options;
+  const token = globalClient.token;
+  const prefix = globalClient.prefix;
+  const id = globalClient.id;
+  globalClient.destroy();
+
+  globalClient = new NorthClient(options);
+  NorthClient.storage = new ClientStorage();
+  
+  globalClient.prefix = prefix;
+  globalClient.id = id;
+
+  Handler.setup(globalClient, token);
+}
 
 export default async (client: NorthClient) => {
   const mysql_config = {
