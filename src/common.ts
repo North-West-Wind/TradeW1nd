@@ -7,9 +7,9 @@ import isOnline from "is-online";
 const { version } = require("../package.json");
 var globalClient: NorthClient;
 
-process.on('unhandledRejection', (reason: string) => {
+process.on('unhandledRejection', (reason) => {
   console.error('Reason:', reason);
-  if (reason.includes("EAI_AGAIN")) {
+  if (typeof reason === "string" && reason.includes("EAI_AGAIN")) {
     async function check() {
       if (await isOnline()) reloadClient();
       else setTimeout(check, 30000);
