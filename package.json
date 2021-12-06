@@ -4,8 +4,8 @@
   "description": "N0rthWestW1nd with only music functions.",
   "main": "out/main.js",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=1024 --gc_interval=100 --trace-warnings out/main.js",
-    "tsc": "tsc"
+    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --trace-warnings out/main.js",
+    "tsc": "node fix.js && tsc"
   },
   "engines": {
     "node": "16.x",
@@ -44,6 +44,7 @@
     "sanitize-filename": "^1.6.3",
     "soundcloud-downloader": "^1.0.0",
     "spotify-web-api-node": "^5.0.2",
+    "winston": "^3.3.3",
     "ytdl-core": "^4.9.1",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"

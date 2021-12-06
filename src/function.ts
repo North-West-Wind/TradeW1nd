@@ -236,18 +236,17 @@ export function mutate(array: any[], fromIndex: number, toIndex: number) {
 
 export function requestYTDLStream(url: string, opts: downloadOptions & { timeout?: number }) {
     const timeoutMS = opts.timeout || 120000;
-    const timeout = new Promise((resolve) => setTimeout(() => resolve(null), timeoutMS));
-    const getStream = new Promise((resolve, reject) => {
+    const getStream = new Promise(async(resolve, reject) => {
         const options = <any> opts;
         if (process.env.COOKIE) {
           options.requestOptions = {};
           options.requestOptions.headers = { cookie: process.env.COOKIE };
           if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
         }
-        const stream = ytdl(url, options);
+        const stream = await ytdl(url, options);
         stream.on("finish", () => resolve(stream)).on("error", err => reject(err));
     });
-    return Promise.race([timeout, getStream]);
+    return Promise.race([wait(timeoutMS), getStream]);
 }
 
 export async function fixGuildRecord(id: Discord.Snowflake) {
