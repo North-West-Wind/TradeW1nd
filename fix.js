@@ -7,12 +7,13 @@ const ytdlFix = `const ytdl = async (link, options) => {
     let info = await ytdl.getInfo(link, options).catch((err) => { rejected = true; error = err; });
     if (rejected) return void j(error);
     downloadFromInfoCallback(stream, info, options);
-    r(stream)
-  })
-}`;
+    r(stream);
+  });
+}
+module.exports = ytdl;`;
 
 fs.readFile("./node_modules/ytdl-core/lib/index.js", { encoding: "utf8" }, function (_err, data) {
-    var formatted = data.replace(/const ytdl = \((.|\n)*return stream;\n};/, ytdlFix);
+    var formatted = data.replace(/const ytdl = \((.|\n)*ytdl;/gm, ytdlFix);
     fs.writeFile("./node_modules/ytdl-core/lib/index.js", formatted, 'utf8', function (err) {
         if (err) return console.log(err);
     });
