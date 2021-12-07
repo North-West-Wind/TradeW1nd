@@ -243,7 +243,7 @@ export function requestYTDLStream(url: string, opts: downloadOptions & { timeout
           options.requestOptions.headers = { cookie: process.env.COOKIE };
           if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
         }
-        const stream = ytdl(url, options);
+        const stream = await ytdl(url, options);
         stream.on("finish", () => resolve(stream)).on("error", err => reject(err));
     });
     return Promise.race([wait(timeoutMS), getStream]);

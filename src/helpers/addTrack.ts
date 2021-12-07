@@ -595,7 +595,7 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                         options.requestOptions.headers = { cookie: process.env.COOKIE };
                         if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
                     }
-                    stream = <Stream.Readable> ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
+                    stream = <Stream.Readable> await ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
                     cacheFound = true;
                 } else stream = <Stream.Readable>(await requestStream(c.url)).data;
                 break;
@@ -616,7 +616,7 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                     }
                     throw new Error("This soundtrack is missing URL! It is being removed automatically.");
                 }
-                stream = ytdl(track.url, options);
+                stream = await ytdl(track.url, options);
                 if (!stream) throw new Error("Failed to get YouTube video stream.");
                 cacheFound = true;
                 break;
