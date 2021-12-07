@@ -135,7 +135,7 @@ export class SoundTrack {
     spot?: string;
 }
 
-export class RadioSoundTrack extends SoundTrack {
+class RadioSoundTrack extends SoundTrack {
     looped?: number;
 }
 
@@ -169,7 +169,7 @@ export class RadioChannel {
             const finished = this.tracks.shift();
             if (!finished.looped) finished.looped = 1;
             else finished.looped++;
-            if (finished.looped <= 10) this.tracks.push(finished);
+            if (finished.looped <= 10 || this.tracks.length <= 10) this.tracks.push(finished);
             else removeUsing(finished.id, true);
             this.update();
             this.updateSeek();

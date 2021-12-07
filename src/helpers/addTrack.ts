@@ -54,7 +54,7 @@ export async function addAttachment(message: Message) {
             type: 2,
             time: length,
             volume: 1,
-            thumbnail: "https://www.flaticon.com/svg/static/icons/svg/2305/2305904.svg",
+            thumbnail: "https://cdn-icons.flaticon.com/png/512/2995/premium/2995101.png?token=exp=1638874239~hmac=59c250395c5782e66929185a28056457",
             isLive: false
         });
     }
@@ -432,7 +432,7 @@ export async function addURL(link: string) {
         type: 2,
         time: length,
         volume: 1,
-        thumbnail: "https://cdn-icons-png.flaticon.com/512/651/651758.png",
+        thumbnail: "https://cdn-icons.flaticon.com/png/512/2995/premium/2995101.png?token=exp=1638874239~hmac=59c250395c5782e66929185a28056457",
         isLive: false
     };
     return { error: false, songs: [song], msg: null, message: null };
@@ -589,7 +589,7 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                 if (c.error) throw new Error(c.message);
                 if (c.url.startsWith("https://www.youtube.com/embed/")) {
                     const ytid = c.url.split("/").slice(-1)[0].split("?")[0];
-                    const options = <any>{ highWaterMark: 1 << 26, filter: "audioonly", dlChunkSize: 0 };
+                    const options = <any>{ highWaterMark: 1 << 25, filter: "audioonly", dlChunkSize: 0 };
                     if (process.env.COOKIE) {
                         options.requestOptions = {};
                         options.requestOptions.headers = { cookie: process.env.COOKIE };
@@ -606,8 +606,8 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                     options.requestOptions.headers = { cookie: process.env.COOKIE };
                     if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
                 }
-                if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 26 });
-                else Object.assign(options, { highWaterMark: 1 << 26 });
+                if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 25 });
+                else Object.assign(options, { highWaterMark: 1 << 25 });
                 if (!track.url) {
                     const index = data.serverQueue.songs.indexOf(track);
                     if (index !== -1) {
