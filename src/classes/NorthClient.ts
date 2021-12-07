@@ -189,7 +189,7 @@ export class RadioChannel {
             if (this.seek) {
                 console.log(`Fast-forwarding radio channel #${this.id} to where we left off (${this.seek}s)`)
                 const command = ffmpeg(stream);
-                const passthru = new Stream.PassThrough();
+                const passthru = new Stream.PassThrough({ highWaterMark: 1 << 25 });
                 command.on("error", err => console.error(err.message)).seekInput(this.seek).format("wav").output(passthru, { end: true }).run();
                 this.player.play(await probeAndCreateResource(passthru));
             } else this.player.play(await probeAndCreateResource(stream));
