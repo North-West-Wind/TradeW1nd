@@ -68,7 +68,7 @@ export async function music(command: Command, message: Message | CommandInteract
         return false;
     }
     const serverQueue = getQueue(message.guildId);
-    if (serverQueue.playing && !(<Permissions> message.member.permissions).any(BigInt(56)) && !serverQueue.callers.has(message.member.user.id) && !(<GuildMember> message.member).roles.cache.hasAny(...serverQueue.callRoles)) {
+    if (serverQueue?.playing && !(<Permissions> message.member.permissions).any(BigInt(56)) && !serverQueue.callers.has(message.member.user.id) && !(<GuildMember> message.member).roles.cache.hasAny(...serverQueue.callRoles)) {
         await msgOrRes(message, "You don't have the permissions to alter the queue!");
         return false;
     }
