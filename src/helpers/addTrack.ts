@@ -54,7 +54,7 @@ export async function addAttachment(message: Message) {
             type: 2,
             time: length,
             volume: 1,
-            thumbnail: "https://cdn-icons.flaticon.com/png/512/2995/premium/2995101.png?token=exp=1638874239~hmac=59c250395c5782e66929185a28056457",
+            thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
             isLive: false
         });
     }
@@ -432,7 +432,7 @@ export async function addURL(link: string) {
         type: 2,
         time: length,
         volume: 1,
-        thumbnail: "https://cdn-icons.flaticon.com/png/512/2995/premium/2995101.png?token=exp=1638874239~hmac=59c250395c5782e66929185a28056457",
+        thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
         isLive: false
     };
     return { error: false, songs: [song], msg: null, message: null };
