@@ -2,7 +2,6 @@ import { DiscordGatewayAdapterCreator, DiscordGatewayAdapterLibraryMethods } fro
 import * as Discord from "discord.js";
 import * as Stream from 'stream';
 import * as fs from "fs";
-import * as path from "path";
 import { GatewayVoiceServerUpdateDispatchData, GatewayVoiceStateUpdateDispatchData } from "discord-api-types/v9";
 import { ServerQueue, SoundTrack } from "../classes/NorthClient";
 import { globalClient as client } from "../common";
@@ -32,6 +31,7 @@ export function stop(guild: Discord.Guild) {
 	serverQueue.connection = null;
 	serverQueue.voiceChannel = null;
 	serverQueue.textChannel = null;
+	serverQueue.clean();
 }
 export function setQueue(guild: Discord.Snowflake, tracks: SoundTrack[], loopStatus: boolean, repeatStatus: boolean) {
 	tracks = tracks.filter(track => !!track).map(track => {

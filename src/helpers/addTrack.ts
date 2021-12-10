@@ -405,7 +405,7 @@ export async function addMSURL(link: string) {
     }
     const song = {
         title: data.title,
-        url: link,
+        url: data.url,
         type: 5,
         time: humanDurationToNum(data.duration),
         volume: 1,

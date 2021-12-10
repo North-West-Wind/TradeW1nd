@@ -1,6 +1,7 @@
 import { CommandInteraction, GuildMember, Message, Permissions, TextChannel } from "discord.js";
 import { Command } from "../classes/NorthClient";
 import { genPermMsg, getOwner, msgOrRes } from "../function";
+import { getQueue } from "./music";
 import { isPlaying } from "./radio";
 
 var timeout: NodeJS.Timeout;
@@ -64,6 +65,11 @@ export async function music(command: Command, message: Message | CommandInteract
     }
     if (command.name !== "radio" && isPlaying(message.guildId)) {
         await msgOrRes(message, "Radio is still connected! Disconnect from radio first to use other commands.");
+        return false;
+    }
+    const serverQueue = getQueue(message.guildId);
+    if (serverQueue.playing && !(<Permissions> message.member.permissions).any(BigInt(56)) && !serverQueue.callers.has(message.member.user.id) && !(<GuildMember> message.member).roles.cache.hasAny(...serverQueue.callRoles)) {
+        await msgOrRes(message, "You don't have the permissions to alter the queue!");
         return false;
     }
     return true;

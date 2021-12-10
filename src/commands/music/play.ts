@@ -10,7 +10,6 @@ import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, 
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
-import * as mm from "music-metadata";
 const ffmpeg = require("fluent-ffmpeg");
 
 function createPlayer(guild: Discord.Guild) {
@@ -205,6 +204,7 @@ class PlayCommand implements SlashCommand {
       serverQueue.voiceChannel = voiceChannel;
       serverQueue.playing = true;
       serverQueue.textChannel = <Discord.TextChannel>message.channel;
+      serverQueue.callers.add(message.member.user.id);
       if (!serverQueue.player) serverQueue.player = createPlayer(message.guild);
       await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
       serverQueue.connection.subscribe(serverQueue.player);
@@ -251,6 +251,7 @@ class PlayCommand implements SlashCommand {
       serverQueue.voiceChannel = voiceChannel;
       serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
       serverQueue.textChannel = <Discord.TextChannel>message.channel;
+      serverQueue.callers.add(message.member.user.id);
       message.guild.me.voice?.setDeaf(true).catch(() => {});
       await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
       serverQueue.connection.subscribe(serverQueue.player);
@@ -268,7 +269,10 @@ class PlayCommand implements SlashCommand {
     } catch (err: any) {
       await msgOrRes(message, "There was an error trying to connect to the voice channel!");
       if (err.message) await message.channel.send(err.message);
-      serverQueue?.destroy();
+      if (serverQueue) {
+        serverQueue.destroy();
+        serverQueue.clean();
+      }
       console.error(err);
     }
   }

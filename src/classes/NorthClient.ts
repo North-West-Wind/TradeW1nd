@@ -80,6 +80,8 @@ export class ServerQueue {
         this.looping = loopStatus;
         this.repeating = repeatStatus;
         this.random = false;
+        this.callers = new Set();
+        this.callRoles = new Set();
     }
 
     textChannel: TextChannel;
@@ -98,6 +100,8 @@ export class ServerQueue {
     errorCounter?: number;
     isSkipping?: boolean;
     seek?: number;
+    callers: Set<Snowflake>;
+    callRoles: Set<Snowflake>;
 
     getPlaybackDuration() {
         if (this.player?.state?.status != AudioPlayerStatus.Playing) return 0;
@@ -119,6 +123,11 @@ export class ServerQueue {
             this.player?.stop();
         } catch (err: any) { }
         this.player = null;
+    }
+
+    clean() {
+        this.callers.clear();
+        this.callRoles.clear();
     }
 }
 
