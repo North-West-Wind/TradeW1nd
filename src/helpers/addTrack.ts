@@ -608,14 +608,6 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                 }
                 if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 25 });
                 else Object.assign(options, { highWaterMark: 1 << 25 });
-                if (!track.url) {
-                    const index = data.serverQueue.songs.indexOf(track);
-                    if (index !== -1) {
-                        data.serverQueue.songs.splice(index, 1);
-                        updateQueue(data.guild.id, data.serverQueue);
-                    }
-                    throw new Error("This soundtrack is missing URL! It is being removed automatically.");
-                }
                 stream = await ytdl(track.url, options);
                 if (!stream) throw new Error("Failed to get YouTube video stream.");
                 cacheFound = true;

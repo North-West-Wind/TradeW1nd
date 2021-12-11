@@ -63,7 +63,7 @@ function createPlayer(guild: Discord.Guild) {
     console.error(error.message);
     if (serverQueue) {
       removeUsing(track?.id);
-      serverQueue.textChannel?.send("There was an error trying to play the soundtrack!").then(msg => setTimeout(() => msg.delete().catch(() => {}), 10000));
+      serverQueue.textChannel?.send("There was an error trying to play the soundtrack!").then(msg => setTimeout(() => msg.delete().catch(() => { }), 10000));
       if (!serverQueue.errorCounter) serverQueue.errorCounter = 1;
       else serverQueue.errorCounter = 3;
       if (serverQueue.errorCounter >= 3) serverQueue?.destroy();
@@ -73,8 +73,8 @@ function createPlayer(guild: Discord.Guild) {
 }
 
 export async function probeAndCreateResource(readableStream: Stream.Readable) {
-	const { stream, type } = await demuxProbe(readableStream);
-	return createAudioResource(stream, { inputType: type, inlineVolume: true });
+  const { stream, type } = await demuxProbe(readableStream);
+  return createAudioResource(stream, { inputType: type, inlineVolume: true });
 }
 
 export function createEmbed(songs: SoundTrack[]) {
@@ -93,7 +93,7 @@ export function createEmbed(songs: SoundTrack[]) {
 export async function play(guild: Discord.Guild, song: SoundTrack) {
   const queue = getQueues();
   const serverQueue = queue.get(guild.id);
-  if (!serverQueue.voiceChannel && guild.me.voice?.channel) serverQueue.voiceChannel = <Discord.VoiceChannel> guild.me.voice.channel;
+  if (!serverQueue.voiceChannel && guild.me.voice?.channel) serverQueue.voiceChannel = <Discord.VoiceChannel>guild.me.voice.channel;
   serverQueue.playing = true;
   if (!song && serverQueue.songs.length > 0) {
     const filtered = serverQueue.songs.filter(song => !!song);
@@ -115,7 +115,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   if (!serverQueue.connection) try {
     serverQueue.connection = joinVoiceChannel({ channelId: serverQueue.voiceChannel.id, guildId: guild.id, adapterCreator: createDiscordJSAdapter(serverQueue.voiceChannel) })
     serverQueue.connection.subscribe(serverQueue.player);
-    if (!guild.me.voice.selfDeaf) guild.me.voice.setDeaf(true).catch(() => {});
+    if (!guild.me.voice.selfDeaf) guild.me.voice.setDeaf(true).catch(() => { });
   } catch (err: any) {
     serverQueue?.destroy();
     if (serverQueue?.textChannel) {
@@ -130,6 +130,14 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   if (serverQueue.connection) serverQueue.startTime = streamTime - seek * 1000;
   else serverQueue.startTime = -seek * 1000;
   try {
+    if (!song.url) {
+      const index = serverQueue.songs.indexOf(song);
+      if (index !== -1) {
+        serverQueue.songs.splice(index, 1);
+        updateQueue(guild.id, serverQueue, false);
+      }
+      throw new Error("This soundtrack is missing URL! It is being removed automatically.");
+    }
     const stream = await getStream(song, { type: "server", guild, serverQueue });
     if (seek) {
       const command = ffmpeg(stream);
@@ -151,7 +159,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
       .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
       .setTimestamp()
       .setFooter("Have a nice day! :)", guild.client.user.displayAvatarURL());
-    const msg = await serverQueue.textChannel.send({embeds: [Embed]});
+    const msg = await serverQueue.textChannel.send({ embeds: [Embed] });
     await wait(30000);
     msg.delete().catch(() => { });
   }
@@ -181,7 +189,7 @@ class PlayCommand implements SlashCommand {
 
   async logic(message: Discord.Message | Discord.CommandInteraction, str: string) {
     var serverQueue = getQueues().get(message.guild.id);
-    const voiceChannel = <Discord.VoiceChannel> (<Discord.GuildMember> message.member).voice.channel;
+    const voiceChannel = <Discord.VoiceChannel>(<Discord.GuildMember>message.member).voice.channel;
     if (!voiceChannel) return await msgOrRes(message, "You need to be in a voice channel to play music!");
     if (!voiceChannel.permissionsFor(message.guild.me).has(BigInt(3145728))) return await msgOrRes(message, "I can't play in your voice channel!");
     if (!str && ((message instanceof Discord.Message && message.attachments.size < 1) || message instanceof Discord.Interaction)) {
@@ -194,7 +202,7 @@ class PlayCommand implements SlashCommand {
           serverQueue?.destroy();
           serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
         }
-        if (message.guild.me.voice?.channelId && !message.guild.me.voice.selfDeaf) message.guild.me.voice.setDeaf(true).catch(() => {});
+        if (message.guild.me.voice?.channelId && !message.guild.me.voice.selfDeaf) message.guild.me.voice.setDeaf(true).catch(() => { });
       } catch (err: any) {
         await msgOrRes(message, "There was an error trying to connect to the voice channel!");
         if (err.message) await message.channel.send(err.message);
@@ -245,14 +253,14 @@ class PlayCommand implements SlashCommand {
       var msg: Discord.Message;
       if (result.msg) await result.msg.edit({ content: null, embeds: [Embed] });
       else await msgOrRes(message, Embed);
-      setTimeout(async() => { try { await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }) } catch (err: any) { } }, 30000);
+      setTimeout(async () => { try { await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }) } catch (err: any) { } }, 30000);
       updateQueue(message.guild.id, serverQueue);
       if (!serverQueue.player) serverQueue.player = createPlayer(message.guild);
       serverQueue.voiceChannel = voiceChannel;
       serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
       serverQueue.textChannel = <Discord.TextChannel>message.channel;
       serverQueue.callers.add(message.member.user.id);
-      message.guild.me.voice?.setDeaf(true).catch(() => {});
+      message.guild.me.voice?.setDeaf(true).catch(() => { });
       await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
       serverQueue.connection.subscribe(serverQueue.player);
       updateQueue(message.guild.id, serverQueue, false);
