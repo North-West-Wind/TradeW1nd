@@ -40,6 +40,7 @@ export async function migrate(message: Message | CommandInteraction) {
         serverQueue.playing = true;
         serverQueue.textChannel = <TextChannel>message.channel;
         serverQueue.seek = seek;
+        serverQueue.callers.add(message.member.user.id);
         migrating.splice(migrating.indexOf(message.guild.id));
         msg.edit(`Moved from **${oldChannel.name}** to **${voiceChannel.name}**`).catch(() => { });
         updateQueue(message.guild.id, serverQueue, false);
