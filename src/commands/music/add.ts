@@ -3,7 +3,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { SlashCommand } from "../../classes/NorthClient";
 import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, msgOrRes, wait } from "../../function";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { createEmbed } from "./play";
 
 class AddCommand implements SlashCommand {
@@ -28,7 +28,7 @@ class AddCommand implements SlashCommand {
     }
 
     async add(message: Message | CommandInteraction, str: string) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         try {
             var songs = [];
             var result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };

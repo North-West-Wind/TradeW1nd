@@ -4,7 +4,7 @@ import * as moment from "moment";
 import { SlashCommand } from "../../classes/NorthClient";
 import { color, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
-import { createDiscordJSAdapter, getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio";
 import { createEmbed } from "./play";
 import { globalClient as client } from "../../common";
@@ -223,7 +223,7 @@ class RadioCommand implements SlashCommand {
     }
 
     async copy(message: Message | CommandInteraction, channel: number) {
-        var serverQueue = getQueues().get(message.guildId);
+        var serverQueue = getQueue(message.guildId);
         const pool = client.pool;
         const author = message instanceof Message ? message.author : message.user;
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");

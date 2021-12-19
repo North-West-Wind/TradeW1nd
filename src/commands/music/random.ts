@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient";
 import { msgOrRes } from "../../function";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 
 class RandomCommand implements SlashCommand {
     name = "random"
@@ -20,7 +20,7 @@ class RandomCommand implements SlashCommand {
     }
 
     async random(message: Message | CommandInteraction) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.random = !serverQueue.random;
         if (serverQueue.repeating && serverQueue.random) {

@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, requestStream, moveArray, color, validGDDLURL, bufferToStream, msgOrRes, wait } from "../../function.js";
 import { migrate as music } from "./migrate.js";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
-import { getQueues, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
+import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
@@ -13,7 +13,7 @@ import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioReso
 const ffmpeg = require("fluent-ffmpeg");
 
 function createPlayer(guild: Discord.Guild) {
-  var serverQueue = getQueues().get(guild.id);
+  var serverQueue = getQueue(guild.id);
   if (!serverQueue.player) {
     serverQueue.player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
     updateQueue(guild.id, serverQueue, false);
@@ -57,7 +57,7 @@ function createPlayer(guild: Discord.Guild) {
     updateQueue(guild.id, serverQueue, false);
   }).on(AudioPlayerStatus.Idle, async () => {
     removeUsing(track?.id);
-    serverQueue = getQueues().get(guild.id);
+    serverQueue = getQueue(guild.id);
     await next();
   }).on("error", async error => {
     console.error(error.message);
@@ -91,7 +91,7 @@ export function createEmbed(songs: SoundTrack[]) {
 }
 
 export async function play(guild: Discord.Guild, song: SoundTrack) {
-  const queue = getQueues();
+  const queue = getQueue();
   const serverQueue = queue.get(guild.id);
   if (!serverQueue.voiceChannel && guild.me.voice?.channel) serverQueue.voiceChannel = <Discord.VoiceChannel>guild.me.voice.channel;
   serverQueue.playing = true;
@@ -188,7 +188,7 @@ class PlayCommand implements SlashCommand {
   }
 
   async logic(message: Discord.Message | Discord.CommandInteraction, str: string) {
-    var serverQueue = getQueues().get(message.guild.id);
+    var serverQueue = getQueue(message.guild.id);
     const voiceChannel = <Discord.VoiceChannel>(<Discord.GuildMember>message.member).voice.channel;
     if (!voiceChannel) return await msgOrRes(message, "You need to be in a voice channel to play music!");
     if (!voiceChannel.permissionsFor(message.guild.me).has(BigInt(3145728))) return await msgOrRes(message, "I can't play in your voice channel!");

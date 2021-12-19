@@ -2,7 +2,7 @@ import { CommandInteraction, GuildMember, Message } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient";
 import { moveArray, msgOrRes } from "../../function";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { play } from "./play";
 
 class ReverseCommand implements SlashCommand {
@@ -20,7 +20,7 @@ class ReverseCommand implements SlashCommand {
     }
 
     async reverse(message: Message | CommandInteraction) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
         if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");

@@ -5,7 +5,7 @@ import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import * as Discord from "discord.js";
 import { color, msgOrRes } from "../../function";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { globalClient as client } from "../../common";
 
 const type = [
@@ -34,7 +34,7 @@ class NPCommand implements SlashCommand {
     }
 
     async nowplaying(message: Discord.Message | Discord.CommandInteraction) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
         const filtered = serverQueue.songs.filter(song => !!song);

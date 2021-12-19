@@ -5,7 +5,7 @@ import sanitize from "sanitize-filename";
 import scdl from 'soundcloud-downloader/dist/index';
 import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function";
 import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search } from "../../helpers/addTrack";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { getMP3 } from "../../helpers/musescore";
 
 class DownloadCommand implements SlashCommand {
@@ -22,7 +22,7 @@ class DownloadCommand implements SlashCommand {
     }]
 
     async execute(interaction: Discord.CommandInteraction) {
-        var serverQueue = getQueues().get(interaction.guild.id);
+        var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const keywords = interaction.options.getString("keywords");
         await interaction.deferReply();
@@ -35,7 +35,7 @@ class DownloadCommand implements SlashCommand {
     }
     
     async run(message: Discord.Message, args: string[]) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         const parsed = parseInt(args[0]);
         if (args[0] && isNaN(parsed)) return await this.downloadFromArgs(message, serverQueue, args.join(" "));

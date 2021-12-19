@@ -3,7 +3,7 @@ import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.
 
 import { SlashCommand } from "../../classes/NorthClient";
 import { moveArray, msgOrRes } from "../../function";
-import { createDiscordJSAdapter, getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { play } from "./play";
 
 class SkipCommand implements SlashCommand {
@@ -36,7 +36,7 @@ class SkipCommand implements SlashCommand {
     }
 
     async skip(message: Message | CommandInteraction, skip: number) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         const guild = message.guild;
         const member = (<GuildMember> message.member);
         if (!serverQueue || !Array.isArray(serverQueue?.songs)) serverQueue = setQueue(message.guild.id, [], false, false);

@@ -48,4 +48,9 @@ app.get("/checkGuild/:guild", async(req, res) => {
     res.json({ guildId: id, isIn: isInGuild });
 });
 
+app.post("/update/:guild", (req, res) => {
+    NorthClient.storage.guilds[req.params.guild] = req.body;
+    res.sendStatus(200);
+});
+
 app.listen(process.env.PORT || 3000);

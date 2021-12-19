@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { msgOrRes } from "../../function";
 
 class StopCommand implements SlashCommand {
@@ -19,7 +19,7 @@ class StopCommand implements SlashCommand {
     }
 
     async stop(message: Message | CommandInteraction) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue?.playing) return await msgOrRes(message, "You have to be in a voice channel to stop the music when the bot is playing!");
         serverQueue.destroy();

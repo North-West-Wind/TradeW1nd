@@ -4,7 +4,7 @@ import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import { RowDataPacket } from "mysql2";
 import { fixGuildRecord, messagePrefix } from "./function";
-import { setQueue, stop } from "./helpers/music";
+import { getQueue, setQueue, stop } from "./helpers/music";
 import { NorthClient, GuildConfig } from "./classes/NorthClient";
 import * as filter from "./helpers/filter";
 import common from "./common";
@@ -105,7 +105,8 @@ export class Handler {
         if ((oldState.id == guild.me.id || newState.id == guild.me.id) && (!guild.me.voice?.channel)) return stop(guild);
         if (!guild.me.voice?.channel || (newState.channelId !== guild.me.voice.channelId && oldState.channelId !== guild.me.voice.channelId)) return;
         if (!NorthClient.storage.guilds[guild.id]) await fixGuildRecord(guild.id);
-        if (guild.me.voice.channel?.members.size <= 1) {
+        const serverQueue = getQueue(guild.id);
+        if (guild.me.voice.channel.members.filter(member => member.permissions.any(BigInt(56)) || serverQueue.callers.has(member.id)).size <= 1) {
             if (exit) return;
             NorthClient.storage.guilds[guild.id].exit = true;
             setTimeout(() => NorthClient.storage.guilds[guild.id]?.exit ? stop(guild) : 0, 30000);

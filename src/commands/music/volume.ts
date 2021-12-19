@@ -2,7 +2,7 @@ import { CommandInteraction, GuildMember, Message } from "discord.js";
 
 import { ServerQueue, SlashCommand } from "../../classes/NorthClient";
 import { msgOrRes } from "../../function";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 
 class VolumeCommand implements SlashCommand {
     name = "volume"
@@ -26,7 +26,7 @@ class VolumeCommand implements SlashCommand {
     ]
 
     async execute(interaction: CommandInteraction) {
-        var serverQueue = getQueues().get(interaction.guild.id);
+        var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const pct = interaction.options.getInteger("percentage");
         if (!pct) return await interaction.reply(`The current volume is **${Math.round(serverQueue.volume * 100)}%** and the current volume of the soundtrack is **${Math.round(serverQueue.volume * (serverQueue.songs[0] && serverQueue.songs[0].volume ? serverQueue.songs[0].volume : 1) * 100)}%**`);
@@ -34,7 +34,7 @@ class VolumeCommand implements SlashCommand {
     }
 
     async run(message: Message, args: string[]) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (!args[0]) return await message.channel.send(`The current volume is **${Math.round(serverQueue.volume * 100)}%** and the current volume of the soundtrack is **${Math.round(serverQueue.volume * (serverQueue.songs[0] && serverQueue.songs[0].volume ? serverQueue.songs[0].volume : 1) * 100)}%**`);
         if (isNaN(Number(args[0]))) return await message.channel.send("The percentage change you gave is not a number!");

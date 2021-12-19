@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient";
-import { getQueues, setQueue, updateQueue } from "../../helpers/music";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { msgOrRes } from "../../function";
 
 class RepeatCommand implements SlashCommand {
@@ -19,7 +19,7 @@ class RepeatCommand implements SlashCommand {
     }
 
     async repeat(message: Message | CommandInteraction) {
-        var serverQueue = getQueues().get(message.guild.id);
+        var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.repeating = !serverQueue.repeating;
         if (serverQueue.repeating && serverQueue.looping) {
