@@ -91,8 +91,7 @@ export function createEmbed(songs: SoundTrack[]) {
 }
 
 export async function play(guild: Discord.Guild, song: SoundTrack) {
-  const queue = getQueue();
-  const serverQueue = queue.get(guild.id);
+  const serverQueue = getQueue(guild.id);
   if (!serverQueue.voiceChannel && guild.me.voice?.channel) serverQueue.voiceChannel = <Discord.VoiceChannel>guild.me.voice.channel;
   serverQueue.playing = true;
   if (!song && serverQueue.songs.length > 0) {
