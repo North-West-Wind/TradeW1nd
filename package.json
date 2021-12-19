@@ -38,7 +38,7 @@
     "music-metadata": "^7.11.4",
     "mysql2": "^2.3.3-rc.0",
     "node-fetch": "^2.6.6",
-    "puppeteer-core": "^12.0.0",
+    "puppeteer-core": "^13.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
