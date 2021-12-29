@@ -150,18 +150,18 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
     console.error(err);
     serverQueue.player?.emit("error", new AudioPlayerError(err instanceof Error ? err : new Error(err), serverQueue.resource));
   }
-  if (serverQueue.textChannel) {
-    const Embed = new Discord.MessageEmbed()
-      .setColor(color())
-      .setTitle("Now playing:")
-      .setThumbnail(song.thumbnail)
-      .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
-      .setTimestamp()
-      .setFooter("Have a nice day! :)", guild.client.user.displayAvatarURL());
-    const msg = await serverQueue.textChannel.send({ embeds: [Embed] });
-    await wait(30000);
-    msg.delete().catch(() => { });
-  }
+  // if (serverQueue.textChannel) {
+  //   const Embed = new Discord.MessageEmbed()
+  //     .setColor(color())
+  //     .setTitle("Now playing:")
+  //     .setThumbnail(song.thumbnail)
+  //     .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
+  //     .setTimestamp()
+  //     .setFooter("Have a nice day! :)", guild.client.user.displayAvatarURL());
+  //   const msg = await serverQueue.textChannel.send({ embeds: [Embed] });
+  //   await wait(30000);
+  //   msg.delete().catch(() => { });
+  // }
 }
 
 class PlayCommand implements SlashCommand {
