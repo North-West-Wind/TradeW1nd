@@ -172,7 +172,7 @@ export class RadioChannel {
                 this.seek = Math.floor(((this.player.state.status == AudioPlayerStatus.Playing ? this.player.state.playbackDuration : this.startTime) - this.startTime) / 1000);
                 this.updateSeek();
             }, 30000);
-        }).on(AudioPlayerStatus.Idle, async () => {
+        }).on(AudioPlayerStatus.Idle || "error", async () => {
             clearInterval(this.interval);
             this.seek = 0;
             const finished = this.tracks.shift();
