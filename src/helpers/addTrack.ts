@@ -546,13 +546,13 @@ export async function search(message: Message | Discord.CommandInteraction, link
     });
     return new Promise<{ error: boolean, songs: any[], msg: Message, message: any }>(resolve => {
         collector.on("end", async () => {
-            if (val.error && !msg.deleted) {
+            if (val.error) {
                 const cancelled = new Discord.MessageEmbed()
                     .setColor(color())
                     .setTitle("Action cancelled.")
                     .setTimestamp()
                     .setFooter("Have a nice day! :)", message.client.user.displayAvatarURL());
-                await msg.edit({ embeds: [cancelled] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
+                msg.edit({ embeds: [cancelled] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
             }
             resolve(val);
         });
