@@ -37,7 +37,10 @@ function reloadClient() {
 
 export default async (client: NorthClient) => {
   if (!fs.existsSync("log")) fs.mkdirSync("log");
-  SimpleNodeLogger.createSimpleFileLogger(`log/console_${client.id}.log`);
+  SimpleNodeLogger.createSimpleLogger({
+		logFilePath: `log/console_${client.id}.log`,
+		timestampFormat: 'YYYY-MM-DD HH:mm:ss.SSS'
+	});
 
   const mysql_config = {
     connectTimeout: 30000,
