@@ -4,7 +4,7 @@
   "description": "N0rthWestW1nd with only music functions.",
   "main": "out/main.js",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --trace-warnings out/main.js",
+    "start": "node --optimize_for_size --gc_interval=100 --trace-warnings out/main.js",
     "tsc": "node fix.js && tsc"
   },
   "engines": {

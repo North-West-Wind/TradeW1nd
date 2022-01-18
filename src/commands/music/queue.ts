@@ -117,7 +117,7 @@ class QueueCommand implements SlashCommand {
                 .setTitle(`Song queue for ${message.guild.name} [${i + 1}/${Math.ceil(songArray.length / 10)}]`)
                 .setDescription(`There are ${songArray.length} tracks in total.\n\n${pageArray.join("\n")}`)
                 .setTimestamp()
-                .setFooter(`Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")} | LP: ${serverQueue.looping ? "Y" : "N"} | RP: ${serverQueue.repeating ? "Y" : "N"} | RD: ${serverQueue.random ? "Y" : "N"}`, message.client.user.displayAvatarURL());
+                .setFooter({ text: `Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")} | LP: ${serverQueue.looping ? "Y" : "N"} | RP: ${serverQueue.repeating ? "Y" : "N"} | RD: ${serverQueue.random ? "Y" : "N"}`, iconURL: message.client.user.displayAvatarURL() });
             allEmbeds.push(queueEmbed);
         }
         if (allEmbeds.length == 1) await msgOrRes(message, allEmbeds[0]).then(msg => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
@@ -193,7 +193,7 @@ class QueueCommand implements SlashCommand {
                 .setTitle(`Queue - ${result.name}`)
                 .setDescription(`There are ${queue.length} tracks in total.\n\n${pageArray.join("\n")}`)
                 .setTimestamp()
-                .setFooter(queue.length > pageArray.length ? "Cannot show all soundtracks here..." : "Here are all the soundtracks in this queue.", message.client.user.displayAvatarURL());
+                .setFooter({ text: queue.length > pageArray.length ? "Cannot show all soundtracks here..." : "Here are all the soundtracks in this queue.", iconURL: message.client.user.displayAvatarURL() });
             allEmbeds.push(queueEmbed);
         }
         const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
@@ -203,7 +203,7 @@ class QueueCommand implements SlashCommand {
             .setTitle(`Stored queues of **${author.tag}**`)
             .setDescription(`Slots used: **${results.length}/10**\n\n${queues.join("\n")}`)
             .setTimestamp()
-            .setFooter("React to the numbers to view your queue.", client.user.displayAvatarURL());
+            .setFooter({ text: "React to the numbers to view your queue.", iconURL: client.user.displayAvatarURL() });
         allEmbeds.unshift(em);
         var msg = await msgOrRes(message, em);
         for (let i = 0; i < Math.min(num, 10); i++) {

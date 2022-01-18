@@ -75,7 +75,7 @@ class HelpCommand implements SlashCommand {
             .setDescription(`[**Click this**](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd) for the user manual.\nIf you need any support, you can join the [**Support Server**](https://discord.gg/S44PNSh)\n\nI don't know if you need but [**here's N0rthWestW1nd**](https://top.gg/bot/649611982428962819) in [**Discord bot List**](https://top.gg)!`)
             .setThumbnail(message.client.user.displayAvatarURL())
             .setTimestamp()
-            .setFooter("Have a nice day! :)", message.client.user.displayAvatarURL());
+            .setFooter({ text: "Have a nice day! :)", iconURL: message.client.user.displayAvatarURL() });
         for (let i = 0; i < categories.length; i++) {
             Embed.addField(`**${categories[i]}**`, Array.from(NorthClient.storage.commands.filter(x => x.category === i).keys()).join("\n"), true);
         }

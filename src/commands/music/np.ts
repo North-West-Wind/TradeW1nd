@@ -65,7 +65,7 @@ class NPCommand implements SlashCommand {
             .setColor(color())
             .setTitle("Now playing:" + (serverQueue.playing ? "" : " (Not actually)"))
             .setTimestamp()
-            .setFooter(`Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, client.user.displayAvatarURL());
+            .setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: client.user.displayAvatarURL() });
 
         const songLength = !serverQueue.songs[0].time ? "∞" : moment.duration(serverQueue.songs[0].time, "seconds").format();
         if (serverQueue.songs[0].type === 1) info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].spot})**\nLength: **${songLength}**`, serverQueue.songs[0].thumbnail];

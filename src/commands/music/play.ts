@@ -85,7 +85,7 @@ export function createEmbed(songs: SoundTrack[]) {
     .setThumbnail(songs[0].thumbnail)
     .setDescription(`**[${songs[0].title}](${songs[0].url})**\nLength: **${songLength}**`)
     .setTimestamp()
-    .setFooter("Have a nice day! :)", client.user.displayAvatarURL());
+    .setFooter({ text: "Have a nice day! :)", iconURL: client.user.displayAvatarURL() });
   if (songs.length > 1) Embed.setDescription(`**${songs.length}** tracks were added.`).setThumbnail(undefined);
   return Embed;
 }
@@ -157,7 +157,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   //     .setThumbnail(song.thumbnail)
   //     .setDescription(`**[${song.title}](${song.type === 1 ? song.spot : song.url})**\nLength: **${!song.time ? "∞" : moment.duration(song.time, "seconds").format()}**${seek > 0 ? ` | Starts From: **${moment.duration(seek, "seconds").format()}**` : ""}`)
   //     .setTimestamp()
-  //     .setFooter("Have a nice day! :)", guild.client.user.displayAvatarURL());
+  //     .setFooter({ text: "Have a nice day! :)", iconURL: guild.client.user.displayAvatarURL() });
   //   const msg = await serverQueue.textChannel.send({ embeds: [Embed] });
   //   await wait(30000);
   //   msg.delete().catch(() => { });

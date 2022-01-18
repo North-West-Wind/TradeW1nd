@@ -443,7 +443,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
         .setTitle(`Search result of ${link} on YouTube`)
         .setColor(color())
         .setTimestamp()
-        .setFooter("Please do so within 60 seconds.", message.client.user.displayAvatarURL());
+        .setFooter({ text: "Please do so within 60 seconds.", iconURL: message.client.user.displayAvatarURL() });
     const results = [];
     try {
         const searched = await ytsr(link, { limit: 20 });
@@ -472,7 +472,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
         .setTitle(`Search result of ${link} on SoundCloud`)
         .setColor(color())
         .setTimestamp()
-        .setFooter("Please do so within 60 seconds.", message.client.user.displayAvatarURL());
+        .setFooter({ text: "Please do so within 60 seconds.", iconURL: message.client.user.displayAvatarURL() });
     try {
         var scSearched = await scdl.search({
             limit: 20,
@@ -538,7 +538,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
                 .setThumbnail(results[s][o].thumbnail)
                 .setDescription(`**[${decodeHtmlEntity(results[s][o].title)}](${results[s][o].url})** : **${length}**`)
                 .setTimestamp()
-                .setFooter("Have a nice day :)", message.client.user.displayAvatarURL());
+                .setFooter({ text: "Have a nice day :)", iconURL: message.client.user.displayAvatarURL() });
             await msg.edit({ embeds: [chosenEmbed] });
             val = { error: false, songs: [results[s][o]], msg, message: null };
             collector.emit("end");
@@ -551,7 +551,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
                     .setColor(color())
                     .setTitle("Action cancelled.")
                     .setTimestamp()
-                    .setFooter("Have a nice day! :)", message.client.user.displayAvatarURL());
+                    .setFooter({ text: "Have a nice day! :)", iconURL: message.client.user.displayAvatarURL() });
                 msg.edit({ embeds: [cancelled] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
             }
             resolve(val);
