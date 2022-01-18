@@ -42,9 +42,9 @@
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
+    "simple-node-logger": "^21.8.12",
     "soundcloud-downloader": "^1.0.0",
     "spotify-web-api-node": "^5.0.2",
-    "winston": "^3.3.3",
     "ytdl-core": "^4.9.1",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"
