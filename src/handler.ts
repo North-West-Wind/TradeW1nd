@@ -50,7 +50,7 @@ export class Handler {
     }
 
     async readServers(client: NorthClient) {
-        const [results] = await query("SELECT * FROM servers WHERE id <> '622311594654695434'");
+        const results = await query("SELECT * FROM servers WHERE id <> '622311594654695434'");
         for (const result of results) {
             if (!inited && (result.queue || result.looping || result.repeating)) {
                 var queue = [];
