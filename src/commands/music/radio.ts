@@ -7,7 +7,6 @@ import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, 
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio";
 import { createEmbed } from "./play";
-import { globalClient as client } from "../../common";
 const type = [
     "YouTube",
     "Spotify",
@@ -224,8 +223,6 @@ class RadioCommand implements SlashCommand {
 
     async copy(message: Message | CommandInteraction, channel: number) {
         var serverQueue = getQueue(message.guildId);
-        const pool = client.pool;
-        const author = message instanceof Message ? message.author : message.user;
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
         const radio = players[channel - 1];
         if (radio.tracks.length == 0) return await msgOrRes(message, "The queue of this radio channel is empty!");
