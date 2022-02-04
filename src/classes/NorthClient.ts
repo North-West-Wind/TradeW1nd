@@ -1,12 +1,11 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
 import { Client, ClientOptions, Collection, CommandInteraction, GuildMember, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
-import { Pool, RowDataPacket } from "mysql2/promise";
+import { RowDataPacket } from "mysql2/promise";
 import { probeAndCreateResource } from "../commands/music/play";
-import { globalClient } from "../common";
 import { getStream } from "../helpers/addTrack";
-import { addUsing, createDiscordJSAdapter, removeUsing } from "../helpers/music";
+import { addUsing, removeUsing } from "../helpers/music";
 import * as Stream from "stream";
-import { msgOrRes } from "../function";
+import { query } from "../function";
 const ffmpeg = require("fluent-ffmpeg");
 
 export class NorthClient extends Client {
@@ -16,11 +15,9 @@ export class NorthClient extends Client {
 
     id: number;
     prefix: string;
-    pool: Pool;
     version: string;
     static storage: ClientStorage;
 
-    setPool(pool: Pool) { this.pool = pool; }
     setVersion(version: string) { this.version = version; }
 }
 
@@ -214,13 +211,13 @@ export class RadioChannel {
 
     async update() {
         try {
-            await globalClient.pool.query(`UPDATE radio SET queue = "${escape(JSON.stringify(this.tracks))}" WHERE id = ${this.id}`);
+            await query(`UPDATE radio SET queue = "${escape(JSON.stringify(this.tracks))}" WHERE id = ${this.id}`);
         } catch (err) {}
     }
 
     async updateSeek() {
         try {
-            await globalClient.pool.query(`UPDATE radio SET seek = "${this.seek || 0}" WHERE id = ${this.id}`);
+            await query(`UPDATE radio SET seek = "${this.seek || 0}" WHERE id = ${this.id}`);
         } catch (err) {}
     }
 }

@@ -251,7 +251,7 @@ export function requestYTDLStream(url: string, opts: downloadOptions & { timeout
 
 export async function fixGuildRecord(id: Discord.Snowflake) {
     if (NorthClient.storage.guilds[id]) return NorthClient.storage.guilds[id];
-    const [results] = <RowDataPacket[][]> await globalClient.pool.query("SELECT id FROM servers WHERE id = " + id);
+    const results = await query("SELECT id FROM servers WHERE id = " + id);
     if (results.length > 0) {
         if (results[0].queue || results[0].looping || results[0].repeating) {
             var queue = [];
@@ -262,7 +262,7 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
         NorthClient.storage.guilds[results[0].id] = new GuildConfig(results[0]);
     } else {
         try {
-            await globalClient.pool.query(`INSERT INTO servers (id, autorole, giveaway, safe) VALUES ('${id}', '[]', '${escape("🎉")}', 1)`);
+            await query(`INSERT INTO servers (id, autorole, giveaway, safe) VALUES ('${id}', '[]', '${escape("🎉")}', 1)`);
             NorthClient.storage.guilds[id] = new GuildConfig();
         } catch (err: any) { }
     }
@@ -289,4 +289,10 @@ export function humanDurationToNum(duration: string) {
 export async function getOwner() {
 	if (!globalClient.application?.owner) await globalClient.application?.fetch();
     return globalClient.application?.owner.id;
+}
+
+export async function query(query: string) {
+    const res = await fetch("http://localhost:4269/api/" + query + "?token=" + process.env.DB_TOKEN);
+    if (!res.ok) return null;
+    else return await res.json();
 }

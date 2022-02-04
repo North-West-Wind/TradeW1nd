@@ -1,9 +1,8 @@
-import { CommandInteraction, Guild, Interaction, Message, VoiceState } from "discord.js";
+import { Guild, Interaction, Message, VoiceState } from "discord.js";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
-import { RowDataPacket } from "mysql2";
-import { fixGuildRecord, messagePrefix } from "./function";
+import { fixGuildRecord, messagePrefix, query } from "./function";
 import { getQueue, setQueue, stop } from "./helpers/music";
 import { NorthClient, GuildConfig } from "./classes/NorthClient";
 import * as filter from "./helpers/filter";
@@ -51,8 +50,7 @@ export class Handler {
     }
 
     async readServers(client: NorthClient) {
-        const con = await client.pool.getConnection();
-        const [results] = <RowDataPacket[][]><unknown>await con.query("SELECT * FROM servers WHERE id <> '622311594654695434'");
+        const [results] = await query("SELECT * FROM servers WHERE id <> '622311594654695434'");
         for (const result of results) {
             if (!inited && (result.queue || result.looping || result.repeating)) {
                 var queue = [];
@@ -64,7 +62,6 @@ export class Handler {
             else if (NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id].prefix = result.prefix;
         }
         inited = true;
-        con.release();
         setTimeout(async () => this.readServers(client), 3600000);
     }
 
@@ -90,10 +87,9 @@ export class Handler {
     async guildDelete(guild: Guild) {
         try {
             if (await guild.members.fetch("649611982428962819")) return;
-            const client = <NorthClient>guild.client;
             delete NorthClient.storage.guilds[guild.id];
             try {
-                await client.pool.query("DELETE FROM servers WHERE id=" + guild.id);
+                await query("DELETE FROM servers WHERE id=" + guild.id);
             } catch (err: any) {
                 console.error(err);
             }
