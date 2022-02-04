@@ -291,7 +291,7 @@ export async function getOwner() {
 }
 
 export async function query(query: string) {
-    const res = await fetch("http://localhost:4269/api/" + query + "?token=" + process.env.DB_TOKEN);
+    const res = await fetch("http://localhost:4269/api/" + encodeURIComponent(query) + "?token=" + process.env.DB_TOKEN);
     if (!res.ok) return null;
     else return await res.json();
 }
