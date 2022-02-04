@@ -1,6 +1,5 @@
-import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
-import { Client, ClientOptions, Collection, CommandInteraction, GuildMember, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
-import { RowDataPacket } from "mysql2/promise";
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
+import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { probeAndCreateResource } from "../commands/music/play";
 import { getStream } from "../helpers/addTrack";
 import { addUsing, removeUsing } from "../helpers/music";
@@ -51,7 +50,7 @@ export class GuildConfig {
     prefix?: string;
     exit?: boolean;
 
-    constructor(data: RowDataPacket = (<RowDataPacket> {})) {
+    constructor(data: any = (<any> {})) {
         if (data) {
             this.prefix = data.prefix;
         }

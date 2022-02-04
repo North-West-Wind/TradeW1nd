@@ -9,7 +9,6 @@ import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
-import { RowDataPacket } from "mysql2/promise";
 import { setQueue } from "./helpers/music";
 import originalFetch from "node-fetch";
 import fetchBuilder from "fetch-retry-ts";

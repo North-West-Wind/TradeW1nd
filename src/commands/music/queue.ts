@@ -7,7 +7,6 @@ import * as Discord from "discord.js";
 import { color, createEmbedScrolling, msgOrRes, query } from "../../function";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music";
 import { globalClient as client } from "../../common";
-import { RowDataPacket } from "mysql2";
 
 class QueueCommand implements SlashCommand {
     name = "queue"
