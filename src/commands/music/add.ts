@@ -56,7 +56,7 @@ class AddCommand implements SlashCommand {
             if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
             else msg = await msgOrRes(message, Embed);
             await wait(30000);
-            await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0].title}]**` });
+            msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0].title}]**` }).catch(() => { });
         } catch(err) {
             await msgOrRes(message, "There was an error trying to add the soundtrack to the queue!");
             console.error(err);

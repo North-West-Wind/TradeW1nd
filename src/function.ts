@@ -146,7 +146,7 @@ export async function createEmbedScrolling(message: Discord.Message | Discord.Co
         } else if (id == 2) setTimeout(() => msg.edit({ embeds: [], content: `**[Lyrics of ${additionalData.title}**]` }).catch(() => {}), 10000);
         else if (id == 3) setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${additionalData.songArray.length} tracks in total]**` }).catch(() => {}), 60000);
     });
-    return { msg: msg, collector: collector };
+    return { msg, collector };
 }
 export function genPermMsg(permissions: number, id) {
     if (id == 0) return `You need the permissions \`${new Discord.Permissions(BigInt(permissions)).toArray().join("`, `")}\` to use this command.`;

@@ -142,9 +142,8 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
       const command = ffmpeg(stream);
       const passthru = new Stream.PassThrough();
       command.on("error", err => console.error(err.message)).seekInput(seek).format("wav").output(passthru, { end: true }).run();
-      serverQueue.player?.play(await probeAndCreateResource(passthru));
-    } else serverQueue.player?.play(await probeAndCreateResource(stream));
-    if (!serverQueue.player) return;
+      serverQueue.player.play(await probeAndCreateResource(passthru));
+    } else serverQueue.player.play(await probeAndCreateResource(stream));
     await entersState(serverQueue.player, AudioPlayerStatus.Playing, 5e3);
   } catch (err: any) {
     console.error(err);
@@ -252,7 +251,7 @@ class PlayCommand implements SlashCommand {
       var msg: Discord.Message;
       if (result.msg) await result.msg.edit({ content: null, embeds: [Embed] });
       else await msgOrRes(message, Embed);
-      setTimeout(async () => { try { await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }) } catch (err: any) { } }, 30000);
+      setTimeout(() => { try { msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }).catch(() => { }) } catch (err: any) { } }, 30000);
       updateQueue(message.guild.id, serverQueue);
       if (!serverQueue.player) serverQueue.player = createPlayer(message.guild);
       serverQueue.voiceChannel = voiceChannel;
