@@ -14,7 +14,6 @@ const type = [
     "SoundCloud",
     "Google Drive",
     "Musescore",
-    "PornHub",
     "MSCZ/MSCX"
 ];
 
@@ -102,6 +101,7 @@ class RadioCommand implements SlashCommand {
             await interaction.deferReply();
             return await this.add(interaction, interaction.options.getString("track"), interaction.options.getInteger("channel"));
         } else if (sub === "info") return await this.info(interaction, interaction.options.getInteger("channel"));
+        else if (sub === "copy") return await this.copy(interaction, interaction.options.getInteger("channel"));
     }
 
     async run(message: Message, args: string[]) {
@@ -124,6 +124,11 @@ class RadioCommand implements SlashCommand {
             if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
             if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
             return await this.info(message, channel);
+        } else if (args[0] === "copy") {
+            const channel = parseInt(args[1]);
+            if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
+            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
+            return await this.copy(message, channel);
         }
     }
 
