@@ -8,9 +8,7 @@ import moment from "moment";
 import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
 import { setQueue } from "./helpers/music.js";
-import originalFetch from "node-fetch";
-import fetchBuilder from "fetch-retry-ts";
-export const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
+import fetch from "node-fetch";
 
 export function twoDigits(d) {
     if (0 <= d && d < 10) return "0" + d.toString();
