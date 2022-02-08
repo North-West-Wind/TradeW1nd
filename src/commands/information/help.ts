@@ -20,7 +20,7 @@ class HelpCommand implements SlashCommand {
                 type: "SUB_COMMAND"
             }
         ];
-        const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
+        const commandFiles = deepReaddir("./out/src/commands").filter(file => file.endsWith(".js"));
         for (const category of categories) {
             const fetchOpt = {
                 name: "command",

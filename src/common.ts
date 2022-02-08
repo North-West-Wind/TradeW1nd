@@ -44,7 +44,7 @@ export default async (client: NorthClient) => {
   console.log = (message: string, ...data: any[]) => logger.info(message, ...data);
   console.error = (message: string, ...data: any[]) => logger.error(message, ...data);
 
-  const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
+  const commandFiles = deepReaddir("./out/src/commands").filter(file => file.endsWith(".js"));
   for (const file of commandFiles) {
     const command = <SlashCommand>(await import(file)).default;
     NorthClient.storage.commands.set(command.name, command);

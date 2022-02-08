@@ -5,7 +5,7 @@
   "exports": "out/src/main.js",
   "type": "module",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/main.js",
+    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/src/main.js",
     "tsc": "node fix.js && tsc"
   },
   "engines": {
