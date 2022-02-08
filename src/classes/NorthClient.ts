@@ -1,11 +1,11 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
 import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
-import { probeAndCreateResource } from "../commands/music/play";
-import { getStream } from "../helpers/addTrack";
-import { addUsing, removeUsing } from "../helpers/music";
+import { probeAndCreateResource } from "../commands/music/play.js";
+import { getStream } from "../helpers/addTrack.js";
+import { addUsing, removeUsing } from "../helpers/music.js";
 import * as Stream from "stream";
-import { query } from "../function";
-const ffmpeg = require("fluent-ffmpeg");
+import { query } from "../function.js";
+import Ffmpeg from "fluent-ffmpeg";
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -193,7 +193,7 @@ export class RadioChannel {
             const stream = await getStream(this.tracks[0], { type: "radio", tracks: this.tracks });
             if (this.seek) {
                 console.log(`Fast-forwarding radio channel #${this.id} to where we left off (${this.seek}s)`)
-                const command = ffmpeg(stream);
+                const command = Ffmpeg(stream);
                 const passthru = new Stream.PassThrough({ highWaterMark: 1 << 25 });
                 command.on("error", err => console.error(err.message)).seekInput(this.seek).format("wav").output(passthru, { end: true }).run();
                 this.player.play(await probeAndCreateResource(passthru));

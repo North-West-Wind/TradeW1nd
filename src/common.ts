@@ -1,10 +1,10 @@
-import { ClientStorage, NorthClient, SlashCommand } from "./classes/NorthClient";
-import { deepReaddir } from "./function";
+import { ClientStorage, NorthClient, SlashCommand } from "./classes/NorthClient.js";
+import { deepReaddir } from "./function.js";
 import * as fs from "fs";
 import isOnline from "is-online";
 import SimpleNodeLogger from "simple-node-logger";
-import { Handler } from "./handler";
-const { version } = require("../package.json");
+import { Handler } from "./handler.js";
+import pkg from "../package.json";
 var globalClient: NorthClient;
 
 process.on('unhandledRejection', (reason) => {
@@ -50,7 +50,7 @@ export default async (client: NorthClient) => {
     NorthClient.storage.commands.set(command.name, command);
   }
   if (!fs.existsSync(process.env.CACHE_DIR)) fs.mkdirSync(process.env.CACHE_DIR);
-  client.setVersion(version);
+  client.setVersion(pkg.version);
   globalClient = client;
 }
 

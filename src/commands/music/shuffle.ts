@@ -1,8 +1,8 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient";
-import { msgOrRes, shuffleArray } from "../../function";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { msgOrRes, shuffleArray } from "../../function.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
 class ShuffleCommand implements SlashCommand {
     name = "shuffle"

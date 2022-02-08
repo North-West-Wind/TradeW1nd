@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { msgOrRes } from "../../function";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { msgOrRes } from "../../function.js";
 
 class RepeatCommand implements SlashCommand {
     name = "repeat"

@@ -1,10 +1,10 @@
 import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
 
-import { NorthClient, SlashCommand } from "../../classes/NorthClient";
-import { moveArray, msgOrRes } from "../../function";
-import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { play } from "./play";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { moveArray, msgOrRes } from "../../function.js";
+import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { play } from "./play.js";
 
 export async function migrate(message: Message | CommandInteraction) {
     var serverQueue = getQueue(message.guild.id);

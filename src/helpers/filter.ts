@@ -1,8 +1,8 @@
 import { CommandInteraction, GuildMember, Message, Permissions, TextChannel } from "discord.js";
-import { Command } from "../classes/NorthClient";
-import { genPermMsg, getOwner, msgOrRes } from "../function";
-import { getQueue } from "./music";
-import { isPlaying } from "./radio";
+import { Command } from "../classes/NorthClient.js";
+import { genPermMsg, getOwner, msgOrRes } from "../function.js";
+import { getQueue } from "./music.js";
+import { isPlaying } from "./radio.js";
 
 var timeout: NodeJS.Timeout;
 

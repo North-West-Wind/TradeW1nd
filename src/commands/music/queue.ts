@@ -2,11 +2,11 @@ import { Message } from "discord.js";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
-import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient";
+import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
-import { color, createEmbedScrolling, msgOrRes, query } from "../../function";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { globalClient as client } from "../../common";
+import { color, createEmbedScrolling, msgOrRes, query } from "../../function.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { globalClient as client } from "../../common.js";
 
 class QueueCommand implements SlashCommand {
     name = "queue"

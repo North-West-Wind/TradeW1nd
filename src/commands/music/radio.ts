@@ -1,12 +1,12 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, MessageEmbed, VoiceChannel } from "discord.js";
 import * as moment from "moment";
-import { SlashCommand } from "../../classes/NorthClient";
-import { color, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function";
-import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
-import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio";
-import { createEmbed } from "./play";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { color, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
+import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
+import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio.js";
+import { createEmbed } from "./play.js";
 const type = [
     "YouTube",
     "Spotify",
@@ -163,7 +163,7 @@ class RadioCommand implements SlashCommand {
             else if (validSPURL(str)) result = await addSPURL(message, str);
             else if (validSCURL(str)) result = await addSCURL(str);
             else if (validGDFolderURL(str)) {
-                const msg = message instanceof Message ? await message.channel.send("Processing track: (Initializing)") : <Message>await message.reply({ content: "Processing track: (Initializing)", fetchReply: true });
+                const msg = await msgOrRes(message, "Processing track: (Initializing)");
                 result = await addGDFolderURL(str, async (i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
                 result.msg = msg;
             } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);

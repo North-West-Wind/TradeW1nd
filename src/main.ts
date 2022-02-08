@@ -1,11 +1,11 @@
 import * as dotenv from "dotenv";
-import { Handler } from "./handler";
-import { NorthClient, ClientStorage } from "./classes/NorthClient";
+import { Handler } from "./handler.js";
+import { NorthClient, ClientStorage } from "./classes/NorthClient.js";
 import { Intents, Options } from "discord.js";
 import express from "express";
+import config from "../config.json";
 dotenv.config();
 
-const { prefix0 } = require("../config.json");
 const client = new NorthClient({
     restRequestTimeout: 60000,
     makeCache: Options.cacheWithLimits({
@@ -25,7 +25,7 @@ const client = new NorthClient({
 });
 NorthClient.storage = new ClientStorage();
 
-client.prefix = prefix0;
+client.prefix = config.prefix0;
 client.id = 0;
 Handler.setup(client, process.env.TOKEN0);
 

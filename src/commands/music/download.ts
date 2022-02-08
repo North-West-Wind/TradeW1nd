@@ -1,12 +1,12 @@
 
-import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient";
+import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
 import scdl from 'soundcloud-downloader/dist/index';
-import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function";
-import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search } from "../../helpers/addTrack";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { getMP3 } from "../../helpers/musescore";
+import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function.js";
+import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search } from "../../helpers/addTrack.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { getMP3 } from "../../helpers/musescore.js";
 
 class DownloadCommand implements SlashCommand {
     name = "download"

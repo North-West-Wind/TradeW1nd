@@ -1,9 +1,9 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient";
-import { moveArray, msgOrRes } from "../../function";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { play } from "./play";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { moveArray, msgOrRes } from "../../function.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { play } from "./play.js";
 
 class RemoveCommand implements SlashCommand {
     name = "remove"

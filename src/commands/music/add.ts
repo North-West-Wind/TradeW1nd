@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient";
-import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, msgOrRes, wait } from "../../function";
-import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { createEmbed } from "./play";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, msgOrRes, wait } from "../../function.js";
+import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { createEmbed } from "./play.js";
 
 class AddCommand implements SlashCommand {
     name = "add"
@@ -37,7 +37,7 @@ class AddCommand implements SlashCommand {
             else if (validSPURL(str)) result = await addSPURL(message, str);
             else if (validSCURL(str)) result = await addSCURL(str);
             else if (validGDFolderURL(str)) {
-                const msg = message instanceof Message ? await message.channel.send("Processing track: (Initializing)") : <Message> await message.reply({ content: "Processing track: (Initializing)", fetchReply: true });
+                const msg = await msgOrRes(message, "Processing track: (Initializing)");
                 result = await addGDFolderURL(str, async(i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
                 result.msg = msg;
             } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);

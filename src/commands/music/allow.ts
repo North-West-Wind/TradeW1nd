@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, Role, User } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient";
-import { msgOrRes } from "../../function";
-import { getQueue } from "../../helpers/music";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { msgOrRes } from "../../function.js";
+import { getQueue } from "../../helpers/music.js";
 
 class AllowCommand implements SlashCommand {
     name = "allow"

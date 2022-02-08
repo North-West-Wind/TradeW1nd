@@ -1,5 +1,5 @@
-import { GuildConfig, NorthClient } from "./classes/NorthClient";
-import { globalClient } from "./common";
+import { GuildConfig, NorthClient } from "./classes/NorthClient.js";
+import { globalClient } from "./common.js";
 import * as Discord from "discord.js";
 import superms from "ms";
 import * as fs from "fs";
@@ -9,7 +9,7 @@ import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
-import { setQueue } from "./helpers/music";
+import { setQueue } from "./helpers/music.js";
 import originalFetch from "node-fetch";
 import fetchBuilder from "fetch-retry-ts";
 export const fetch = fetchBuilder(originalFetch, { retries: 5, retryDelay: attempt => Math.pow(2, attempt) * 1000 });
@@ -293,5 +293,5 @@ export async function getOwner() {
 export async function query(query: string) {
     const res = await fetch("http://localhost:4269/api/" + encodeURIComponent(query) + "?token=" + process.env.DB_TOKEN);
     if (!res.ok) return null;
-    else return await res.json();
+    else return <any> await res.json();
 }

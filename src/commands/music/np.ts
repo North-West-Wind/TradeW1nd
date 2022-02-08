@@ -1,12 +1,12 @@
 
-import { SlashCommand } from "../../classes/NorthClient";
+import { SlashCommand } from "../../classes/NorthClient.js";
 import * as moment from "moment";
 import formatSetup from "moment-duration-format";
 formatSetup(moment);
 import * as Discord from "discord.js";
-import { color, msgOrRes } from "../../function";
-import { getQueue, setQueue, updateQueue } from "../../helpers/music";
-import { globalClient as client } from "../../common";
+import { color, msgOrRes } from "../../function.js";
+import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
+import { globalClient as client } from "../../common.js";
 
 const type = [
     "YouTube",

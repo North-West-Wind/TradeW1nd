@@ -1,5 +1,5 @@
-import { NorthClient, SlashCommand } from "../../classes/NorthClient";
-import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
 import * as Discord from "discord.js";
 
 export const categories = ["Music", "Information", "Dev"];
@@ -27,7 +27,7 @@ class HelpCommand implements SlashCommand {
                 description: "The command to fetch.",
                 required: true,
                 type: "STRING",
-                choices: commandFiles.map(file => require(file)).filter(command => command.category === categories.indexOf(category)).map(x => ({ name: x.name, value: x.name }))
+                choices: commandFiles.map(async file => (await import(file)).default).filter(command => command.category === categories.indexOf(category)).map(x => ({ name: x.name, value: x.name }))
             };
             const option = {
                 name: category.toLowerCase(),

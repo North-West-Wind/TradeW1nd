@@ -2,9 +2,10 @@
   "name": "tradew1nd",
   "version": "1.1.0",
   "description": "N0rthWestW1nd with only music functions.",
-  "main": "out/main.js",
+  "exports": "out/src/main.js",
+  "type": "module",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --trace-warnings out/main.js",
+    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/main.js",
     "tsc": "node fix.js && tsc"
   },
   "engines": {
@@ -36,8 +37,8 @@
     "moment-duration-format": "^2.3.2",
     "musescore-metadata": "^1.0.3",
     "music-metadata": "^7.11.4",
-    "node-fetch": "^2.6.6",
-    "puppeteer-core": "^13.0.0",
+    "node-fetch": "^3.2.0",
+    "puppeteer-core": "^13.2.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
