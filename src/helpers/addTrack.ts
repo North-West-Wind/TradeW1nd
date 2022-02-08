@@ -4,7 +4,7 @@ import { Message } from "discord.js";
 formatSetup(moment);
 import * as mm from "music-metadata";
 import muse from "musescore-metadata";
-import scdl from 'soundcloud-downloader/dist/index';
+import scdl from 'soundcloud-downloader/dist/index.js';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
