@@ -5,7 +5,7 @@ import scdl from 'soundcloud-downloader/dist/index.js';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
-import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream, fetch, duration } from "../function.js";
+import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream, duration } from "../function.js";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
 import * as crypto from "crypto";
@@ -16,6 +16,7 @@ import { ServerQueue, SoundTrack } from "../classes/NorthClient.js";
 import { getMP3 } from "./musescore.js";
 import { cacheTrack, findCache, updateQueue } from "./music.js";
 import { TrackInfo } from "soundcloud-downloader/dist/info";
+import fetch from "node-fetch";
 var spotifyApi: SpotifyWebApi;
 
 export function init() {
