@@ -109,8 +109,11 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
     serverQueue.connection?.subscribe(serverQueue.player);
   }
   if (!serverQueue.connection) try {
-    serverQueue.connection = joinVoiceChannel({ channelId: serverQueue.voiceChannel.id, guildId: guild.id, adapterCreator: createDiscordJSAdapter(serverQueue.voiceChannel) })
-    serverQueue.connection.subscribe(serverQueue.player);
+    if (guild.me.voice?.channelId === serverQueue.voiceChannel.id) serverQueue.connection = getVoiceConnection(guild.id);
+    else {
+      serverQueue.connection = joinVoiceChannel({ channelId: serverQueue.voiceChannel.id, guildId: guild.id, adapterCreator: createDiscordJSAdapter(serverQueue.voiceChannel) })
+      serverQueue.connection.subscribe(serverQueue.player);
+    }
     if (!guild.me.voice.selfDeaf) guild.me.voice.setDeaf(true).catch(() => { });
   } catch (err: any) {
     serverQueue?.destroy();
@@ -121,7 +124,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
     }
   }
   const streamTime = serverQueue.getPlaybackDuration();
-  const seek = serverQueue.seek;
+  const seek = serverQueue.seek || 0;
   if (seek) serverQueue.seek = undefined;
   if (serverQueue.connection) serverQueue.startTime = streamTime - seek * 1000;
   else serverQueue.startTime = -seek * 1000;
