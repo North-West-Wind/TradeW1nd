@@ -4,9 +4,7 @@ import * as Discord from "discord.js";
 import superms from "ms";
 import * as fs from "fs";
 import * as path from "path";
-import * as moment from "moment";
-import formatSetup from "moment-duration-format";
-formatSetup(moment);
+import moment from "moment";
 import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
 import { setQueue } from "./helpers/music.js";
@@ -175,8 +173,13 @@ export function bufferToStream(buf, chunkSize = undefined) {
     }
     return reader;
 }
-export function duration(seconds) {
-    return moment.duration(seconds, "seconds").format();
+export function duration(seconds: number, type: moment.unitOfTime.DurationConstructor = "seconds") {
+    const duration = moment.duration(seconds, type);
+    const str = [];
+    if (duration.hours()) str.push(twoDigits(duration.hours()) + ":");
+    str.push(twoDigits(duration.minutes()) + ":");
+    str.push(twoDigits(duration.seconds()));
+    return str.join("");
 }
 export async function msgOrRes(message: Discord.Message | Discord.CommandInteraction, str: any): Promise<Discord.Message> {
     if (message instanceof Discord.Message) {

@@ -1,11 +1,8 @@
 import * as Discord from "discord.js";
-import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, requestStream, moveArray, color, validGDDLURL, bufferToStream, msgOrRes, wait } from "../../function.js";
+import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, msgOrRes, wait, duration } from "../../function.js";
 import { migrate as music } from "./migrate.js";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
-import * as moment from "moment";
-import formatSetup from "moment-duration-format";
-formatSetup(moment);
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
@@ -78,7 +75,7 @@ export async function probeAndCreateResource(readableStream: Stream.Readable) {
 }
 
 export function createEmbed(songs: SoundTrack[]) {
-  const songLength = songs[0].time == 0 ? "∞" : moment.duration(songs[0].time, "seconds").format();
+  const songLength = songs[0].time == 0 ? "∞" : duration(songs[0].time, "seconds");
   const Embed = new Discord.MessageEmbed()
     .setColor(color())
     .setTitle("New track added:")

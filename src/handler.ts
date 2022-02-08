@@ -1,7 +1,4 @@
 import { Guild, Interaction, Message, VoiceState } from "discord.js";
-import * as moment from "moment";
-import formatSetup from "moment-duration-format";
-formatSetup(moment);
 import { fixGuildRecord, messagePrefix, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
 import { NorthClient, GuildConfig } from "./classes/NorthClient.js";

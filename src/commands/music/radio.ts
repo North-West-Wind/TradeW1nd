@@ -1,8 +1,7 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, MessageEmbed, VoiceChannel } from "discord.js";
-import * as moment from "moment";
 import { SlashCommand } from "../../classes/NorthClient.js";
-import { color, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
+import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio.js";
@@ -201,15 +200,15 @@ class RadioCommand implements SlashCommand {
             processBar.splice(19, 1, "■");
             var positionTime = "∞";
         } else {
-            var positionTime = moment.duration(Math.round(position / 1000), "seconds").format();
+            var positionTime = duration(Math.round(position / 1000), "seconds");
             if (position === 0 || isNaN(position))
                 positionTime = "0:00";
             progress = Math.floor((position / length) * processBar.length);
             processBar.splice(progress, 1, "■");
         }
         var next: string;
-        if (radio.tracks[1]) next = `${radio.tracks[1].title} : ${moment.duration(radio.tracks[1].time, "seconds").format()}`;
-        else if ((radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${moment.duration(radio.tracks[0].time, "seconds").format()}`;
+        if (radio.tracks[1]) next = `${radio.tracks[1].title} : ${duration(radio.tracks[1].time, "seconds")}`;
+        else if ((radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${duration(radio.tracks[0].time, "seconds")}`;
         else next = "Empty";
         var info = [];
         var embed = new MessageEmbed()
@@ -218,7 +217,7 @@ class RadioCommand implements SlashCommand {
             .setTimestamp()
             .setFooter({ text: `Coming up next: ${next}`, iconURL: message.client.user.displayAvatarURL() });
 
-        const songLength = !radio.tracks[0].time ? "∞" : moment.duration(radio.tracks[0].time, "seconds").format();
+        const songLength = !radio.tracks[0].time ? "∞" : duration(radio.tracks[0].time, "seconds");
         if (radio.tracks[0].type === 1) info = [`**[${radio.tracks[0].title}](${radio.tracks[0].spot})**\nLength: **${songLength}**`, radio.tracks[0].thumbnail];
         else info = [`**[${radio.tracks[0].title}](${radio.tracks[0].url})**\nLive: **${isLive ? "Yes" : "No"}**\nType: **${type[radio.tracks[0].type]}**`, radio.tracks[0].thumbnail];
         embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength || "Unknown"}`).setThumbnail(info[1]);

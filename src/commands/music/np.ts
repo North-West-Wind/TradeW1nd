@@ -1,10 +1,7 @@
 
 import { SlashCommand } from "../../classes/NorthClient.js";
-import * as moment from "moment";
-import formatSetup from "moment-duration-format";
-formatSetup(moment);
 import * as Discord from "discord.js";
-import { color, msgOrRes } from "../../function.js";
+import { color, duration, msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { globalClient as client } from "../../common.js";
 
@@ -54,7 +51,7 @@ class NPCommand implements SlashCommand {
             processBar.splice(19, 1, "■");
             var positionTime = "∞";
         } else {
-            var positionTime = moment.duration(Math.round(position / 1000), "seconds").format();
+            var positionTime = duration(Math.round(position / 1000), "seconds");
             if (position === 0 || isNaN(position))
                 positionTime = "0:00";
             progress = Math.floor((position / length) * processBar.length);
@@ -67,7 +64,7 @@ class NPCommand implements SlashCommand {
             .setTimestamp()
             .setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: client.user.displayAvatarURL() });
 
-        const songLength = !serverQueue.songs[0].time ? "∞" : moment.duration(serverQueue.songs[0].time, "seconds").format();
+        const songLength = !serverQueue.songs[0].time ? "∞" : duration(serverQueue.songs[0].time, "seconds");
         if (serverQueue.songs[0].type === 1) info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].spot})**\nLength: **${songLength}**`, serverQueue.songs[0].thumbnail];
         else info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})**\nLive: **${isLive ? "Yes" : "No"}**\nVolume: **${serverQueue.songs[0].volume ? (`${serverQueue.volume * serverQueue.songs[0].volume * 100}% (Local) | ${serverQueue.volume * 100}% (Global)`) : `${serverQueue.volume * 100}%`}**\nType: **${type[serverQueue.songs[0].type]}**`, serverQueue.songs[0].thumbnail];
         embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength || "Unknown"}`).setThumbnail(info[1]);
