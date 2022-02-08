@@ -212,7 +212,7 @@ export function deepReaddir(dir) {
         file = path.resolve(dir, file);
         const stat = fs.statSync(file);
         if (stat && stat.isDirectory()) {
-            const res = module.exports.deepReaddir(file);
+            const res = deepReaddir(file);
             results = results.concat(res);
             return next();
         } else {
