@@ -41,6 +41,7 @@ class NPCommand implements SlashCommand {
         }
         var position = 0;
         const streamTime = serverQueue.getPlaybackDuration();
+        console.log(streamTime);
         if (streamTime && serverQueue.startTime) position = (streamTime - serverQueue.startTime);
         var processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");

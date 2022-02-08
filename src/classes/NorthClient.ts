@@ -149,7 +149,6 @@ export class RadioChannel {
     player: AudioPlayer;
     tracks: RadioSoundTrack[];
     guilds: Set<Snowflake> = new Set();
-    startTime?: number;
     seek: number;
     private interval: NodeJS.Timer;
 
@@ -162,10 +161,9 @@ export class RadioChannel {
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Pause
             }
-        }).on(AudioPlayerStatus.Playing, async (_oldState, newState) => {
-            this.startTime = newState.playbackDuration;
+        }).on(AudioPlayerStatus.Playing, async () => {
             this.interval = setInterval(() => {
-                this.seek = Math.floor(((this.player.state.status == AudioPlayerStatus.Playing ? this.player.state.playbackDuration : this.startTime) - this.startTime) / 1000);
+                this.seek = this.player.state.status == AudioPlayerStatus.Playing ? Math.floor(this.player.state.playbackDuration / 1000) : 0;
                 this.updateSeek();
             }, 30000);
         }).on(AudioPlayerStatus.Idle || "error", async () => {

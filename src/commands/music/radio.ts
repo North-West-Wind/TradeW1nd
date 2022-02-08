@@ -188,9 +188,7 @@ class RadioCommand implements SlashCommand {
 
     async info(message: Message | CommandInteraction, channel: number) {
         const radio = players[channel - 1];
-        var position = 0;
-        const streamTime = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
-        if (streamTime && radio.startTime) position = (streamTime - radio.startTime);
+        var position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
         var processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
         var progress = 0;
