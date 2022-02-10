@@ -25,6 +25,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.7.0",
     "@discordjs/voice": "^0.8.0",
+    "@vncsprd/soundcloud-downloader": "^1.2.2",
     "cheerio": "^1.0.0-rc.10",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
@@ -41,7 +42,6 @@
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
     "simple-node-logger": "^21.8.12",
-    "soundcloud-downloader": "^1.0.0",
     "spotify-web-api-node": "^5.0.2",
     "ytdl-core": "^4.9.1",
     "ytpl": "^2.2.3",
