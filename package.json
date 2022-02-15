@@ -52,7 +52,6 @@
     "@types/fluent-ffmpeg": "^2.1.20",
     "@types/moment-duration-format": "^2.2.3",
     "@types/ms": "^0.7.31",
-    "@types/node-fetch": "^3.0.3",
     "@types/request-promise-native": "^1.0.18",
     "@types/spotify-web-api-node": "^5.0.3",
     "typescript": "^4.4.3"
