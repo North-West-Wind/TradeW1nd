@@ -120,7 +120,7 @@ export class Handler {
             const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
             if (await filter.all(command, message, args) && (catFilter ? await catFilter(command, message) : true)) await command.run(message, args);
         } catch (err: any) {
-            console.error(`Error in ${command.name}!`);
+            console.error(`Error in command ${command.name}!`);
             console.error(err);
             try {
                 await message.reply(error);

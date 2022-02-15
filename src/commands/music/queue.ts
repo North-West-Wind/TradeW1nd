@@ -147,7 +147,6 @@ class QueueCommand implements SlashCommand {
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, JSON.parse(unescape(results[0].queue)), false, false);
         else serverQueue.songs = JSON.parse(unescape(results[0].queue));
         updateQueue(guild.id, serverQueue);
-        console.log(message);
         return await msgOrRes(message, `The queue **${results[0].name}** has been loaded.`);
     }
 
