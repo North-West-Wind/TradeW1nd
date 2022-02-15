@@ -13,7 +13,7 @@ var inited = false;
 export class Handler {
     static async setup(client: NorthClient, token: string) {
         await common(client);
-        new Handler(client);
+        client.handler = new Handler(client);
         client.login(token);
     }
 

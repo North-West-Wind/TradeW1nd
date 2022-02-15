@@ -6,6 +6,7 @@ import { addUsing, removeUsing } from "../helpers/music.js";
 import * as Stream from "stream";
 import { query } from "../function.js";
 import Ffmpeg from "fluent-ffmpeg";
+import { Handler } from "../handler.js";
 
 export class NorthClient extends Client {
     constructor(options: ClientOptions) {
@@ -15,6 +16,7 @@ export class NorthClient extends Client {
     id: number;
     prefix: string;
     version: string;
+    handler: Handler;
     static storage: ClientStorage;
 
     setVersion(version: string) { this.version = version; }
@@ -50,7 +52,7 @@ export class GuildConfig {
     prefix?: string;
     exit?: boolean;
 
-    constructor(data: any = (<any> {})) {
+    constructor(data: any = (<any>{})) {
         if (data) {
             this.prefix = data.prefix;
         }
@@ -209,12 +211,12 @@ export class RadioChannel {
     async update() {
         try {
             await query(`UPDATE radio SET queue = "${escape(JSON.stringify(this.tracks))}" WHERE id = ${this.id}`);
-        } catch (err) {}
+        } catch (err) { }
     }
 
     async updateSeek() {
         try {
             await query(`UPDATE radio SET seek = "${this.seek || 0}" WHERE id = ${this.id}`);
-        } catch (err) {}
+        } catch (err) { }
     }
 }
