@@ -1,4 +1,3 @@
-import { Message } from "discord.js";
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import { color, createEmbedScrolling, duration, msgOrRes, query } from "../../function.js";
@@ -85,7 +84,7 @@ class QueueCommand implements SlashCommand {
         await this.viewQueue(interaction, serverQueue);
     }
     
-    async run(message: Message, args: string[]) {
+    async run(message: Discord.Message, args: string[]) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (args[0] && (args[0].toLowerCase() === "save" || args[0].toLowerCase() === "s")) return await this.save(message, serverQueue, args.slice(1).join(" "));
@@ -96,7 +95,7 @@ class QueueCommand implements SlashCommand {
         await this.viewQueue(message, serverQueue);
     }
 
-    async viewQueue(message: Message | Discord.CommandInteraction, serverQueue: ServerQueue) {
+    async viewQueue(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue) {
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
         const filtered = serverQueue.songs.filter(song => !!song);
         if (serverQueue.songs.length !== filtered.length) {
@@ -120,7 +119,7 @@ class QueueCommand implements SlashCommand {
         else await createEmbedScrolling(message, allEmbeds, 3, { songArray });
     }
 
-    async save(message: Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async save(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
         const author = message.member.user;
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, [], false, false);
@@ -138,9 +137,9 @@ class QueueCommand implements SlashCommand {
         return await msgOrRes(message, `The song queue has been stored with the name **${name}**!\nSlots used: **${q.substring(0, 6) == "INSERT" ? results.length + 1 : results.length}/10**`);
     }
 
-    async load(message: Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async load(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
-        const author = message instanceof Message ? message.author : message.user;
+        const author = message instanceof Discord.Message ? message.author : message.user;
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
         if (!name) return await msgOrRes(message, "Please provide the name of the queue.");
         const results = await query(`SELECT * FROM queue WHERE name = '${name}' AND user = '${author.id}'`);
@@ -148,10 +147,11 @@ class QueueCommand implements SlashCommand {
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, JSON.parse(unescape(results[0].queue)), false, false);
         else serverQueue.songs = JSON.parse(unescape(results[0].queue));
         updateQueue(guild.id, serverQueue);
+        console.log(message);
         return await msgOrRes(message, `The queue **${results[0].name}** has been loaded.`);
     }
 
-    async delete(message: Message | Discord.CommandInteraction, name: string) {
+    async delete(message: Discord.Message | Discord.CommandInteraction, name: string) {
         const author = message.member.user;
         if (!name) return await msgOrRes(message, "Please provide the name of the queue.");
         const results = await query(`SELECT * FROM queue WHERE name = '${name}' AND user = '${author.id}'`);
@@ -160,8 +160,8 @@ class QueueCommand implements SlashCommand {
         return await msgOrRes(message, `The stored queue **${results[0].name}** has been deleted.`);
     }
 
-    async list(message: Message | Discord.CommandInteraction) {
-        const author = message instanceof Message ? message.author : message.user;
+    async list(message: Discord.Message | Discord.CommandInteraction) {
+        const author = message instanceof Discord.Message ? message.author : message.user;
         const results = await query(`SELECT * FROM queue WHERE user = '${author.id}'`);
         const queues = [];
         var num = 0;
@@ -227,7 +227,7 @@ class QueueCommand implements SlashCommand {
         });
     }
 
-    async sync(message: Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async sync(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
         const author = message.member.user;
         if (serverQueue && serverQueue.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");

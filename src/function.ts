@@ -180,6 +180,7 @@ export function duration(seconds: number, type: moment.unitOfTime.DurationConstr
     return str.join("");
 }
 export async function msgOrRes(message: Discord.Message | Discord.CommandInteraction, str: string | Discord.MessageEmbed | Discord.MessageAttachment | { content?: string, embeds?: Discord.MessageEmbed[], files?: Discord.MessageAttachment[], components?: Discord.MessageActionRow[] }, reply: boolean = false): Promise<Discord.Message> {
+    console.log(message);
     if (message instanceof Discord.Message) {
         if (str instanceof Discord.MessageEmbed) return await (reply ? message.reply : message.channel.send)({ embeds: [str] });
         else if (str instanceof Discord.MessageAttachment) return await (reply ? message.reply : message.channel.send)({ files: [str] });
