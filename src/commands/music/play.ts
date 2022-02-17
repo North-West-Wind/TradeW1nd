@@ -214,6 +214,7 @@ class PlayCommand implements SlashCommand {
       if (message instanceof Discord.Interaction) await message.deleteReply();
       return;
     }
+    if (!str) return await msgOrRes(message, "You didn't provide any link or keywords!");
     try {
       var songs = [];
       var result = { error: true, songs: [], msg: null, message: null };

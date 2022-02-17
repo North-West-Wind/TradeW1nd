@@ -24,7 +24,9 @@ class AddCommand implements SlashCommand {
     }
 
     async run(message: Message, args: string[]) {
-        await this.add(message, args.join(" "));
+        const str = args.join(" ");
+        if (!str) return await message.channel.send("You didn't provide any link or keywords!");
+        await this.add(message, str);
     }
 
     async add(message: Message | CommandInteraction, str: string) {
