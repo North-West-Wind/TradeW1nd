@@ -299,12 +299,12 @@ export async function getOwner() {
 }
 
 export async function query(query: string) {
-    const res = await fetch("http://localhost:4269/api/" + encodeURIComponent(query) + "?token=" + process.env.DB_TOKEN);
+    const res = await fetch("http://192.168.1.29:4269/api/" + encodeURIComponent(query) + "?token=" + process.env.DB_TOKEN);
     if (!res.ok) return null;
     else return <any> await res.json();
 }
 
 export async function checkN0rthWestW1nd(guild: Discord.Snowflake) {
-    const res = await fetch("http://localhost:3001/checkGuild/" + guild);
+    const res = await fetch("http://192.168.1.29:3001/checkGuild/" + guild);
     return res.ok && (<any> await res.json()).isIn;
 }

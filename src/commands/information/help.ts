@@ -1,6 +1,7 @@
 import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
-import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
+import { color, deepReaddir, fixGuildRecord, messagePrefix } from "../../function.js";
 import * as Discord from "discord.js";
+import { globalClient as client } from "../../common.js";
 
 export const categories = ["Music", "Information", "Dev"];
 
@@ -42,40 +43,32 @@ class HelpCommand implements SlashCommand {
     async execute(interaction: Discord.CommandInteraction) {
         const sub = interaction.options.getSubcommand();
         if (sub === "all") {
-            await interaction.reply({ embeds: [await this.getAllCommands(interaction)] });
-            await wait(60000);
-            await interaction.editReply({
-                content: "This is the **[manual](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd)**, my friend.",
-                embeds: []
-            });
-            return;
+            await interaction.user.send({embeds: [await this.getAllCommands(interaction.guildId)]});
+            return await interaction.reply({ content: "Slided into your DM!", ephemeral: true });
         }
-
         const name = interaction.options.getString("command").toLowerCase();
         await interaction.reply(this.getCommand(name, "/").join("\n"));
     }
 
     async run(message: Discord.Message, args: string[]) {
         if (!args.length) {
-            const msg = await message.channel.send({ embeds: [await this.getAllCommands(message)] });
-            setTimeout(() => msg.edit({ content: "This is the **manual**, my friend:\nhttps://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd", embeds: [] }).catch(() => { }), 60000);
-            return;
+            await message.author.send({embeds: [await this.getAllCommands(message.guildId)]});
+            return await message.react("💨");
         }
         const name = args[0].toLowerCase();
         await message.channel.send(this.getCommand(name, messagePrefix(message, <NorthClient>message.client)).join("\n"));
     }
 
-    async getAllCommands(message: Discord.Message | Discord.CommandInteraction) {
-        const guildID = message.guildId;
+    async getAllCommands(guildID: Discord.Snowflake) {
         var config = NorthClient.storage.guilds[guildID];
         if (!config) config = await fixGuildRecord(guildID);
         const Embed = new Discord.MessageEmbed()
             .setColor(color())
             .setTitle("Command list is here!")
             .setDescription(`[**Click this**](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd) for the user manual.\nIf you need any support, you can join the [**Support Server**](https://discord.gg/S44PNSh)\n\nI don't know if you need but [**here's N0rthWestW1nd**](https://top.gg/bot/649611982428962819) in [**Discord bot List**](https://top.gg)!`)
-            .setThumbnail(message.client.user.displayAvatarURL())
+            .setThumbnail(client.user.displayAvatarURL())
             .setTimestamp()
-            .setFooter({ text: "Have a nice day! :)", iconURL: message.client.user.displayAvatarURL() });
+            .setFooter({ text: "Have a nice day! :)", iconURL: client.user.displayAvatarURL() });
         for (let i = 0; i < categories.length; i++) {
             Embed.addField(`**${categories[i]}**`, Array.from(NorthClient.storage.commands.filter(x => x.category === i).keys()).join("\n"), true);
         }
