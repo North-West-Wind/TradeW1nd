@@ -2,8 +2,8 @@
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
-import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream } from "../../function.js";
-import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search, getSCDL } from "../../helpers/addTrack.js";
+import { isEquivalent, requestStream, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, msgOrRes, requestYTDLStream, validMSSetURL } from "../../function.js";
+import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search, getSCDL, addMSSetURL } from "../../helpers/addTrack.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { getMP3 } from "../../helpers/musescore.js";
 
@@ -108,6 +108,7 @@ class DownloadCommand implements SlashCommand {
             else if (validSPURL(link)) result = await addSPURL(message, link);
             else if (validSCURL(link)) result = await addSCURL(link);
             else if (validGDURL(link)) return await msgOrRes(message, "Wait, you should be able to access this file?");
+            else if (validMSSetURL(link)) result = await addMSSetURL(link);
             else if (validMSURL(link)) result = await addMSURL(link);
             else if (validURL(link)) return await msgOrRes(message, "Wait, you should be able to access this file?");
             else result = await search(message, link);

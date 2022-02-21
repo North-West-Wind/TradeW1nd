@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import * as mm from "music-metadata";
-import muse from "musescore-metadata";
+import { muse, museSet } from "musescore-metadata";
 import { SCDL } from '@vncsprd/soundcloud-downloader';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
@@ -395,7 +395,14 @@ export async function addGDFolderURL(link: string, cb: Function = async () => { 
     }
     return { error: false, songs: songs, msg: null, message: null };
 }
-
+export async function addMSSetURL(link: string) {
+    try {
+        var data = await museSet(link);
+    } catch (err: any) {
+        return { error: true, message: "Failed to fetch metadata of the set!", msg: null, songs: [] };
+    }
+    return { error: false, songs: data.scores.map(score => ({ title: score.title, url: score.url, type: 5, time: humanDurationToNum(score.duration), volume: 1, thumbnail: "http://s.musescore.org/about/images/musescore-mu-logo-bluebg-xl.png", isLive: false })), msg: null, message: null };
+}
 export async function addMSURL(link: string) {
     try {
         var data = await muse(link);

@@ -1,9 +1,9 @@
 import * as Discord from "discord.js";
-import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, msgOrRes, wait, duration } from "../../function.js";
+import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, msgOrRes, wait, duration, validMSSetURL } from "../../function.js";
 import { migrate as music } from "./migrate.js";
 import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
-import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream } from "../../helpers/addTrack.js";
+import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream, addMSSetURL } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
 import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
@@ -227,6 +227,7 @@ class PlayCommand implements SlashCommand {
         result = await addGDFolderURL(str, async (i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
         await msg.delete();
       } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);
+      else if (validMSSetURL(str)) result = await addMSSetURL(str);
       else if (validMSURL(str)) result = await addMSURL(str);
       else if (validURL(str)) result = await addURL(str);
       else if (message instanceof Discord.Message && message.attachments.size > 0) result = await addAttachment(message);

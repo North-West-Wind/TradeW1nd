@@ -1,8 +1,8 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, MessageEmbed, VoiceChannel } from "discord.js";
 import { SlashCommand } from "../../classes/NorthClient.js";
-import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
-import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search } from "../../helpers/addTrack.js";
+import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
+import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio.js";
 import { createEmbed } from "./play.js";
@@ -166,6 +166,7 @@ class RadioCommand implements SlashCommand {
                 result = await addGDFolderURL(str, async (i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
                 result.msg = msg;
             } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);
+            else if (validMSSetURL(str)) result = await addMSSetURL(str);
             else if (validMSURL(str)) result = await addMSURL(str);
             else if (validURL(str)) result = await addURL(str);
             else if (message instanceof Message && message.attachments.size > 0) result = await addAttachment(message);
