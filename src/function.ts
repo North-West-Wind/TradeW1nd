@@ -303,3 +303,8 @@ export async function query(query: string) {
     if (!res.ok) return null;
     else return <any> await res.json();
 }
+
+export async function checkN0rthWestW1nd(guild: Discord.Snowflake) {
+    const res = await fetch("http://localhost:3001/checkGuild/" + guild);
+    return res.ok && (<any> await res.json()).isIn;
+}

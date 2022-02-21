@@ -1,5 +1,5 @@
 import { Guild, Interaction, Message, VoiceState } from "discord.js";
-import { fixGuildRecord, messagePrefix, query } from "./function.js";
+import { checkN0rthWestW1nd, fixGuildRecord, messagePrefix, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
 import { NorthClient, GuildConfig } from "./classes/NorthClient.js";
 import * as filter from "./helpers/filter.js";
@@ -83,7 +83,7 @@ export class Handler {
 
     async guildDelete(guild: Guild) {
         try {
-            if (await guild.members.fetch("649611982428962819")) return;
+            if (await checkN0rthWestW1nd(guild.id)) return;
             delete NorthClient.storage.guilds[guild.id];
             try {
                 await query("DELETE FROM servers WHERE id=" + guild.id);
