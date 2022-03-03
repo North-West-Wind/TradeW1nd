@@ -1,5 +1,5 @@
 import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
-import { color, deepReaddir, fixGuildRecord, messagePrefix } from "../../function.js";
+import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
 import * as Discord from "discord.js";
 import { globalClient as client } from "../../common.js";
 
@@ -43,20 +43,32 @@ class HelpCommand implements SlashCommand {
     async execute(interaction: Discord.CommandInteraction) {
         const sub = interaction.options.getSubcommand();
         if (sub === "all") {
-            await interaction.user.send({embeds: [await this.getAllCommands(interaction.guildId)]});
-            return await interaction.reply({ content: "Slided into your DM!", ephemeral: true });
+            try {
+                await interaction.user.send({ embeds: [await this.getAllCommands(interaction.guildId)] });
+                await interaction.reply({ content: "Slid into your DM!", ephemeral: true });
+            } catch (err) {
+                await interaction.reply({ embeds: [await this.getAllCommands(interaction.guildId)], ephemeral: true });
+            }
+        } else {
+            const name = interaction.options.getString("command").toLowerCase();
+            await interaction.reply({ content: this.getCommand(name, "/").join("\n"), ephemeral: true });
         }
-        const name = interaction.options.getString("command").toLowerCase();
-        await interaction.reply(this.getCommand(name, "/").join("\n"));
     }
 
     async run(message: Discord.Message, args: string[]) {
         if (!args.length) {
-            await message.author.send({embeds: [await this.getAllCommands(message.guildId)]});
-            return await message.react("💨");
+            try {
+                await message.author.send({ embeds: [await this.getAllCommands(message.guildId)] });
+                await message.react("💨");
+            } catch (err) {
+                const msg = await message.channel.send({ embeds: [await this.getAllCommands(message.guildId)] });
+                await wait(30000);
+                msg.delete().catch(() => { });
+            }
+        } else {
+            const name = args[0].toLowerCase();
+            await message.channel.send(this.getCommand(name, messagePrefix(message, client)).join("\n"));
         }
-        const name = args[0].toLowerCase();
-        await message.channel.send(this.getCommand(name, messagePrefix(message, <NorthClient>message.client)).join("\n"));
     }
 
     async getAllCommands(guildID: Discord.Snowflake) {
