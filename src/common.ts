@@ -43,7 +43,8 @@ export default async (client: NorthClient) => {
   logger.setLevel("all");
   console.log = (message: string, ...data: any[]) => logger.info(message, ...data);
   console.error = (message: string, ...data: any[]) => logger.error(message, ...data);
-
+  console.debug = (message: string, ...data: any[]) => logger.debug(message, ...data);
+  console.trace = (message: string, ...data: any[]) => logger.trace(message, ...data);
   const commandFiles = deepReaddir("./out/src/commands").filter(file => file.endsWith(".js"));
   for (const file of commandFiles) {
     const command = <SlashCommand>(await import(file)).default;

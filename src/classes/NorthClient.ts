@@ -107,6 +107,7 @@ export class ServerQueue {
     }
 
     destroy() {
+        console.trace("Connection destroy called");
         try {
             this.player?.stop();
             this.connection?.destroy();
