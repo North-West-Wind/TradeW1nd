@@ -101,7 +101,7 @@ export class Handler {
         if (!guild.me.voice?.channel || (newState.channelId !== guild.me.voice.channelId && oldState.channelId !== guild.me.voice.channelId)) return;
         if (!NorthClient.storage.guilds[guild.id]) await fixGuildRecord(guild.id);
         const serverQueue = getQueue(guild.id);
-        if (guild.me.voice.channel.members.filter(member => member.permissions.any(BigInt(56)) || serverQueue.callers.has(member.id) || !!Array.from(serverQueue.callRoles).find(role => member.roles.cache.has(role))).size < 1) {
+        if (guild.me.voice.channel.members.filter(member => !member.user.bot && (member.permissions.any(BigInt(56)) || serverQueue.callers.has(member.id) || !!Array.from(serverQueue.callRoles).find(role => member.roles.cache.has(role)))).size < 1) {
             if (exit) return;
             NorthClient.storage.guilds[guild.id].exit = true;
             setTimeout(() => NorthClient.storage.guilds[guild.id]?.exit ? stop(guild) : 0, 30000);
