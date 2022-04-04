@@ -401,7 +401,7 @@ export async function addMSSetURL(link: string) {
     } catch (err: any) {
         return { error: true, message: "Failed to fetch metadata of the set!", msg: null, songs: [] };
     }
-    return { error: false, songs: data.scores.map(score => ({ title: score.title, url: score.url, type: 5, time: humanDurationToNum(score.duration), volume: 1, thumbnail: "http://s.musescore.org/about/images/musescore-mu-logo-bluebg-xl.png", isLive: false })), msg: null, message: null };
+    return { error: false, songs: data.scores.map(score => ({ title: score.title, url: score.url, type: 5, time: humanDurationToNum(score.duration), volume: 1.5, thumbnail: "http://s.musescore.org/about/images/musescore-mu-logo-bluebg-xl.png", isLive: false })), msg: null, message: null };
 }
 export async function addMSURL(link: string) {
     try {
@@ -414,7 +414,7 @@ export async function addMSURL(link: string) {
         url: data.url,
         type: 5,
         time: humanDurationToNum(data.duration),
-        volume: 1,
+        volume: 1.5,
         thumbnail: "http://s.musescore.org/about/images/musescore-mu-logo-bluebg-xl.png",
         isLive: false
     };
