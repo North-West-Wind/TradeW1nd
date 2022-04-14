@@ -13,7 +13,7 @@ export async function getMP3(url: string): Promise<{ error: boolean, url: string
                 else req.continue();
             });
             await page.goto(url, { waitUntil: "domcontentloaded" });
-            await page.waitForSelector("circle").then(el => el.click());
+            await page.waitForSelector("circle, button[title='Toggle Play']").then(el => el.click());
             const mp3 = await page.waitForRequest(req => req.url()?.startsWith("https://s3.ultimate-guitar.com/") || req.url()?.startsWith("https://www.youtube.com/embed/"));
             result.url = mp3.url();
             result.error = false;
