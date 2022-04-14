@@ -26,7 +26,7 @@ const client = new NorthClient({
 });
 NorthClient.storage = new ClientStorage();
 
-client.prefix = config.prefix0;
+client.prefix = process.env.PREFIX || config.prefix0;
 client.id = 0;
 Handler.setup(client, process.env.TOKEN0);
 
