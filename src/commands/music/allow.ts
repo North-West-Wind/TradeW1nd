@@ -24,11 +24,12 @@ class AllowCommand implements SlashCommand {
     }
 
     async run(message: Message, args: string[]) {
+        const extracted = args[0].replace(/[^0-9]/g, "");
         try {
-            const role = await message.guild.roles.fetch(args[0]);
+            const role = await message.guild.roles.fetch(extracted);
             return await this.addRole(message, role);
         } catch (err) {
-            const user = await message.guild.members.fetch(args[0]);
+            const user = await message.guild.members.fetch(extracted).catch(() => null);
             if (user) return await this.addUser(message, user.user);
             else await message.channel.send("The type of mention is unknown!");
         }
