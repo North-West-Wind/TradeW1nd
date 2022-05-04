@@ -336,10 +336,8 @@ export async function addGDURL(link: string) {
             else return { error: true, message: `The link/keywords you provided is invalid!`, msg: null, songs: [] };
         }
     }
-    console.log("Google Drive download link: ", dl);
     var f = await fetch(dl);
     if (!f.ok) return { error: true, message: `Received HTTP Status: ${f.status}`, msg: null, songs: [] };
-    console.log("No error :)");
     const stream = <Stream.Readable>f.body;
     var title = "No Title";
     try {
