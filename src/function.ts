@@ -258,7 +258,7 @@ export function requestYTDLStream(url: string, opts: downloadOptions & { timeout
 
 export async function fixGuildRecord(id: Discord.Snowflake) {
     if (NorthClient.storage.guilds[id]) return NorthClient.storage.guilds[id];
-    const results = await query("SELECT id FROM servers WHERE id = " + id);
+    const results = await query(`SELECT servers.*, configs.prefix FROM servers LEFT JOIN configs ON configs.id = servers.id WHERE servers.id = "${id}" AND configs.id = "${id}"`);
     if (results.length > 0) {
         if (results[0].queue || results[0].looping || results[0].repeating) {
             var queue = [];
@@ -269,7 +269,8 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
         NorthClient.storage.guilds[results[0].id] = new GuildConfig(results[0]);
     } else {
         try {
-            await query(`INSERT INTO servers (id, autorole, giveaway, safe) VALUES ('${id}', '[]', '${escape("🎉")}', 1)`);
+            await query(`INSERT INTO configs (id, safe) VALUES ('${id}', 1)`);
+            await query(`INSERT INTO servers (id), VALUES ('${id}')`);
             NorthClient.storage.guilds[id] = new GuildConfig();
         } catch (err: any) { }
     }

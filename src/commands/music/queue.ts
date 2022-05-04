@@ -134,7 +134,7 @@ class QueueCommand implements SlashCommand {
             }
         }
         await query(q);
-        return await msgOrRes(message, `The song queue has been stored with the name **${name}**!\nSlots used: **${q.substring(0, 6) == "INSERT" ? results.length + 1 : results.length}/10**`);
+        return await msgOrRes(message, `The song queue has been stored with the name **${name}**!\nSlots used: **${results.length || 1}/10**`);
     }
 
     async load(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {

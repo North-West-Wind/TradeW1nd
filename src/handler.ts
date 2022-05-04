@@ -47,7 +47,7 @@ export class Handler {
     }
 
     async readServers(client: NorthClient) {
-        const results = await query("SELECT * FROM servers");
+        const results = await query("SELECT servers.*, configs.prefix FROM servers LEFT JOIN configs ON configs.id = servers.id");
         for (const result of results) {
             if (!inited && (result.queue || result.looping || result.repeating)) {
                 var queue = [];
