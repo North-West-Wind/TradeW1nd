@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, Role, User } from "discord.js";
+import { CommandInteraction, GuildMember, Message, Role, User } from "discord.js";
 import { SlashCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue } from "../../helpers/music.js";
@@ -19,6 +19,7 @@ class AllowCommand implements SlashCommand {
     async execute(interaction: CommandInteraction) {
         const mentionable = interaction.options.getMentionable("mentionable");
         if (mentionable instanceof User) return await this.addUser(interaction, mentionable);
+        else if (mentionable instanceof GuildMember) return await this.addUser(interaction, mentionable.user);
         else if (mentionable instanceof Role) return await this.addRole(interaction, mentionable);
         await interaction.reply("The type of mention is unknown!");
     }
