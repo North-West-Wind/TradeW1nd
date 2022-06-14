@@ -21,7 +21,7 @@ export class Handler {
         client.once("ready", () => this.ready(client));
         client.on("guildCreate", guild => this.guildCreate(guild));
         client.on("guildDelete", guild => this.guildDelete(guild));
-        client.on("voiceStateUpdate", (oldState, newState) => this.voiceStateUpdate(oldState, newState));
+        client.on("voiceStateUpdate", (oldState, newState) => this.voiceStateUpdate(<VoiceState>oldState, <VoiceState>newState));
         client.on("messageCreate", message => this.message(message));
         client.on("interactionCreate", interaction => this.interactionCreate(interaction));
     }

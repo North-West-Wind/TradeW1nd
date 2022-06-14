@@ -1,4 +1,4 @@
-import { Snowflake } from "discord-api-types";
+import { Snowflake } from "discord.js";
 import { RadioChannel } from "../classes/NorthClient.js";
 import { query } from "../function.js";
 export const players: RadioChannel[] = [];
