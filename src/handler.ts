@@ -29,7 +29,7 @@ export class Handler {
         client.on("interactionCreate", interaction => this.interactionCreate(interaction));
 
         setInterval(async () => {
-            if (!client.user.presence.activities.length) await this.setPresence().catch(() => { });
+            if (!client.user.presence.activities?.length) await this.setPresence().catch(() => { });
         }, 60000);
     }
 
