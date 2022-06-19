@@ -11,6 +11,8 @@ import { makePlayers, isPlaying } from "./helpers/radio.js";
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
 var inited = false;
 export class Handler {
+    protected readonly client: NorthClient;
+
     static async setup(client: NorthClient, token: string) {
         await common(client);
         client.handler = new Handler(client);
@@ -18,12 +20,17 @@ export class Handler {
     }
 
     constructor(client: NorthClient) {
-        client.once("ready", () => this.ready(client));
+        this.client = client;
+        client.once("ready", () => this.ready());
         client.on("guildCreate", guild => this.guildCreate(guild));
         client.on("guildDelete", guild => this.guildDelete(guild));
         client.on("voiceStateUpdate", (oldState, newState) => this.voiceStateUpdate(<VoiceState>oldState, <VoiceState>newState));
         client.on("messageCreate", message => this.message(message));
         client.on("interactionCreate", interaction => this.interactionCreate(interaction));
+
+        setInterval(async () => {
+            if (!client.user.presence.activities.length) await this.setPresence().catch(() => { });
+        }, 60000);
     }
 
     async interactionCreate(interaction: Interaction) {
@@ -42,11 +49,11 @@ export class Handler {
         }
     }
 
-    async setPresence(client: NorthClient) {
-        client.user.setPresence({ activities: [{ name: "AFK", type: "PLAYING" }], status: "idle", afk: true });
+    async setPresence() {
+        this.client.user.setPresence({ activities: [{ name: `AFK | ${this.client.prefix}help`, type: "PLAYING" }], status: "idle", afk: true });
     }
 
-    async readServers(client: NorthClient) {
+    async readServers() {
         const results = await query("SELECT servers.*, configs.prefix FROM servers LEFT JOIN configs ON configs.id = servers.id");
         for (const result of results) {
             if (!inited && (result.queue || result.looping || result.repeating)) {
@@ -59,16 +66,15 @@ export class Handler {
             else if (NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id].prefix = result.prefix;
         }
         inited = true;
-        setTimeout(async () => this.readServers(client), 3600000);
+        setTimeout(async () => this.readServers(), 3600000);
     }
 
-    async ready(client: NorthClient) {
-        const id = client.id;
-        console.log(`[${id}] Ready!`);
-        this.setPresence(client);
+    async ready() {
+        console.log(`[${this.client.id}] Ready!`);
+        this.setPresence();
         try {
             init();
-            await this.readServers(client);
+            await this.readServers();
             await makePlayers();
         } catch (err: any) { console.error(err); };
     }
