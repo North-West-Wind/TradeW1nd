@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "ES2020",
+    "module": "esnext",
     "allowJs": false,
     "checkJs": false,
     "outDir": "./out",

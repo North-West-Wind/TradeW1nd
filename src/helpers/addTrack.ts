@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, SelectMenuInteraction } from "discord.js";
 import * as mm from "music-metadata";
 import { muse, museSet } from "musescore-metadata";
 import { SCDL } from '@vncsprd/soundcloud-downloader';
@@ -442,13 +442,13 @@ export async function addURL(link: string) {
     return { error: false, songs: [song], msg: null, message: null };
 }
 export async function search(message: Message | Discord.CommandInteraction, link: string) {
-    const allEmbeds = [];
+    const allEmbeds: Discord.MessageEmbed[] = [], allMenus: Discord.MessageSelectMenu[] = [];
     const Embed = new Discord.MessageEmbed()
         .setTitle(`Search result of ${link} on YouTube`)
         .setColor(color())
         .setTimestamp()
         .setFooter({ text: "Please do so within 60 seconds.", iconURL: message.client.user.displayAvatarURL() });
-    const results = [];
+    const results = { yt: [], sc: [] };
     try {
         const searched = await ytsr(link, { limit: 20 });
         var video = <Video[]>searched.items.filter(x => x.type === "video" && !x.isUpcoming);
@@ -468,9 +468,12 @@ export async function search(message: Message | Discord.CommandInteraction, link
     })).filter(x => !!x.url);
     var num = 0;
     if (ytResults.length > 0) {
-        results.push(ytResults);
-        Embed.setDescription("Type **soundcloud** / **sc** to show the search results from SoundCloud.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
+        results.yt = ytResults;
+        Embed.setDescription("This page shows search results from **YouTube**. The other page shows search results from **SoundCloud**.\nChoose the soundtrack from the menu, or click \"cancel\" to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
         allEmbeds.push(Embed);
+        const menu = new Discord.MessageSelectMenu().setCustomId("yt").setMinValues(1).setMaxValues(ytResults.length);
+        for (let ii = 0; ii < ytResults.length; ii++) menu.addOptions({ label: ytResults[ii].title, value: ii.toString() });
+        allMenus.push(menu);
     }
     const scEm = new Discord.MessageEmbed()
         .setTitle(`Search result of ${link} on SoundCloud`)
@@ -489,7 +492,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
         await msgOrRes(message, "There was an error trying to search the videos!");
         return { error: true, msg: null, songs: [], message: err.message };
     }
-    const scResults = (<TrackInfo[]> scSearched.collection).map(x => ({
+    const scResults = (<TrackInfo[]>scSearched.collection).map(x => ({
         title: x.title,
         url: x.permalink_url,
         type: 3,
@@ -499,9 +502,12 @@ export async function search(message: Message | Discord.CommandInteraction, link
         isLive: false
     })).filter(x => !!x.url);
     if (scResults.length > 0) {
-        results.push(scResults);
-        scEm.setDescription("Type **youtube** / **yt** to show the search results from Youtube.\nType the index of the soundtrack to select, or type anything else to cancel.\n\n" + scResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
+        results.sc = scResults;
+        scEm.setDescription("This page shows search results from **SoundCloud**. The other page shows search results from **YouTube**.\nChoose the soundtrack from the menu, or click \"cancel\" to cancel.\n\n" + scResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
         allEmbeds.push(scEm);
+        const menu = new Discord.MessageSelectMenu().setCustomId("sc");
+        for (let ii = 0; ii < scResults.length; ii++) menu.addOptions({ label: scResults[ii].title, value: ii.toString() });
+        allMenus.push(menu);
     }
     if (allEmbeds.length < 1) {
         await msgOrRes(message, "Cannot find any result with the given string.");
@@ -509,43 +515,43 @@ export async function search(message: Message | Discord.CommandInteraction, link
     }
     var val = { error: true, songs: [], msg: null, message: null };
     var s = 0;
-    var msg = <Message>await msgOrRes(message, allEmbeds[0]);
-    const filter = x => x.author.id === (message instanceof Message ? message.author : message.user).id;
-    const collector = msg.channel.createMessageCollector({ filter, idle: 60000 });
-    collector.on("collect", async collected => {
-        collected.delete().catch(() => { });
-        if (isNaN(parseInt(collected.content))) {
-            switch (collected.content) {
-                case "youtube":
-                case "yt":
-                    s = 0;
-                    await msg.edit({ embeds: [allEmbeds[s]] });
-                    break;
-                case "soundcloud":
-                case "sc":
-                    s = 1;
-                    await msg.edit({ embeds: [allEmbeds[s]] });
-                    break;
-                default:
-                    collector.emit("end");
-            }
-        } else {
-            const o = parseInt(collected.content) - 1;
-            if (o < 0 || o > results[s].length - 1) {
+    const globalRow = new Discord.MessageActionRow().addComponents(
+        new Discord.MessageButton({ label: "Next Page", emoji: "📄", customId: "next", style: "PRIMARY" }),
+        new Discord.MessageButton({ label: "Cancel", emoji: "✖️", customId: "cancel", style: "DANGER" }),
+    );
+    var msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.MessageActionRow().addComponents(allMenus[0]), globalRow] });
+    const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === message.member.user.id, idle: 60000 });
+    collector.on("collect", async interaction => {
+        switch (interaction.customId) {
+            case "next":
+                s = (s + 1) % allEmbeds.length;
+                await interaction.update({ embeds: [allEmbeds[s]], components: [new Discord.MessageActionRow().addComponents(allMenus[s]), globalRow] });
+                break;
+            case "cancel":
+                await interaction.update({});
                 collector.emit("end");
-                return;
-            }
-            const length = !results[s][o].time ? "∞" : duration(results[s][o].time, "seconds");
-            const chosenEmbed = new Discord.MessageEmbed()
-                .setColor(color())
-                .setTitle("Music chosen:")
-                .setThumbnail(results[s][o].thumbnail)
-                .setDescription(`**[${decodeHtmlEntity(results[s][o].title)}](${results[s][o].url})** : **${length}**`)
-                .setTimestamp()
-                .setFooter({ text: "Have a nice day :)", iconURL: message.client.user.displayAvatarURL() });
-            await msg.edit({ embeds: [chosenEmbed] });
-            val = { error: false, songs: [results[s][o]], msg, message: null };
-            collector.emit("end");
+            default:
+                const descriptions: string[] = [];
+                const tracks = [];
+                var thumb: string;
+                for (const val of (<SelectMenuInteraction> interaction).values) {
+                    const o = parseInt(val);
+                    const track = results[interaction.customId][o];
+                    tracks.push(track);
+                    if (!thumb) thumb = track.thumbnail;
+                    const length = !track.time ? "∞" : duration(track.time, "seconds");
+                    descriptions.push(`**[${decodeHtmlEntity(track.title)}](${track.url})** : **${length}**`);
+                }
+                const chosenEmbed = new Discord.MessageEmbed()
+                    .setColor(color())
+                    .setTitle("Soundtrack(s) chosen:")
+                    .setThumbnail(thumb)
+                    .setDescription(descriptions.join("\n"))
+                    .setTimestamp()
+                    .setFooter({ text: "Have a nice day :)", iconURL: message.client.user.displayAvatarURL() });
+                await interaction.update({ embeds: [chosenEmbed] });
+                val = { error: false, songs: tracks, msg, message: null };
+                collector.emit("end");
         }
     });
     return new Promise<{ error: boolean, songs: any[], msg: Message, message: any }>(resolve => {
@@ -556,8 +562,9 @@ export async function search(message: Message | Discord.CommandInteraction, link
                     .setTitle("Action cancelled.")
                     .setTimestamp()
                     .setFooter({ text: "Have a nice day! :)", iconURL: message.client.user.displayAvatarURL() });
-                msg.edit({ embeds: [cancelled] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
+                msg.edit({ embeds: [cancelled], components: [] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
             }
+            msg.edit({ components: [] });
             resolve(val);
         });
     });
@@ -599,7 +606,7 @@ export async function getStream(track: SoundTrack, data: { type: string, guild?:
                         options.requestOptions.headers = { cookie: process.env.COOKIE };
                         if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
                     }
-                    stream = <Stream.Readable> await ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
+                    stream = <Stream.Readable>await ytdl(`https://www.youtube.com/watch?v=${ytid}`, options);
                     cacheFound = true;
                 } else stream = <Stream.Readable>(await requestStream(c.url)).data;
                 break;

@@ -4,7 +4,7 @@ import * as fs from "fs";
 import isOnline from "is-online";
 import SimpleNodeLogger from "simple-node-logger";
 import { Handler } from "./handler.js";
-import pkg from "../package.json";
+import pkg from "../package.json" assert { type: "json" };
 var globalClient: NorthClient;
 
 process.on('unhandledRejection', (reason) => {

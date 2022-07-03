@@ -1,6 +1,6 @@
 {
   "name": "tradew1nd",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "N0rthWestW1nd with only music functions.",
   "exports": "out/src/main.js",
   "type": "module",
@@ -27,11 +27,11 @@
     "@discordjs/voice": "^0.10.0",
     "@vncsprd/soundcloud-downloader": "^1.2.2",
     "brstm": "^1.6.1",
-    "cheerio": "^1.0.0-rc.11",
-    "discord.js": "^13.8.0",
+    "cheerio": "^1.0.0-rc.12",
+    "discord.js": "^13.8.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "ffmpeg-static": "^5.0.0",
+    "ffmpeg-static": "^5.0.2",
     "fluent-ffmpeg": "^2.1.2",
     "is-online": "^10.0.0",
     "moment": "^2.29.3",
@@ -39,7 +39,7 @@
     "music-metadata": "^7.12.3",
     "node-fetch": "^3.2.6",
     "opusscript": "^0.0.8",
-    "puppeteer-core": "^14.4.0",
+    "puppeteer-core": "^15.3.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
@@ -57,6 +57,6 @@
     "@types/ms": "^0.7.31",
     "@types/request-promise-native": "^1.0.18",
     "@types/spotify-web-api-node": "^5.0.3",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   }
 }

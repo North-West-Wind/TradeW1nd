@@ -116,7 +116,7 @@ class QueueCommand implements SlashCommand {
             allEmbeds.push(queueEmbed);
         }
         if (allEmbeds.length == 1) await msgOrRes(message, allEmbeds[0]).then(msg => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
-        else await createEmbedScrolling(message, allEmbeds, 3, { songArray });
+        else await createEmbedScrolling(message, allEmbeds, (msg: Discord.Message) => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
     }
 
     async save(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
@@ -165,9 +165,12 @@ class QueueCommand implements SlashCommand {
         const queues = [];
         var num = 0;
         const allEmbeds = [];
-        for (const result of results) {
+        const menu = new Discord.MessageSelectMenu().setCustomId("menu");
+        for (let ii = 0; ii < results.length; ii++) {
+            const result = results[ii];
             const queue = <SoundTrack[]> JSON.parse(unescape(result.queue));
             queues.push(`${++num}. **${result.name}** : **${queue.length} tracks**`);
+            menu.addOptions({ label: result.name, value: (ii + 1).toString() });
             var queueNum = 0;
             var pageArray = queue.map(song => {
                 var str: string;
@@ -184,44 +187,32 @@ class QueueCommand implements SlashCommand {
                 .setFooter({ text: queue.length > pageArray.length ? "Cannot show all soundtracks here..." : "Here are all the soundtracks in this queue.", iconURL: message.client.user.displayAvatarURL() });
             allEmbeds.push(queueEmbed);
         }
-        const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
-        const available = ["⬅", "⏹️"];
         const em = new Discord.MessageEmbed()
             .setColor(color())
             .setTitle(`Stored queues of **${author.tag}**`)
             .setDescription(`Slots used: **${results.length}/10**\n\n${queues.join("\n")}`)
             .setTimestamp()
-            .setFooter({ text: "React to the numbers to view your queue.", iconURL: client.user.displayAvatarURL() });
+            .setFooter({ text: "Choose a queue in the menu to view it.", iconURL: client.user.displayAvatarURL() });
         allEmbeds.unshift(em);
-        var msg = await msgOrRes(message, em);
-        for (let i = 0; i < Math.min(num, 10); i++) {
-            await msg.react(emojis[i]);
-            available.push(emojis[i]);
-        }
-        await msg.react(available[1]);
-        const collector = msg.createReactionCollector({ filter: (r, u) => available.includes(r.emoji.name) && u.id === author.id, idle: 30000 });
-        collector.on("collect", async function (reaction, user) {
-            var index = available.indexOf(reaction.emoji.name);
-            reaction.users.remove(user.id).catch(() => {});
-            if (index < 0 || index > num + 2 || index == 1) return collector.emit("end");
-            else if (index == 0) {
-                const back = msg.reactions.cache.get(available[0]);
-                back.remove().catch(() => {});
-                await msg.edit({embeds: [allEmbeds[0]]});
-            } else {
-                await msg.edit({embeds: [allEmbeds[index - 1]]});
-                const back = msg.reactions.cache.get(available[0]);
-                if (!back) {
-                    const stop = msg.reactions.cache.get(available[1]);
-                    if (stop) stop.remove().catch(() => {});
-                    await msg.react(available[0]);
-                    await msg.react(available[1]);
+        const backButton = new Discord.MessageButton({ label: "Back", emoji: "⬅", style: "SECONDARY", disabled: true, customId: "back" });
+        const stopButton = new Discord.MessageButton({ label: "Stop", emoji: "✖️", style: "DANGER", customId: "stop" });
+        var msg = await msgOrRes(message, { embeds: [em], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
+        const collector = msg.createMessageComponentCollector({ filter: interaction => interaction.user.id === author.id, idle: 60000 });
+        collector.on("collect", async function (interaction) {
+            if (interaction.isButton()) {
+                if (interaction.customId === "stop") collector.emit("end");
+                else if (interaction.customId === "back") {
+                    backButton.setDisabled(true);
+                    await interaction.update({ embeds: [allEmbeds[0]], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
                 }
+            } else if (interaction.isSelectMenu()) {
+                const index = parseInt(interaction.values[0]);
+                backButton.setDisabled(false);
+                await interaction.update({ embeds: [allEmbeds[index]], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
             }
         });
         collector.on("end", function () {
-            msg.reactions.removeAll().catch(() => {});
-            msg.edit({embeds: [allEmbeds[0]]}).catch(() => {});
+            msg.edit({ embeds: [allEmbeds[0]], components: [] }).catch(() => {});
             setTimeout(() => msg.edit({ embeds: [], content: `**[Queues: ${results.length}/10 slots used]**` }).catch(() => {}), 60000);
         });
     }
