@@ -530,7 +530,9 @@ export async function search(message: Message | Discord.CommandInteraction, link
             case "cancel":
                 await interaction.update({});
                 collector.emit("end");
+                break;
             default:
+                if (!interaction.isSelectMenu()) return;
                 const descriptions: string[] = [];
                 const tracks = [];
                 var thumb: string;
