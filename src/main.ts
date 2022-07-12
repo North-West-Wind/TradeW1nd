@@ -3,8 +3,10 @@ import { Handler } from "./handler.js";
 import { NorthClient, ClientStorage } from "./classes/NorthClient.js";
 import { Intents, Options, TextChannel } from "discord.js";
 import express from "express";
-import config from "../config.json" assert { type: "json" };
+import * as fs from "fs";
 dotenv.config();
+
+const config = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }))
 
 const client = new NorthClient({
     restRequestTimeout: 60000,

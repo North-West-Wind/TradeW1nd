@@ -4,8 +4,9 @@ import * as fs from "fs";
 import isOnline from "is-online";
 import SimpleNodeLogger from "simple-node-logger";
 import { Handler } from "./handler.js";
-import pkg from "../package.json" assert { type: "json" };
 var globalClient: NorthClient;
+
+const pkg = JSON.parse(fs.readFileSync("package.json", { encoding: "utf8" }));
 
 process.on('unhandledRejection', (reason) => {
   console.error('Reason:', reason);
