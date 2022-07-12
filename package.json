@@ -2,10 +2,10 @@
   "name": "tradew1nd",
   "version": "1.3.0",
   "description": "N0rthWestW1nd with only music functions.",
-  "exports": "out/src/main.js",
+  "exports": "out/main.js",
   "type": "module",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/src/main.js",
+    "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/main.js",
     "tsc": "node fix.js && tsc"
   },
   "engines": {
