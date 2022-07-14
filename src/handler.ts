@@ -29,8 +29,8 @@ export class Handler {
         client.on("interactionCreate", interaction => this.interactionCreate(interaction));
 
         setInterval(async () => {
-            if (!client.user.presence.activities?.length) await this.setPresence().catch(() => { });
-        }, 60000);
+            if (filter.canReset()) await this.setPresence().catch(() => { });
+        }, 300000);
     }
 
     async interactionCreate(interaction: Interaction) {

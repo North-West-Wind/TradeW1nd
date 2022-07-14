@@ -1,10 +1,14 @@
 import { CommandInteraction, GuildMember, Message, Permissions, TextChannel } from "discord.js";
-import { Command } from "../classes/NorthClient.js";
+import { Command, NorthClient } from "../classes/NorthClient.js";
 import { genPermMsg, getOwner, msgOrRes } from "../function.js";
 import { getQueue } from "./music.js";
 import { isPlaying } from "./radio.js";
 
 var timeout: NodeJS.Timeout;
+
+export function canReset() {
+    return !timeout;
+}
 
 export async function all(command: Command, message: Message | CommandInteraction, args: string[] = []) {
     if (message instanceof Message) {
@@ -44,7 +48,7 @@ export async function all(command: Command, message: Message | CommandInteractio
         timeout = undefined;
     } else message.client.user.setPresence({ activities: [{ name: `${(message instanceof Message ? message.author : message.user).username}'s Commands`, type: "WATCHING" }], status: "online", afk: false });
     timeout = setTimeout(() => {
-        message.client.user.setPresence({ activities: [{ name: "AFK", type: "PLAYING" }], status: "idle", afk: true });
+        message.client.user.setPresence({ activities: [{ name: `AFK | ${(<NorthClient>message.client).prefix}help`, type: "PLAYING" }], status: "idle", afk: true });
         timeout = undefined;
     }, 10000);
     return true;
