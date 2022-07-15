@@ -1,7 +1,7 @@
 import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
 
-import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
@@ -55,7 +55,7 @@ export async function migrate(message: Message | CommandInteraction) {
     }, 3000);
 }
 
-class MigrateCommand implements SlashCommand {
+class MigrateCommand implements FullCommand {
     name = "migrate"
     description = "Moves the bot to the channel you are in. Use when changing voice channel."
     category = 0

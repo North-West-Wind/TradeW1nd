@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
-import { ServerQueue, SlashCommand } from "../../classes/NorthClient.js";
+import { ServerQueue, FullCommand } from "../../classes/NorthClient.js";
 import { duration, ms, msgOrRes } from "../../function.js";
 import { createDiscordJSAdapter, getQueue, setQueue } from "../../helpers/music.js";
 import { joinVoiceChannel } from "@discordjs/voice";
 
-class SeekCommand implements SlashCommand {
+class SeekCommand implements FullCommand {
     name = "seek"
     description = "Skips to the time specified for the current playing soundtrack."
     usage = "<time>"

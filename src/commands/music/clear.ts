@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class ClearCommand implements SlashCommand {
+class ClearCommand implements FullCommand {
     name = "clear"
     description = "Clears the queue and stop the playing soundtrack. Also resets the volume to 100%."
     category = 0

@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { msgOrRes } from "../../function.js";
 
-class RepeatCommand implements SlashCommand {
+class RepeatCommand implements FullCommand {
     name = "repeat"
     description = "Toggles repeat of a soundtrack."
     aliases = ["rep", "rp"]

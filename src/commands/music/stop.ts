@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { msgOrRes } from "../../function.js";
 
-class StopCommand implements SlashCommand {
+class StopCommand implements FullCommand {
     name = "stop"
     description = "Stops the music and disconnect the bot from the voice channel."
     aliases = ["end", "disconnect", "dis"]

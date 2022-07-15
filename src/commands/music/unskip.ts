@@ -1,12 +1,12 @@
 import { joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
 
-class UnSkipCommand implements SlashCommand {
+class UnSkipCommand implements FullCommand {
     name = "unskip"
     description = "Goes to the previous soundtrack in the queue."
     usage = "[amount]"

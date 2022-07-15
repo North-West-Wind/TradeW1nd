@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { ServerQueue, SlashCommand } from "../../classes/NorthClient.js";
+import { ServerQueue, FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class VolumeCommand implements SlashCommand {
+class VolumeCommand implements FullCommand {
     name = "volume"
     description = "Turns the volume of music up or down by percentage."
     usage = "[percentage]"

@@ -1,5 +1,5 @@
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import { color, duration, msgOrRes, wait } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
@@ -15,7 +15,7 @@ const type = [
     "MSCZ/MSCX"
 ];
 
-class NPCommand implements SlashCommand {
+class NPCommand implements FullCommand {
     name = "np"
     description = "Displays information about the soundtrack being played."
     aliases = ["nowplaying"]

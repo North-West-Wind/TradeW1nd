@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class RandomCommand implements SlashCommand {
+class RandomCommand implements FullCommand {
     name = "random"
     description = "Plays the queue randomly."
     aliases = ["rnd"]

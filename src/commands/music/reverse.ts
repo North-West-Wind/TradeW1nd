@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
 
-class ReverseCommand implements SlashCommand {
+class ReverseCommand implements FullCommand {
     name = "reverse"
     description = "Reverses the order of the server queue."
     aliases = ["rev"]

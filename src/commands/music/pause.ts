@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { msgOrRes } from "../../function.js";
 
-class PauseCommand implements SlashCommand {
+class PauseCommand implements FullCommand {
     name = "pause"
     description = "Pauses the current music."
     category = 0

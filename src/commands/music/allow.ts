@@ -1,9 +1,9 @@
 import { CommandInteraction, GuildMember, Message, Role, User } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue } from "../../helpers/music.js";
 
-class AllowCommand implements SlashCommand {
+class AllowCommand implements FullCommand {
     name = "allow"
     description = "Allows a user or role to alter the queue."
     aliases = ["al"]

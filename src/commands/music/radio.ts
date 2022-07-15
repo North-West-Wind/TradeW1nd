@@ -1,6 +1,6 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message, MessageEmbed, VoiceChannel } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
@@ -16,7 +16,7 @@ const type = [
     "MSCZ/MSCX"
 ];
 
-class RadioCommand implements SlashCommand {
+class RadioCommand implements FullCommand {
     name = "radio";
     description = "Plays music in a channel 24/7!";
     usage = "<subcommand>";

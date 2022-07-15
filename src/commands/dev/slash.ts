@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 
-class DevSlashCommand implements SlashCommand {
+class DevSlashCommand implements FullCommand {
     name = "slash";
     description = "TradeW1nd's Slash Command Manager.";
     usage = "<subcommand>";

@@ -1,11 +1,11 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
 
-class RemoveCommand implements SlashCommand {
+class RemoveCommand implements FullCommand {
     name = "remove"
     description = "Removes soundtrack(s) from the queue."
     usage = "<index | starting index> [delete count]"

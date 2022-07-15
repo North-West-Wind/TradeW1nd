@@ -1,10 +1,10 @@
-import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
+import { ServerQueue, FullCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import { color, createEmbedScrolling, duration, msgOrRes, query } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { globalClient as client } from "../../common.js";
 
-class QueueCommand implements SlashCommand {
+class QueueCommand implements FullCommand {
     name = "queue"
     description = "Displays the current song queue."
     aliases = ["q"]

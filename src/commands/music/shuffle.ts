@@ -1,10 +1,10 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes, shuffleArray } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class ShuffleCommand implements SlashCommand {
+class ShuffleCommand implements FullCommand {
     name = "shuffle"
     description = "Shuffles the queue."
     category = 0

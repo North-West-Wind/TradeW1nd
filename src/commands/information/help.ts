@@ -1,11 +1,11 @@
-import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
 import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
 import * as Discord from "discord.js";
 import { globalClient as client } from "../../common.js";
 
 export const categories = ["Music", "Information", "Dev"];
 
-class HelpCommand implements SlashCommand {
+class HelpCommand implements FullCommand {
     name = "help"
     description = "Sends you a DM with an embed of all available commands and the user manual."
     usage = "[command]"

@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, msgOrRes, wait, duration, validMSSetURL } from "../../function.js";
 import { migrate as music } from "./migrate.js";
-import { NorthClient, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
+import { NorthClient, FullCommand, SoundTrack } from "../../classes/NorthClient.js";
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream, addMSSetURL } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
@@ -151,7 +151,7 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   }
 }
 
-class PlayCommand implements SlashCommand {
+class PlayCommand implements FullCommand {
   name = "play"
   description = "Plays music with the link or keywords provided."
   aliases = ["p"]

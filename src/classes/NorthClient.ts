@@ -22,7 +22,17 @@ export class NorthClient extends Client {
     setVersion(version: string) { this.version = version; }
 }
 
-export interface Command {
+export abstract class IPrefix {
+    abstract run(message: Message, args: string[]): Promise<any> | any;
+}
+
+export abstract class ISlash {
+    options?: any[];
+    
+    abstract execute(interaction: CommandInteraction): Promise<any> | any;
+}
+
+export abstract class Command {
     name: string;
     description: string;
     args?: number;
@@ -34,14 +44,23 @@ export interface Command {
     subdesc?: string[];
     subusage?: (string | number)[];
     permissions?: { guild?: { user?: number, me?: number }, channel?: { user?: number, me?: number } };
-
-    run(message: Message, args: string[]): Promise<any> | any;
 }
 
-export interface SlashCommand extends Command {
+export abstract class PrefixCommand extends Command implements IPrefix {
+    abstract run(message: Message, args: string[]): Promise<any> | any;
+}
+
+export abstract class SlashCommand extends Command implements ISlash {
     options?: any[];
 
-    execute(interaction: CommandInteraction): Promise<any> | any;
+    abstract execute(interaction: CommandInteraction): Promise<any> | any;
+}
+
+export abstract class FullCommand extends Command implements ISlash, IPrefix {
+    options?: any[];
+
+    abstract run(message: Message, args: string[]): Promise<any> | any;
+    abstract execute(interaction: CommandInteraction): Promise<any> | any;
 }
 
 export interface GuildConfigs {
@@ -61,7 +80,7 @@ export class GuildConfig {
 
 export class ClientStorage {
     guilds: GuildConfigs = {};
-    commands: Collection<string, SlashCommand> = new Collection();
+    commands: Collection<string, Command> = new Collection();
     migrating: any[] = [];
 }
 

@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { FullCommand } from "../../classes/NorthClient.js";
 import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, msgOrRes, wait, validMSSetURL } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { createEmbed } from "./play.js";
 
-class AddCommand implements SlashCommand {
+class AddCommand implements FullCommand {
     name = "add"
     description = "Adds soundtracks to the queue without playing it."
     usage = "[link | keywords]"
