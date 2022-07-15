@@ -71,18 +71,19 @@ export class Handler {
                 try {
                     guild = await this.client.guilds.fetch(result.id);
                 } catch (err) { }
-                if (!guild) return;
-                const clients = getClients();
-                for (let ii = 0; ii < this.client.id; ii++) {
-                    const client = clients[ii];
-                    var clientInGuild = false;
-                    try {
-                        await client.guilds.fetch(result.id);
-                        clientInGuild = true;
-                    } catch (err) { }
-                    if (clientInGuild) {
-                        await guild.leave();
-                        break;
+                if (guild) {
+                    const clients = getClients();
+                    for (let ii = 0; ii < this.client.id; ii++) {
+                        const client = clients[ii];
+                        var clientInGuild = false;
+                        try {
+                            await client.guilds.fetch(result.id);
+                            clientInGuild = true;
+                        } catch (err) { }
+                        if (clientInGuild) {
+                            await guild.leave();
+                            break;
+                        }
                     }
                 }
             }

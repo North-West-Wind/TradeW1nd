@@ -40,9 +40,8 @@ function reloadClients() {
   }
 }
 
-var started = false;
 export default async (client: NorthClient) => {
-  if (started) return;
+  if (client.id) return;
   if (!fs.existsSync("log")) fs.mkdirSync("log");
   const logger = SimpleNodeLogger.createSimpleLogger({
 		logFilePath: `log/console_${client.id}.log`,
@@ -60,5 +59,4 @@ export default async (client: NorthClient) => {
   }
   if (!fs.existsSync(process.env.CACHE_DIR)) fs.mkdirSync(process.env.CACHE_DIR);
   client.setVersion(pkg.version);
-  started = true;
 }
