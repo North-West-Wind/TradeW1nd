@@ -1,7 +1,7 @@
 import { Guild, Interaction, Message, VoiceState } from "discord.js";
 import { checkN0rthWestW1nd, fixGuildRecord, messagePrefix, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
-import { NorthClient, GuildConfig } from "./classes/NorthClient.js";
+import { NorthClient, GuildConfig, ISlash, IPrefix } from "./classes/NorthClient.js";
 import * as filter from "./helpers/filter.js";
 import common from "./common.js";
 import { init } from "./helpers/addTrack.js";
@@ -36,10 +36,10 @@ export class Handler {
     async interactionCreate(interaction: Interaction) {
         if (!interaction.isCommand()) return;
         const command = NorthClient.storage.commands.get(interaction.commandName);
-        if (!command) return;
+        if (!command || !(typeof command["execute"] === "function")) return;
         try {
             const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
-            if (await filter.all(command, interaction) && (catFilter ? await catFilter(command, interaction) : true)) await command.execute(interaction);
+            if (await filter.all(command, interaction) && (catFilter ? await catFilter(command, interaction) : true)) await (<ISlash><unknown>command).execute(interaction);
         } catch (err: any) {
             try {
                 if (interaction.replied || interaction.deferred) await interaction.editReply(error);
@@ -121,10 +121,10 @@ export class Handler {
         const args = message.content.slice(prefix.length).split(/ +/);
         const commandName = args.shift().toLowerCase();
         const command = NorthClient.storage.commands.get(commandName) || NorthClient.storage.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-        if (!command) return;
+        if (!command || !(typeof command["run"] === "function")) return;
         try {
             const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
-            if (await filter.all(command, message, args) && (catFilter ? await catFilter(command, message) : true)) await command.run(message, args);
+            if (await filter.all(command, message, args) && (catFilter ? await catFilter(command, message) : true)) await (<IPrefix><unknown>command).run(message, args);
         } catch (err: any) {
             console.error(`Error in command ${command.name}!`);
             console.error(err);
