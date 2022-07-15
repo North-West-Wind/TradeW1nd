@@ -2,7 +2,7 @@ import { ServerQueue, FullCommand, SoundTrack } from "../../classes/NorthClient.
 import * as Discord from "discord.js";
 import { color, createEmbedScrolling, duration, msgOrRes, query } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
-import { globalClient as client } from "../../common.js";
+import { getClients } from "../../main.js";
 
 class QueueCommand implements FullCommand {
     name = "queue"
@@ -192,7 +192,7 @@ class QueueCommand implements FullCommand {
             .setTitle(`Stored queues of **${author.tag}**`)
             .setDescription(`Slots used: **${results.length}/10**\n\n${queues.join("\n")}`)
             .setTimestamp()
-            .setFooter({ text: "Choose a queue in the menu to view it.", iconURL: client.user.displayAvatarURL() });
+            .setFooter({ text: "Choose a queue in the menu to view it.", iconURL: getClients()[0].user.displayAvatarURL() });
         allEmbeds.unshift(em);
         const backButton = new Discord.MessageButton({ label: "Back", emoji: "⬅", style: "SECONDARY", disabled: true, customId: "back" });
         const stopButton = new Discord.MessageButton({ label: "Stop", emoji: "✖️", style: "DANGER", customId: "stop" });
@@ -222,7 +222,7 @@ class QueueCommand implements FullCommand {
         const author = message.member.user;
         if (serverQueue && serverQueue.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
         if (!name) return await msgOrRes(message, "Please provide the name or ID of the server.");
-        const g = client.guilds.cache.find(x => x.name.toLowerCase() === name.toLowerCase() || x.id == name);
+        const g = getClients()[0].guilds.cache.find(x => x.name.toLowerCase() === name.toLowerCase() || x.id == name);
         if (!g) return await msgOrRes(message, "I cannot find that server! Maybe I am not in that server?");
         try {
             await g.members.fetch(author.id);

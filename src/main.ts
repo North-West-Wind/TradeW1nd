@@ -10,6 +10,14 @@ const config = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
 const clients: NorthClient[] = [];
 NorthClient.storage = new ClientStorage();
 
+export function getClients() {
+    return clients;
+}
+
+export function setClient(index: number, client: NorthClient) {
+    clients[index] = client;
+}
+
 let ii = 0;
 while (process.env[`TOKEN${ii}`]) {
     initBot(process.env[`TOKEN${ii}`]);

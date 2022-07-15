@@ -25,6 +25,7 @@ export function getSCDL() {
 }
 
 export function init() {
+    if (spotifyApi) return;
     spotifyApi = new SpotifyWebApi({
         clientId: process.env.SPOTID,
         clientSecret: process.env.SPOTSECRET

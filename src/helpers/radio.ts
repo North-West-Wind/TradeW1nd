@@ -4,6 +4,7 @@ import { query } from "../function.js";
 export const players: RadioChannel[] = [];
 
 export async function makePlayers() {
+    if (players.length) return;
     const results = await query("SELECT * FROM radio");
     for (let i = 0; i < 10; i++) {
         var tracks = [];

@@ -1,5 +1,4 @@
 import { GuildConfig, NorthClient } from "./classes/NorthClient.js";
-import { globalClient } from "./common.js";
 import * as Discord from "discord.js";
 import superms from "ms";
 import * as fs from "fs";
@@ -9,6 +8,7 @@ import { Readable } from "stream";
 import ytdl, { downloadOptions } from "ytdl-core";
 import { setQueue } from "./helpers/music.js";
 import fetch from "node-fetch";
+import { getClients } from "./main.js";
 
 export function twoDigits(d) {
     if (0 <= d && d < 10) return "0" + d.toString();
@@ -291,8 +291,9 @@ export function humanDurationToNum(duration: string) {
 }
 
 export async function getOwner() {
-	if (!globalClient.application?.owner) await globalClient.application?.fetch();
-    return globalClient.application?.owner.id;
+    const [client] = getClients();
+	if (!client.application?.owner) await client.application?.fetch();
+    return client.application?.owner.id;
 }
 
 export async function query(query: string) {

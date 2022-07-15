@@ -7,6 +7,7 @@ import common from "./common.js";
 import { init } from "./helpers/addTrack.js";
 import { categories } from "./commands/information/help.js";
 import { makePlayers, isPlaying } from "./helpers/radio.js";
+import { getClients } from "./main.js";
 
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
 var inited = false;
@@ -56,14 +57,35 @@ export class Handler {
     async readServers() {
         const results = await query("SELECT servers.*, configs.prefix FROM servers LEFT JOIN configs ON configs.id = servers.id");
         for (const result of results) {
-            if (!inited && (result.queue || result.looping || result.repeating)) {
-                var queue = [];
-                try { if (result.queue) queue = JSON.parse(unescape(result.queue)); }
-                catch (err: any) { console.error(`Error parsing queue of ${result.id}`); }
-                setQueue(result.id, queue, !!result.looping, !!result.repeating);
+            if (!this.client.id) {
+                if (!inited && (result.queue || result.looping || result.repeating)) {
+                    var queue = [];
+                    try { if (result.queue) queue = JSON.parse(unescape(result.queue)); }
+                    catch (err: any) { console.error(`Error parsing queue of ${result.id}`); }
+                    setQueue(result.id, queue, !!result.looping, !!result.repeating);
+                }
+                if (!inited || !NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id] = new GuildConfig(result);
+                else if (NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id].prefix = result.prefix;
+            } else {
+                var guild: Guild;
+                try {
+                    guild = await this.client.guilds.fetch(result.id);
+                } catch (err) { }
+                if (!guild) return;
+                const clients = getClients();
+                for (let ii = 0; ii < this.client.id; ii++) {
+                    const client = clients[ii];
+                    var clientInGuild = false;
+                    try {
+                        await client.guilds.fetch(result.id);
+                        clientInGuild = true;
+                    } catch (err) { }
+                    if (clientInGuild) {
+                        await guild.leave();
+                        break;
+                    }
+                }
             }
-            if (!inited || !NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id] = new GuildConfig(result);
-            else if (NorthClient.storage.guilds[result.id]) NorthClient.storage.guilds[result.id].prefix = result.prefix;
         }
         inited = true;
         setTimeout(async () => this.readServers(), 3600000);
@@ -80,6 +102,19 @@ export class Handler {
     }
 
     async guildCreate(guild: Guild) {
+        const clients = getClients();
+        for (let ii = 0; ii < this.client.id; ii++) {
+            const client = clients[ii];
+            var clientInGuild = false;
+            try {
+                await client.guilds.fetch(guild.id);
+                clientInGuild = true;
+            } catch (err) { }
+            if (clientInGuild) {
+                await guild.leave();
+                return;
+            }
+        }
         try {
             await fixGuildRecord(guild.id);
         } catch (err: any) {
@@ -92,7 +127,7 @@ export class Handler {
             if (await checkN0rthWestW1nd(guild.id)) return;
             delete NorthClient.storage.guilds[guild.id];
             try {
-                await query("DELETE FROM servers WHERE id=" + guild.id);
+                await query("DELETE FROM servers WHERE id = " + guild.id);
             } catch (err: any) {
                 console.error(err);
             }

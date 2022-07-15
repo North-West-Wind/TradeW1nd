@@ -1,7 +1,7 @@
 import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
 import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
 import * as Discord from "discord.js";
-import { globalClient as client } from "../../common.js";
+import { getClients } from "../../main.js";
 
 export const categories = ["Music", "Information", "Dev"];
 
@@ -67,11 +67,12 @@ class HelpCommand implements FullCommand {
             }
         } else {
             const name = args[0].toLowerCase();
-            await message.channel.send(this.getCommand(name, messagePrefix(message, client)).join("\n"));
+            await message.channel.send(this.getCommand(name, messagePrefix(message, <NorthClient>message.client)).join("\n"));
         }
     }
 
     async getAllCommands(guildID: Discord.Snowflake) {
+        const [client] = getClients();
         var config = NorthClient.storage.guilds[guildID];
         if (!config) config = await fixGuildRecord(guildID);
         const Embed = new Discord.MessageEmbed()

@@ -3,7 +3,7 @@ import { FullCommand } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import { color, duration, msgOrRes, wait } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
-import { globalClient as client } from "../../common.js";
+import { getClients } from "../../main.js";
 
 const type = [
     "YouTube",
@@ -76,7 +76,7 @@ class NPCommand implements FullCommand {
         }
         var info = [];
         if (!embed) embed = new Discord.MessageEmbed().setColor(color()).setTimestamp();
-        embed.setTitle("Now playing:" + (serverQueue.playing ? "" : " (Not actually)")).setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: client.user.displayAvatarURL() });
+        embed.setTitle("Now playing:" + (serverQueue.playing ? "" : " (Not actually)")).setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: getClients()[0].user.displayAvatarURL() });
 
         const songLength = !serverQueue.songs[0].time ? "∞" : duration(serverQueue.songs[0].time, "seconds");
         if (serverQueue.songs[0].type === 1) info = [`**[${serverQueue.songs[0].title}](${serverQueue.songs[0].spot})**\nLength: **${songLength}**`, serverQueue.songs[0].thumbnail];

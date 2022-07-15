@@ -5,9 +5,9 @@ import { NorthClient, FullCommand, SoundTrack } from "../../classes/NorthClient.
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream, addMSSetURL } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
-import { globalClient as client } from "../../common.js";
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
 import Ffmpeg from "fluent-ffmpeg";
+import { getClients } from "../../main.js";
 
 function createPlayer(guild: Discord.Guild) {
   var serverQueue = getQueue(guild.id);
@@ -82,7 +82,7 @@ export function createEmbed(songs: SoundTrack[]) {
     .setThumbnail(songs[0].thumbnail)
     .setDescription(`**[${songs[0].title}](${songs[0].url})**\nLength: **${songLength}**`)
     .setTimestamp()
-    .setFooter({ text: "Have a nice day! :)", iconURL: client.user.displayAvatarURL() });
+    .setFooter({ text: "Have a nice day! :)", iconURL: getClients()[0].user.displayAvatarURL() });
   if (songs.length > 1) Embed.setDescription(`**${songs.length}** tracks were added.`).setThumbnail(undefined);
   return Embed;
 }
