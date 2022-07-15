@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
+import { NorthClient, FullCommand, ISlash } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 
 class DevSlashCommand implements FullCommand {
@@ -46,12 +46,12 @@ class DevSlashCommand implements FullCommand {
         const msg = await msgOrRes(message, `Registering Slash Commands...`);
         const client = message.client;
         for (const command of NorthClient.storage.commands.values()) {
-            if (command.category === 5) continue;
+            if (command.category === 5 || !(typeof command["execute"] === "function")) continue;
             try {
                 const options = {
                     name: command.name,
                     description: command.description,
-                    options: command.options
+                    options: (<ISlash><unknown>command).options
                 };
                 await client.application.commands.create(options);
             } catch (err: any) {
@@ -69,14 +69,14 @@ class DevSlashCommand implements FullCommand {
         for (const command of commands.values()) {
             try {
                 const cmd = NorthClient.storage.commands.get(command.name);
-                if (!cmd) {
+                if (!cmd || !(typeof command["execute"] === "function")) {
                     await client.application.commands.delete(command.id);
                     continue;
                 }
                 const options = {
                     name: cmd.name,
                     description: cmd.description,
-                    options: cmd.options
+                    options: (<ISlash><unknown>cmd).options
                 };
                 await client.application.commands.edit(command.id, options);
             } catch (err: any) {
