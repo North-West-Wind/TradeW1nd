@@ -189,6 +189,7 @@ class RadioCommand implements FullCommand {
 
     async info(message: Message | CommandInteraction, channel: number) {
         const radio = players[channel - 1];
+        if (!radio.tracks.length) return await msgOrRes(message, "There are currently no tracks in this radio channel.");
         var position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
         var processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
