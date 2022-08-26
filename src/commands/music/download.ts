@@ -20,7 +20,7 @@ class DownloadCommand implements SlashCommand {
         type: "STRING"
     }]
 
-    async execute(interaction: Discord.CommandInteraction) {
+    async execute(interaction: Discord.ChatInputCommandInteraction) {
         var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const keywords = interaction.options.getString("keywords");
@@ -44,7 +44,7 @@ class DownloadCommand implements SlashCommand {
         await this.download(message, serverQueue, song);
     }
 
-    async download(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, song: SoundTrack) {
+    async download(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue, song: SoundTrack) {
         try {
             if (song?.isLive) {
                 const result = await addYTURL(song.url, song.type);
@@ -90,7 +90,7 @@ class DownloadCommand implements SlashCommand {
         }
         try {
             await msg.edit("The file may not appear just yet. Please be patient!");
-            const attachment = new Discord.MessageAttachment(stream, sanitize(`${song.title}.mp3`));
+            const attachment = new Discord.AttachmentBuilder(stream).setName(sanitize(`${song.title}.mp3`));
             if (message instanceof Discord.Message) await message.channel.send({ files: [attachment] });
             else await message.followUp({ files: [attachment] });
         } catch (err: any) {
@@ -100,7 +100,7 @@ class DownloadCommand implements SlashCommand {
         }
     }
 
-    async downloadFromArgs(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, link: string) {
+    async downloadFromArgs(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue, link: string) {
         var result = { error: true, songs: [], msg: null };
         try {
             if (validYTPlaylistURL(link)) result = await addYTPlaylist(link);

@@ -46,12 +46,12 @@ export function checkQueue() {
 export function findCache(hashed: string) {
 	const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 	if (!fs.existsSync(filePath)) return null;
-	return fs.createReadStream(filePath, { highWaterMark: 1 << 25 });
+	return fs.createReadStream(filePath, { highWaterMark: 1 << 19 });
 }
 export async function cacheTrack(hashed: string, stream: Stream.Readable, noReturn = false) {
 	const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
-	if (!noReturn) return fs.createReadStream(filePath, { highWaterMark: 1 << 25 });
+	if (!noReturn) return fs.createReadStream(filePath, { highWaterMark: 1 << 19 });
 }
 export function isUsing(hashed: string) {
 	return !!using[hashed];
