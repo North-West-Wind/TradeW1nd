@@ -10,15 +10,15 @@ import Ffmpeg from "fluent-ffmpeg";
 import { getClients } from "../../main.js";
 
 function createPlayer(guild: Discord.Guild) {
-  var serverQueue = getQueue(guild.id);
+  let serverQueue = getQueue(guild.id);
   if (!serverQueue.player) {
     serverQueue.player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
     updateQueue(guild.id, serverQueue, false);
   }
-  var track: SoundTrack;
-  var needResource = true, needSetVolume = true;
+  let track: SoundTrack;
+  let needResource = true, needSetVolume = true;
   async function next() {
-    var randomized = false;
+    let randomized = false;
     if (!serverQueue.isSkipping) {
       if (serverQueue.looping) serverQueue.songs.push(track);
       if (!serverQueue.repeating) serverQueue.songs.shift();
@@ -174,7 +174,7 @@ class PlayCommand implements FullCommand {
   }
 
   async logic(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string) {
-    var serverQueue = getQueue(message.guild.id);
+    let serverQueue = getQueue(message.guild.id);
     const voiceChannel = <Discord.VoiceChannel>(<Discord.GuildMember>message.member).voice.channel;
     if (!voiceChannel) return await msgOrRes(message, "You need to be in a voice channel to play music!");
     if (!voiceChannel.permissionsFor(message.guild.members.me).has(BigInt(3145728))) return await msgOrRes(message, "I can't play in your voice channel!");
@@ -216,8 +216,8 @@ class PlayCommand implements FullCommand {
     }
     if (!str) return await msgOrRes(message, "You didn't provide any link or keywords!");
     try {
-      var songs = [];
-      var result = { error: true, songs: [], msg: null, message: null };
+      let songs = [];
+      let result = { error: true, songs: [], msg: null, message: null };
       if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
       else if (validYTURL(str)) result = await addYTURL(str);
       else if (validSPURL(str)) result = await addSPURL(message, str);
@@ -238,7 +238,7 @@ class PlayCommand implements FullCommand {
       const Embed = createEmbed(songs);
       if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, songs, false, false);
       else serverQueue.songs = ((!message.guild.members.me.voice.channel || !serverQueue.playing) ? songs : serverQueue.songs).concat((!message.guild.members.me.voice.channel || !serverQueue.playing) ? serverQueue.songs : songs);
-      var msg: Discord.Message;
+      let msg: Discord.Message;
       if (result.msg) await result.msg.edit({ content: null, embeds: [Embed] });
       else await msgOrRes(message, Embed);
       setTimeout(() => { try { msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }).catch(() => { }) } catch (err: any) { } }, 30000);

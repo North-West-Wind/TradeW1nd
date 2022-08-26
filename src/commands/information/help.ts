@@ -73,7 +73,7 @@ class HelpCommand implements FullCommand {
 
     async getAllCommands(guildID: Discord.Snowflake) {
         const [client] = getClients();
-        var config = NorthClient.storage.guilds[guildID];
+        let config = NorthClient.storage.guilds[guildID];
         if (!config) config = await fixGuildRecord(guildID);
         const Embed = new Discord.EmbedBuilder()
             .setColor(color())
@@ -102,13 +102,13 @@ class HelpCommand implements FullCommand {
         if (command.subcommands) {
             const strs = [];
             for (let i = 0; i < command.subcommands.length; i++) {
-                var str = "    • ";
+                let str = "    • ";
                 if (command.subaliases) str = `**${command.subcommands[i]} | ${command.subaliases[i]}**${command.subdesc ? ` - ${command.subdesc[i]}` : ""}`;
                 else str = `**${command.subcommands[i]}**${command.subdesc ? ` - ${command.subdesc[i]}` : ""}`;
                 str += "\n        • "
                 if (command.subusage && (command.subusage[i] || command.subusage[i] == 0) && !isNaN(<number>command.subusage[i])) str += `${prefix}${command.name} ${command.subusage[command.subusage[i]].replace("<subcommand>", command.subcommands[i])}`;
                 else if (command.subusage && command.subusage[i]) str += `${prefix}${command.name} ${command.subusage[i].toString().replace("<subcommand>", command.subcommands[i])}`;
-                else str += `${prefix}${command.name} ${command.usage ? command.usage.replace(/(?!\s)[\<\[\w\s\|]*subcommand[\w\s\|\>\]]*/, command.subcommands[i]) : command.subcommands[i]}`;
+                else str += `${prefix}${command.name} ${command.usage ? command.usage.replace(/(?!\s)[<[\w\s|]*subcommand[\w\s|>\]]*/, command.subcommands[i]) : command.subcommands[i]}`;
                 strs.push(str);
             }
             data.push(`**Subcommands:**\n${strs.join("\n")}`);
@@ -116,7 +116,7 @@ class HelpCommand implements FullCommand {
         if (command.subcommands) data.push("\nIf you want to know how subcommands work, please refer to the manual.");
         return data;
     }
-};
+}
 
 const cmd = new HelpCommand();
 export default cmd;

@@ -1,4 +1,4 @@
-import { ClientStorage, NorthClient, FullCommand, Command } from "./classes/NorthClient.js";
+import { ClientStorage, NorthClient, Command } from "./classes/NorthClient.js";
 import { deepReaddir } from "./function.js";
 import * as fs from "fs";
 import isOnline from "is-online";
@@ -22,7 +22,7 @@ process.on('unhandledRejection', (reason) => {
 function reloadClients() {
   const clients = getClients();
   for (let ii = 0; ii < clients.length; ii++) {
-    var client = clients[ii];
+    let client = clients[ii];
     const options = client.options;
     const token = client.token;
     const prefix = client.prefix;

@@ -62,9 +62,9 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/checkGuild/:guild", async (req, res) => {
-    var isInGuild = false;
-    var id = null;
-    var bot = null;
+    let isInGuild = false;
+    let id = null;
+    let bot = null;
     for (const client of clients) {
         try {
             const guild = await client.guilds.fetch(req.params.guild);

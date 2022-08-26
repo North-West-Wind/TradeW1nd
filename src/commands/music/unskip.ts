@@ -2,9 +2,8 @@ import { joinVoiceChannel } from "@discordjs/voice";
 import { ChatInputCommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
-import { moveArray, msgOrRes } from "../../function.js";
-import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
-import { play } from "./play.js";
+import { msgOrRes } from "../../function.js";
+import { createDiscordJSAdapter, getQueue, setQueue } from "../../helpers/music.js";
 
 class UnSkipCommand implements FullCommand {
     name = "unskip"
@@ -25,7 +24,7 @@ class UnSkipCommand implements FullCommand {
     }
 
     async run(message: Message, args: string[]) {
-        var skipped = 1;
+        let skipped = 1;
         if (args[0]) {
             const parsed = parseInt(args[0]);
             if (isNaN(parsed)) await message.channel.send(`**${args[0]}** is not a integer. Will skip 1 track instead.`);
@@ -36,15 +35,15 @@ class UnSkipCommand implements FullCommand {
     }
 
     async unskip(message: Message | ChatInputCommandInteraction, unskip: number) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         const guild = message.guild;
         const member = (<GuildMember> message.member);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if ((member.voice.channelId !== guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message,"You have to be in a voice channel to unskip the music when the bot is playing!");
         if (serverQueue.songs.length < 1) return await msgOrRes(message,"There is nothing in the queue!");
         if (serverQueue.repeating) unskip = 0;
-        for (var i = 0; i < unskip; i++) {
-            var song = serverQueue.songs.pop();
+        for (let i = 0; i < unskip; i++) {
+            const song = serverQueue.songs.pop();
             serverQueue.songs.unshift(song);
         }
         serverQueue.isSkipping = true;

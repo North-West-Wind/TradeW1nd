@@ -18,7 +18,7 @@ class ResumeCommand implements FullCommand {
     }
 
     async resume(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to resume the music when the bot is playing!");
         if (!serverQueue?.player) return await msgOrRes(message, "There is nothing playing.");

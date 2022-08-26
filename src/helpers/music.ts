@@ -11,7 +11,7 @@ const using: { [key: string]: number } = {};
 export function getQueue(id: Discord.Snowflake) {
 	return queue.get(id);
 }
-export async function updateQueue(id: Discord.Snowflake, serverQueue: ServerQueue, update: boolean = true) {
+export async function updateQueue(id: Discord.Snowflake, serverQueue: ServerQueue, update = true) {
 	if (!serverQueue) queue.delete(id);
 	else queue.set(id, serverQueue);
 	if (!update) return;
@@ -48,7 +48,7 @@ export function findCache(hashed: string) {
 	if (!fs.existsSync(filePath)) return null;
 	return fs.createReadStream(filePath, { highWaterMark: 1 << 25 });
 }
-export async function cacheTrack(hashed: string, stream: Stream.Readable, noReturn: boolean = false) {
+export async function cacheTrack(hashed: string, stream: Stream.Readable, noReturn = false) {
 	const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 	if (!fs.existsSync(filePath)) await new Promise((res) => stream.pipe(fs.createWriteStream(filePath)).on("close", res));
 	if (!noReturn) return fs.createReadStream(filePath, { highWaterMark: 1 << 25 });
@@ -59,7 +59,7 @@ export function isUsing(hashed: string) {
 export function addUsing(hashed: string) {
 	if (hashed) using[hashed]++;
 }
-export function removeUsing(hashed: string, all: boolean = false) {
+export function removeUsing(hashed: string, all = false) {
 	if (!hashed || !using[hashed]) return;
 	if (all || !(using[hashed] -= 1))
 		setTimeout(() => {

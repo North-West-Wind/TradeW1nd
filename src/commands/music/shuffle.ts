@@ -18,7 +18,7 @@ class ShuffleCommand implements FullCommand {
     }
 
     async shuffle(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!Array.isArray(serverQueue?.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (!serverQueue || serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to shuffle the queue when the bot is playing!");

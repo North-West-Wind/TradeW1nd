@@ -132,7 +132,7 @@ class RadioCommand implements FullCommand {
     }
 
     async tune(message: Message | ChatInputCommandInteraction, channel: number) {
-        var connection = getVoiceConnection(message.guildId);
+        let connection = getVoiceConnection(message.guildId);
         if (!connection) {
             const member = <GuildMember>message.member;
             if (!member.voice.channelId) return await msgOrRes(message, "You are not in any voice channel!");
@@ -155,8 +155,8 @@ class RadioCommand implements FullCommand {
 
     async add(message: Message | ChatInputCommandInteraction, str: string, channel: number) {
         try {
-            var songs = [];
-            var result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
+            let songs = [];
+            let result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
             if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
             else if (validYTURL(str)) result = await addYTURL(str);
             else if (validSPURL(str)) result = await addSPURL(message, str);
@@ -176,7 +176,7 @@ class RadioCommand implements FullCommand {
             if (!songs || songs.length < 1) return await msgOrRes(message, "There was an error trying to add the soundtrack!");
             const Embed = createEmbed(songs);
             await players[channel - 1].add(songs);
-            var msg: Message;
+            let msg: Message;
             if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
             else msg = await msgOrRes(message, Embed);
             await wait(30000);
@@ -190,28 +190,29 @@ class RadioCommand implements FullCommand {
     async info(message: Message | ChatInputCommandInteraction, channel: number) {
         const radio = players[channel - 1];
         if (!radio.tracks.length) return await msgOrRes(message, "There are currently no tracks in this radio channel.");
-        var position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
-        var processBar = [];
+        const position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
+        const processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
-        var progress = 0;
+        let progress = 0;
         const isLive = !!radio.tracks[0]?.isLive;
         const length = isLive ? 0 : (radio.tracks[0].time || 1);
+        let positionTime: string;
         if (isLive) {
             processBar.splice(19, 1, "■");
-            var positionTime = "∞";
+            positionTime = "∞";
         } else {
-            var positionTime = duration(Math.round(position / 1000), "seconds");
+            positionTime = duration(Math.round(position / 1000), "seconds");
             if (position === 0 || isNaN(position))
                 positionTime = "0:00";
             progress = Math.floor((position / length) * processBar.length);
             processBar.splice(progress, 1, "■");
         }
-        var next: string;
+        let next: string;
         if (radio.tracks[1]) next = `${radio.tracks[1].title} : ${duration(radio.tracks[1].time, "seconds")}`;
         else if ((radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${duration(radio.tracks[0].time, "seconds")}`;
         else next = "Empty";
-        var info = [];
-        var embed = new EmbedBuilder()
+        let info = [];
+        const embed = new EmbedBuilder()
             .setColor(color())
             .setTitle("Information of Radio Channel #" + channel)
             .setTimestamp()
@@ -226,7 +227,7 @@ class RadioCommand implements FullCommand {
     }
 
     async copy(message: Message | ChatInputCommandInteraction, channel: number) {
-        var serverQueue = getQueue(message.guildId);
+        let serverQueue = getQueue(message.guildId);
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
         const radio = players[channel - 1];
         if (radio.tracks.length == 0) return await msgOrRes(message, "The queue of this radio channel is empty!");

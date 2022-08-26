@@ -10,7 +10,7 @@ import { makePlayers, isPlaying } from "./helpers/radio.js";
 import { getClients } from "./main.js";
 
 const error = "There was an error trying to execute that command!\nIf it still doesn't work after a few tries, please contact NorthWestWind or report it on the [support server](<https://discord.gg/n67DUfQ>) or [GitHub](<https://github.com/North-West-Wind/NWWbot/issues>).\nPlease **DO NOT just** sit there and ignore this error. If you are not reporting it, it is **NEVER getting fixed**.";
-var inited = false;
+let inited = false;
 export class Handler {
     protected readonly client: NorthClient;
 
@@ -60,7 +60,7 @@ export class Handler {
         for (const result of results) {
             if (!this.client.id) {
                 if (!inited && (result.queue || result.looping || result.repeating)) {
-                    var queue = [];
+                    let queue = [];
                     try { if (result.queue) queue = JSON.parse(unescape(result.queue)); }
                     catch (err: any) { console.error(`Error parsing queue of ${result.id}`); }
                     setQueue(result.id, queue, !!result.looping, !!result.repeating);
@@ -76,7 +76,7 @@ export class Handler {
                     const clients = getClients();
                     for (let ii = 0; ii < this.client.id; ii++) {
                         const client = clients[ii];
-                        var clientInGuild = false;
+                        let clientInGuild = false;
                         try {
                             await client.guilds.fetch(result.id);
                             clientInGuild = true;
@@ -100,14 +100,14 @@ export class Handler {
             init();
             await this.readServers();
             await makePlayers();
-        } catch (err: any) { console.error(err); };
+        } catch (err: any) { console.error(err); }
     }
 
     async guildCreate(guild: Guild) {
         const clients = getClients();
         for (let ii = 0; ii < this.client.id; ii++) {
             const client = clients[ii];
-            var clientInGuild = false;
+            let clientInGuild = false;
             try {
                 await client.guilds.fetch(guild.id);
                 clientInGuild = true;

@@ -26,7 +26,7 @@ class VolumeCommand implements FullCommand {
     ]
 
     async execute(interaction: ChatInputCommandInteraction) {
-        var serverQueue = getQueue(interaction.guild.id);
+        let serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const pct = interaction.options.getInteger("percentage");
         if (!pct) return await interaction.reply(`The current volume is **${Math.round(serverQueue.volume * 100)}%** and the current volume of the soundtrack is **${Math.round(serverQueue.volume * (serverQueue.songs[0] && serverQueue.songs[0].volume ? serverQueue.songs[0].volume : 1) * 100)}%**`);
@@ -34,7 +34,7 @@ class VolumeCommand implements FullCommand {
     }
 
     async run(message: Message, args: string[]) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (!args[0]) return await message.channel.send(`The current volume is **${Math.round(serverQueue.volume * 100)}%** and the current volume of the soundtrack is **${Math.round(serverQueue.volume * (serverQueue.songs[0] && serverQueue.songs[0].volume ? serverQueue.songs[0].volume : 1) * 100)}%**`);
         if (isNaN(Number(args[0]))) return await message.channel.send("The percentage change you gave is not a number!");

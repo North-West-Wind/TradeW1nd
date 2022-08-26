@@ -42,7 +42,7 @@ class RemoveCommand implements FullCommand {
     }
 
     async remove(message: Message | ChatInputCommandInteraction, queueIndex: number, amount: number) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");

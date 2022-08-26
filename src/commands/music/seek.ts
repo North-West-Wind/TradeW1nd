@@ -19,9 +19,9 @@ class SeekCommand implements FullCommand {
     }]
 
     async execute(interaction: ChatInputCommandInteraction) {
-        var serverQueue = getQueue(interaction.guild.id);
+        let serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
-        var parsed = ms(interaction.options.getString("time")) || interaction.options.getString("time");
+        let parsed = ms(interaction.options.getString("time")) || interaction.options.getString("time");
         if (typeof parsed === "string" && parsed.endsWith("%")) {
             const percentage = Number(parsed.slice(0, -1));
             if (isNaN(percentage) || percentage > 100 || percentage < 0) return await interaction.reply("The given percentage is not valid!");
@@ -31,10 +31,10 @@ class SeekCommand implements FullCommand {
     }
 
     async run(message: Message, args: string[]) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (args.length < 1) return await message.channel.send("You didn't provide the time to skip to!");
-        var parsed = ms(args.join(" "));
+        let parsed = ms(args.join(" "));
         if (args.join(" ").endsWith("%")) {
             const percentage = Number(args.join(" ").slice(0, -1));
             if (isNaN(percentage) || percentage > 100 || percentage < 0) return await message.channel.send("The given percentage is not valid!");

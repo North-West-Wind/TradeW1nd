@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-var browser: puppeteer.Browser, timeout: NodeJS.Timeout;
+let browser: puppeteer.Browser, timeout: NodeJS.Timeout;
 
 async function getBrowser() {
     if (!browser) browser = await puppeteer.launch({

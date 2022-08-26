@@ -17,7 +17,7 @@ import { getMP3 } from "./musescore.js";
 import { cacheTrack, findCache, updateQueue } from "./music.js";
 import { TrackInfo } from "@vncsprd/soundcloud-downloader/dist/info.js";
 import fetch from "node-fetch";
-var spotifyApi: SpotifyWebApi;
+let spotifyApi: SpotifyWebApi;
 const scdl = new SCDL();
 
 export function getSCDL() {
@@ -68,7 +68,7 @@ export async function addYTPlaylist(link: string) {
     try {
         var playlistInfo = await ytpl(link, { limit: Infinity });
     } catch (err: any) {
-        var msg = "There was an error trying to fetch your playlist!";
+        let msg = "There was an error trying to fetch your playlist!";
         if (err.message === "This playlist is private.") msg = "The playlist is private!";
         return { error: true, message: msg, msg: null, songs: [] };
     }
@@ -85,7 +85,7 @@ export async function addYTPlaylist(link: string) {
     });
     return { error: false, songs: songs, msg: null, message: null };
 }
-export async function addYTURL(link: string, type: number = 0) {
+export async function addYTURL(link: string, type = 0) {
     try {
         const options = <any>{};
         if (process.env.COOKIE) {
@@ -98,17 +98,17 @@ export async function addYTURL(link: string, type: number = 0) {
         console.error(err);
         return { error: true, message: "Failed to get video data!", msg: null, songs: [] };
     }
-    var length = parseInt(songInfo.videoDetails.lengthSeconds);
+    const length = parseInt(songInfo.videoDetails.lengthSeconds);
     const thumbnails = songInfo.videoDetails.thumbnails;
-    var thumbUrl = thumbnails[thumbnails.length - 1].url;
-    var maxWidth = 0;
+    let thumbUrl = thumbnails[thumbnails.length - 1].url;
+    let maxWidth = 0;
     for (const thumbnail of thumbnails) {
         if (thumbnail.width > maxWidth) {
             maxWidth = thumbnail.width;
             thumbUrl = thumbnail.url;
         }
     }
-    var songs = [
+    const songs = [
         {
             title: decodeHtmlEntity(songInfo.videoDetails.title),
             url: songInfo.videoDetails.video_url,
@@ -122,21 +122,21 @@ export async function addYTURL(link: string, type: number = 0) {
     return { error: false, songs: songs, msg: null, message: null };
 }
 export async function addSPURL(message: Message | Discord.ChatInputCommandInteraction, link: string) {
-    var url_array = link.replace("https://", "").split("/");
-    var musicID = url_array[2].split("?")[0];
-    var highlight = false;
+    const url_array = link.replace("https://", "").split("/");
+    let musicID = url_array[2].split("?")[0];
+    let highlight = false;
     if (url_array[2].split("?")[1]) highlight = url_array[2].split("?")[1].split("=")[0] === "highlight";
     if (highlight) musicID = url_array[2].split("?")[1].split("=")[1].split(":")[2];
-    var type = url_array[1];
-    var songs = [];
-    var tracks, counter = 0;
+    const type = url_array[1];
+    const songs = [];
+    let tracks, counter = 0;
     switch (type) {
         case "playlist":
             var musics = await spotifyApi.getPlaylist(musicID);
             tracks = musics.body.tracks.items;
             async function checkAll() {
                 if (musics.body.tracks.next) {
-                    var offset = musics.body.tracks.offset + 50;
+                    const offset = musics.body.tracks.offset + 50;
                     musics = await spotifyApi.getPlaylist(musicID, <any>{ limit: 50, offset: offset });
                     tracks = tracks.concat(musics.body.tracks.items);
                     return await checkAll();
@@ -189,7 +189,7 @@ export async function addSPURL(message: Message | Discord.ChatInputCommandIntera
                 tracks = data.body.items;
                 async function checkAll() {
                     if (!data.body.next) return;
-                    var offset = data.body.offset + 50;
+                    const offset = data.body.offset + 50;
                     data = await spotifyApi.getAlbumTracks(musicID, { limit: 50, offset: offset });
                     tracks = tracks.concat(data.body.items);
                     return await checkAll();
@@ -313,7 +313,7 @@ export async function addSCURL(link: string) {
     return { error: false, songs: songs, msg: null, message: null };
 }
 export async function addGDURL(link: string) {
-    var dl;
+    let dl;
     let id;
     const alphanumeric = /^[a-zA-Z0-9\-_]+$/;
     if (!validGDDLURL(link)) {
@@ -337,10 +337,10 @@ export async function addGDURL(link: string) {
             else return { error: true, message: `The link/keywords you provided is invalid!`, msg: null, songs: [] };
         }
     }
-    var f = await fetch(dl);
+    const f = await fetch(dl);
     if (!f.ok) return { error: true, message: `Received HTTP Status: ${f.status}`, msg: null, songs: [] };
     const stream = <Stream.Readable>f.body;
-    var title = "No Title";
+    let title = "No Title";
     try {
         var metadata = await mm.parseStream(stream, {}, { duration: true });
         const html = await fetch(link).then(res => res.text());
@@ -368,13 +368,13 @@ export async function addGDFolderURL(link: string, cb: Function = async () => { 
         const body = await rp(link);
         const $ = cheerio.load(body);
         const elements = $("div[data-target='doc']");
-        var i = 0;
+        let i = 0;
         for (const el of elements.toArray()) {
             const id = (<any>el).attribs["data-id"];
             const link = "https://drive.google.com/uc?export=download&id=" + id;
             ++i;
             cb(i, elements.length);
-            var title = "No Title";
+            let title = "No Title";
             try {
                 const html = await rp("https://drive.google.com/file/d/" + id + "/view");
                 const $1 = cheerio.load(html);
@@ -421,7 +421,7 @@ export async function addMSURL(link: string) {
 }
 
 export async function addURL(link: string) {
-    var title = link.split("/").slice(-1)[0].split(".").slice(0, -1).join(".").replace(/_/g, " ");
+    let title = link.split("/").slice(-1)[0].split(".").slice(0, -1).join(".").replace(/_/g, " ");
     try {
         var stream = <Stream.Readable>await fetch(link).then(res => res.body);
         var metadata = await mm.parseStream(stream, {}, { duration: true });
@@ -467,7 +467,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         volume: 1,
         isLive: x.isLive
     })).filter(x => !!x.url);
-    var num = 0;
+    let num = 0;
     if (ytResults.length > 0) {
         results.yt = ytResults;
         Embed.setDescription("This page shows search results from **YouTube**. The other page shows search results from **SoundCloud**.\nChoose the soundtrack from the menu, or click \"cancel\" to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
@@ -514,13 +514,13 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         await msgOrRes(message, "Cannot find any result with the given string.");
         return { error: true, msg: null, songs: [], message: null };
     }
-    var val = { error: true, songs: [], msg: null, message: null };
-    var s = 0;
+    let val = { error: true, songs: [], msg: null, message: null };
+    let s = 0;
     const globalRow = new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new Discord.ButtonBuilder({ label: "Next Page", emoji: "📄", customId: "next", style: ButtonStyle.Primary }),
         new Discord.ButtonBuilder({ label: "Cancel", emoji: "✖️", customId: "cancel", style: ButtonStyle.Danger }),
     );
-    var msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow] });
+    const msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow] });
     const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === message.member.user.id, idle: 60000 });
     collector.on("collect", async interaction => {
         switch (interaction.customId) {
@@ -575,8 +575,8 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
 
 export async function getStream(track: SoundTrack, data: { type: string, guild?: Discord.Guild, serverQueue?: ServerQueue, tracks?: SoundTrack[] }) {
     if (!track.id) track.id = crypto.createHash("md5").update(`${track.title};${track.url}`).digest("hex");
-    var stream: Stream.Readable;
-    var cacheFound = true;
+    let stream: Stream.Readable;
+    let cacheFound = true;
     if (!(stream = findCache(track.id))) {
         cacheFound = false;
         switch (track.type) {

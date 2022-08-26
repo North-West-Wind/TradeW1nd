@@ -19,7 +19,7 @@ class StopCommand implements FullCommand {
     }
 
     async stop(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue?.playing) return await msgOrRes(message, "You have to be in a voice channel to stop the music when the bot is playing!");
         serverQueue.destroy();

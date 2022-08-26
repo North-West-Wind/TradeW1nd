@@ -1,10 +1,10 @@
-import { ActivityType, ChatInputCommandInteraction, GuildMember, Message, Permissions, PermissionsBitField, TextChannel } from "discord.js";
+import { ActivityType, ChatInputCommandInteraction, GuildMember, Message, PermissionsBitField, TextChannel } from "discord.js";
 import { Command, NorthClient } from "../classes/NorthClient.js";
 import { genPermMsg, getOwner, msgOrRes } from "../function.js";
 import { getQueue } from "./music.js";
 import { isPlaying } from "./radio.js";
 
-var timeout: NodeJS.Timeout;
+let timeout: NodeJS.Timeout;
 
 export function canReset() {
     return !timeout;

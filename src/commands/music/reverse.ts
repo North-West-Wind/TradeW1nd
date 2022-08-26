@@ -20,11 +20,11 @@ class ReverseCommand implements FullCommand {
     }
 
     async reverse(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
-        var oldSong = serverQueue.songs[0];
+        const oldSong = serverQueue.songs[0];
         serverQueue.songs.reverse();
         await msgOrRes(message, "The queue has been reversed!");
         updateQueue(message.guild.id, serverQueue);

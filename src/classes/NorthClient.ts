@@ -189,7 +189,7 @@ export class RadioChannel {
             }, 30000);
         }).on(AudioPlayerStatus.Idle, this.next).on("error", this.next);
         for (const guild of guilds) {
-            var connection = getVoiceConnection(guild);
+            const connection = getVoiceConnection(guild);
             if (!connection) continue;
             connection.subscribe(this.player);
         }

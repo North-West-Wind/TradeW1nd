@@ -7,7 +7,7 @@ import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../h
 import { play } from "./play.js";
 
 export async function migrate(message: Message | ChatInputCommandInteraction) {
-    var serverQueue = getQueue(message.guild.id);
+    let serverQueue = getQueue(message.guild.id);
     const member = <GuildMember> message.member;
     const exit = NorthClient.storage.guilds[message.guild.id].exit;
     const migrating = NorthClient.storage.migrating;
@@ -22,7 +22,7 @@ export async function migrate(message: Message | ChatInputCommandInteraction) {
     migrating.push(message.guild.id);
     if (exit) NorthClient.storage.guilds[message.guild.id].exit = false;
     const oldChannel = serverQueue.voiceChannel;
-    var seek = 0;
+    let seek = 0;
     if (serverQueue.connection) {
         seek = Math.floor((serverQueue.getPlaybackDuration() - serverQueue.startTime) / 1000);
         serverQueue.destroy();

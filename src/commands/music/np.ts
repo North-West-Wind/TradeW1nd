@@ -31,9 +31,9 @@ class NPCommand implements FullCommand {
 
     async nowplaying(message: Discord.Message | Discord.ChatInputCommandInteraction) {
         const getEmbed = this.getEmbed;
-        var embed = getEmbed(message.guildId);
+        let embed = getEmbed(message.guildId);
         if (!embed) return await msgOrRes(message, "There is nothing in the queue.");
-        var counter = 0;
+        let counter = 0;
         const msg = await msgOrRes(message, embed);
         async function edit() {
             await wait(5000);
@@ -48,7 +48,7 @@ class NPCommand implements FullCommand {
     }
 
     getEmbed(id: Discord.Snowflake, embed: Discord.EmbedBuilder = null) {
-        var serverQueue = getQueue(id);
+        let serverQueue = getQueue(id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(id, [], false, false);
         if (serverQueue.songs.length < 1) return null;
         const filtered = serverQueue.songs.filter(song => !!song);
@@ -56,25 +56,26 @@ class NPCommand implements FullCommand {
             serverQueue.songs = filtered;
             updateQueue(id, serverQueue);
         }
-        var position = 0;
+        let position = 0;
         const streamTime = serverQueue.getPlaybackDuration();
         if (streamTime) position = Math.round((streamTime - (serverQueue.startTime || 0)) / 1000);
-        var processBar = [];
+        const processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
-        var progress = 0;
+        let progress = 0;
         const isLive = !!serverQueue?.songs[0]?.isLive;
         const length = isLive ? 0 : (serverQueue.songs[0].time || 1);
+        let positionTime: string;
         if (isLive) {
             processBar.splice(19, 1, "■");
-            var positionTime = "∞";
+            positionTime = "∞";
         } else {
-            var positionTime = duration(position, "seconds");
+            positionTime = duration(position, "seconds");
             if (position === 0 || isNaN(position))
                 positionTime = "00:00";
             progress = Math.floor((position / length) * processBar.length);
             processBar.splice(progress, 1, "■");
         }
-        var info = [];
+        let info = [];
         if (!embed) embed = new Discord.EmbedBuilder().setColor(color()).setTimestamp();
         embed.setTitle("Now playing:" + (serverQueue.playing ? "" : " (Not actually)")).setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: getClients()[0].user.displayAvatarURL() });
 

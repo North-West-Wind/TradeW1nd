@@ -7,7 +7,7 @@ export async function makePlayers() {
     if (players.length) return;
     const results = await query("SELECT * FROM radio");
     for (let i = 0; i < 10; i++) {
-        var tracks = [];
+        let tracks = [];
         if (results[i]) tracks = JSON.parse(unescape(results[i].queue));
         players[i] = new RadioChannel(i + 1, tracks, results[i].seek, results[i].guilds.split(",").filter(x => !!x));
     }

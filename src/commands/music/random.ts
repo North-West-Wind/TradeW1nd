@@ -20,7 +20,7 @@ class RandomCommand implements FullCommand {
     }
 
     async random(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.random = !serverQueue.random;
         if (serverQueue.repeating && serverQueue.random) {

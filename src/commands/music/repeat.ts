@@ -19,7 +19,7 @@ class RepeatCommand implements FullCommand {
     }
 
     async repeat(message: Message | ChatInputCommandInteraction) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.repeating = !serverQueue.repeating;
         if (serverQueue.repeating && serverQueue.looping) {

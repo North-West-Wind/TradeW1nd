@@ -3,7 +3,7 @@ import { Page } from 'puppeteer-core';
 
 export async function getMP3(url: string): Promise<{ error: boolean, url: string, message: string, timeTaken: number }> {
     return await run(async (page: Page) => {
-        var result = { error: true, url: undefined, message: undefined, timeTaken: 0 };
+        const result = { error: true, url: undefined, message: undefined, timeTaken: 0 };
         const start = Date.now();
         try {
             await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36');
@@ -19,9 +19,8 @@ export async function getMP3(url: string): Promise<{ error: boolean, url: string
             result.error = false;
         } catch (err: any) {
             result.message = err.message;
-        } finally {
-            result.timeTaken = Date.now() - start;
-            return result;
         }
+        result.timeTaken = Date.now() - start;
+        return result;
     })
 }

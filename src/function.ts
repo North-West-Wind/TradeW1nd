@@ -29,10 +29,10 @@ export function validMSURL(str: string) { return !!str.match(/^(https?:\/\/)?mus
 export function validMSSetURL(str: string) { return !!str.match(/^https?:\/\/musescore.com\/user\/[\w-]+\/sets\/[\w-]+$/); }
 export function decodeHtmlEntity(str: string) { return str?.replace(/&#(\d+);/g, (_match, dec) => String.fromCharCode(dec)).replace(/&quot;/g, `"`).replace(/&amp;/g, `&`); }
 
-export function shuffleArray(array: any[], start: number = 0) {
+export function shuffleArray(array: any[], start = 0) {
     const temp = array.splice(0, start);
     for (let i = array.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
     return temp.concat(array);
@@ -59,11 +59,11 @@ export function ms(val: string) {
             }
             return mses.reduce((acc, c) => acc + c);
         }
-        var mses = [];
+        const mses = [];
         let temp = "";
-        let last = "";
+        const last = "";
         for (let i = 0; i < val.length; i++) {
-            let char = val.substr(i, 1);
+            const char = val.substr(i, 1);
             if (!/\d/.test(last) && /\d/.test(char) && i != 0) {
                 if (superms(temp) === undefined) return undefined;
                 mses.push(superms(temp));
@@ -76,22 +76,22 @@ export function ms(val: string) {
     } else return superms(val);
 }
 export function isEquivalent(a, b) {
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
+    const aProps = Object.getOwnPropertyNames(a);
+    const bProps = Object.getOwnPropertyNames(b);
     if (aProps.length != bProps.length) return false;
-    for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
+    for (let i = 0; i < aProps.length; i++) {
+        const propName = aProps[i];
         if (a[propName] !== b[propName]) return false;
     }
     return true;
 }
 export async function createEmbedScrolling(message: Discord.Message | Discord.ChatInputCommandInteraction | { interaction: Discord.ChatInputCommandInteraction, useEdit: boolean }, allEmbeds: Discord.EmbedBuilder[], post?: Function) {
-    var author: Discord.Snowflake;
+    let author: Discord.Snowflake;
     if (message instanceof Discord.Message) author = message.author.id;
     else if (message instanceof Discord.ChatInputCommandInteraction) author = message.user.id;
     else author = message.interaction.user.id;
     const filter = (interaction: Discord.Interaction) => (interaction.user.id === author);
-    var s = 0;
+    let s = 0;
     const row = new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new Discord.ButtonBuilder({ label: "<< First", style: ButtonStyle.Secondary, customId: "first" }),
         new Discord.ButtonBuilder({ label: "< Previous", style: ButtonStyle.Primary, customId: "previous" }),
@@ -99,7 +99,7 @@ export async function createEmbedScrolling(message: Discord.Message | Discord.Ch
         new Discord.ButtonBuilder({ label: "Last >>", style: ButtonStyle.Secondary, customId: "last" }),
         new Discord.ButtonBuilder({ label: "Stop", style: ButtonStyle.Danger, customId: "stop", emoji: "✖️" })
     );
-    var msg: Discord.Message;
+    let msg: Discord.Message;
     if (message instanceof Discord.Message) msg = await message.channel.send({ embeds: [allEmbeds[0]], components: [row] });
     else if (message instanceof Discord.ChatInputCommandInteraction) msg = <Discord.Message> await message.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
     else {
@@ -176,7 +176,7 @@ export function duration(seconds: number, type: moment.unitOfTime.DurationConstr
     str.push(twoDigits(duration.seconds()));
     return str.join("");
 }
-export async function msgOrRes(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string | Discord.EmbedBuilder | Discord.AttachmentBuilder | { content?: string, embeds?: Discord.EmbedBuilder[], files?: Discord.AttachmentBuilder[], components?: Discord.ActionRowBuilder<MessageActionRowComponentBuilder>[] }, reply: boolean = false): Promise<Discord.Message> {
+export async function msgOrRes(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string | Discord.EmbedBuilder | Discord.AttachmentBuilder | { content?: string, embeds?: Discord.EmbedBuilder[], files?: Discord.AttachmentBuilder[], components?: Discord.ActionRowBuilder<MessageActionRowComponentBuilder>[] }, reply = false): Promise<Discord.Message> {
     if (message instanceof Discord.Message) {
         if (reply) {
             if (str instanceof Discord.EmbedBuilder) return await message.reply({ embeds: [str] });
@@ -207,11 +207,11 @@ export async function msgOrRes(message: Discord.Message | Discord.ChatInputComma
     }
 }
 export function deepReaddir(dir) {
-    var results = [];
+    let results = [];
     const list = fs.readdirSync(dir);
-    var i = 0;
+    let i = 0;
     function next() {
-        var file = list[i++];
+        let file = list[i++];
         if (!file) return results;
         file = path.resolve(dir, file);
         const stat = fs.statSync(file);
@@ -223,7 +223,7 @@ export function deepReaddir(dir) {
             results.push(file);
             return next();
         }
-    };
+    }
     return next();
 }
 
@@ -258,7 +258,7 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
     const results = await query(`SELECT servers.*, configs.prefix FROM servers LEFT JOIN configs ON configs.id = servers.id WHERE servers.id = "${id}" AND configs.id = "${id}"`);
     if (results.length > 0) {
         if (results[0].queue || results[0].looping || results[0].repeating) {
-            var queue = [];
+            let queue = [];
             try { if (results[0].queue) queue = JSON.parse(unescape(results[0].queue)); }
             catch (err: any) { console.error(`Error parsing queue of ${results[0].id}`); }
             setQueue(results[0].id, queue, !!results[0].looping, !!results[0].repeating);
@@ -282,7 +282,7 @@ export function humanDurationToNum(duration: string) {
     const splitted = duration.split(".");
     const rest = splitted[0];
     const splitted1 = rest.split(":").reverse();
-    var sec = 0;
+    let sec = 0;
     for (let i = 0; i < splitted1.length; i++) {
         let parsed;
         if (isNaN(parsed = parseInt(splitted1[i]))) continue;

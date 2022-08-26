@@ -30,10 +30,10 @@ class AddCommand implements FullCommand {
     }
 
     async add(message: Message | ChatInputCommandInteraction, str: string) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         try {
-            var songs = [];
-            var result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
+            let songs = [];
+            let result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
             if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
             else if (validYTURL(str)) result = await addYTURL(str);
             else if (validSPURL(str)) result = await addSPURL(message, str);
@@ -55,7 +55,7 @@ class AddCommand implements FullCommand {
             if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, songs, false, false);
             else serverQueue.songs = serverQueue.songs.concat(songs);
             updateQueue(message.guild.id, serverQueue);
-            var msg: Message;
+            let msg: Message;
             if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
             else msg = await msgOrRes(message, Embed);
             await wait(30000);

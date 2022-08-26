@@ -73,7 +73,7 @@ class QueueCommand implements FullCommand {
 
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {
-        var serverQueue = getQueue(interaction.guild.id);
+        let serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const sub = interaction.options.getSubcommand();
         if (sub === "current") return await this.viewQueue(interaction, serverQueue);
@@ -86,7 +86,7 @@ class QueueCommand implements FullCommand {
     }
     
     async run(message: Discord.Message, args: string[]) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (args[0] && (args[0].toLowerCase() === "save" || args[0].toLowerCase() === "s")) return await this.save(message, serverQueue, args.slice(1).join(" "));
         if (args[0] && (args[0].toLowerCase() === "load" || args[0].toLowerCase() === "l")) return await this.load(message, serverQueue, args.slice(1).join(" "));
@@ -103,7 +103,7 @@ class QueueCommand implements FullCommand {
             serverQueue.songs = filtered;
             updateQueue(message.guild.id, serverQueue);
         }
-        var index = 0;
+        let index = 0;
         const songArray = serverQueue.songs.map(song => `**${++index} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${!song.time ? "∞" : duration(song.time, "seconds")}**`);
         const allEmbeds = [];
         for (let i = 0; i < Math.ceil(songArray.length / 10); i++) {
@@ -128,7 +128,7 @@ class QueueCommand implements FullCommand {
         const results = await query(`SELECT * FROM queue WHERE user = '${author.id}'`);
         if (results.length >= 10) return await msgOrRes(message, "You have already stored 10 queues! Delete some of them to save this queue.");
         if (!name) return await msgOrRes(message, "Please provide the name of the queue.");
-        var q = `INSERT INTO queue(user, name, queue) VALUES('${author.id}', '${name}', '${escape(JSON.stringify(serverQueue.songs))}')`;
+        const q = `INSERT INTO queue(user, name, queue) VALUES('${author.id}', '${name}', '${escape(JSON.stringify(serverQueue.songs))}')`;
         for (const result of results) {
             if (result.name === name) {
                 return await msgOrRes(message, `The queue with the name ${name} already exists.`);
@@ -164,7 +164,7 @@ class QueueCommand implements FullCommand {
         const author = message instanceof Discord.Message ? message.author : message.user;
         const results = await query(`SELECT * FROM queue WHERE user = '${author.id}'`);
         const queues = [];
-        var num = 0;
+        let num = 0;
         const allEmbeds = [];
         const menu = new Discord.SelectMenuBuilder().setCustomId("menu");
         for (let ii = 0; ii < results.length; ii++) {
@@ -173,8 +173,8 @@ class QueueCommand implements FullCommand {
             queues.push(`${++num}. **${result.name}** : **${queue.length} tracks**`);
             menu.addOptions({ label: result.name, value: (ii + 1).toString() });
             var queueNum = 0;
-            var pageArray = queue.map(song => {
-                var str: string;
+            const pageArray = queue.map(song => {
+                let str: string;
                 const songLength = !song.time ? "∞" : duration(song.time, "seconds");
                 if (song.type === 1) str = `**${++queueNum} - ** **[${song.title}](${song.spot})** : **${songLength}**`;
                 else str = `**${++queueNum} - ** **[${song.title}](${song.url})** : **${songLength}**`;
@@ -197,7 +197,7 @@ class QueueCommand implements FullCommand {
         allEmbeds.unshift(em);
         const backButton = new Discord.ButtonBuilder({ label: "Back", emoji: "⬅", style: ButtonStyle.Secondary, disabled: true, customId: "back" });
         const stopButton = new Discord.ButtonBuilder({ label: "Stop", emoji: "✖️", style: ButtonStyle.Danger, customId: "stop" });
-        var msg = await msgOrRes(message, { embeds: [em], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu), new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(backButton, stopButton)] });
+        const msg = await msgOrRes(message, { embeds: [em], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu), new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(backButton, stopButton)] });
         const collector = msg.createMessageComponentCollector({ filter: interaction => interaction.user.id === author.id, idle: 60000 });
         collector.on("collect", async function (interaction) {
             if (interaction.isButton()) {

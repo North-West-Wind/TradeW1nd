@@ -31,15 +31,15 @@ class MoveCommand implements FullCommand {
     }
 
     async run(message: Message, args: string[]) {
-        var queueIndex = parseInt(args[0]);
-        var dest = parseInt(args[1]);
+        const queueIndex = parseInt(args[0]);
+        const dest = parseInt(args[1]);
         if (isNaN(queueIndex)) return await message.channel.send("The target provided is not a number.");
         if (isNaN(dest)) return await message.channel.send("The destination provided is not a number.");
         await this.move(message, queueIndex, dest);
     }
 
     async move(message: Message | ChatInputCommandInteraction, queueIndex: number, dest: number) {
-        var serverQueue = getQueue(message.guild.id);
+        let serverQueue = getQueue(message.guild.id);
         if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
