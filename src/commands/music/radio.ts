@@ -1,5 +1,5 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, Message, MessageEmbed, VoiceChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel } from "discord.js";
 import { FullCommand } from "../../classes/NorthClient.js";
 import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
@@ -92,7 +92,7 @@ class RadioCommand implements FullCommand {
         return channel >= 1 && channel <= 10 && !(channel % 1);
     }
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const sub = interaction.options.getSubcommand();
         if (sub === "tune") return await this.tune(interaction, interaction.options.getInteger("channel"));
         else if (sub === "off") return await this.off(interaction);
@@ -131,7 +131,7 @@ class RadioCommand implements FullCommand {
         }
     }
 
-    async tune(message: Message | CommandInteraction, channel: number) {
+    async tune(message: Message | ChatInputCommandInteraction, channel: number) {
         var connection = getVoiceConnection(message.guildId);
         if (!connection) {
             const member = <GuildMember>message.member;
@@ -145,7 +145,7 @@ class RadioCommand implements FullCommand {
         await msgOrRes(message, "Connected!");
     }
 
-    async off(message: Message | CommandInteraction) {
+    async off(message: Message | ChatInputCommandInteraction) {
         if (!isPlaying(message.guildId)) return await msgOrRes(message, "Radio isn't connected to this server!");
         const connection = getVoiceConnection(message.guildId);
         if (connection) connection.destroy();
@@ -153,7 +153,7 @@ class RadioCommand implements FullCommand {
         await msgOrRes(message, "Disconnected!");
     }
 
-    async add(message: Message | CommandInteraction, str: string, channel: number) {
+    async add(message: Message | ChatInputCommandInteraction, str: string, channel: number) {
         try {
             var songs = [];
             var result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
@@ -187,7 +187,7 @@ class RadioCommand implements FullCommand {
         }
     }
 
-    async info(message: Message | CommandInteraction, channel: number) {
+    async info(message: Message | ChatInputCommandInteraction, channel: number) {
         const radio = players[channel - 1];
         if (!radio.tracks.length) return await msgOrRes(message, "There are currently no tracks in this radio channel.");
         var position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
@@ -211,7 +211,7 @@ class RadioCommand implements FullCommand {
         else if ((radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${duration(radio.tracks[0].time, "seconds")}`;
         else next = "Empty";
         var info = [];
-        var embed = new MessageEmbed()
+        var embed = new EmbedBuilder()
             .setColor(color())
             .setTitle("Information of Radio Channel #" + channel)
             .setTimestamp()
@@ -225,7 +225,7 @@ class RadioCommand implements FullCommand {
         setTimeout(() => msg.edit({ content: "**[Outdated Radio Information]**", embeds: [] }).catch(() => {}), 60000);
     }
 
-    async copy(message: Message | CommandInteraction, channel: number) {
+    async copy(message: Message | ChatInputCommandInteraction, channel: number) {
         var serverQueue = getQueue(message.guildId);
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
         const radio = players[channel - 1];

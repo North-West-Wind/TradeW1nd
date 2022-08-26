@@ -40,7 +40,7 @@ class HelpCommand implements FullCommand {
         }
     }
 
-    async execute(interaction: Discord.CommandInteraction) {
+    async execute(interaction: Discord.ChatInputCommandInteraction) {
         const sub = interaction.options.getSubcommand();
         if (sub === "all") {
             try {
@@ -75,7 +75,7 @@ class HelpCommand implements FullCommand {
         const [client] = getClients();
         var config = NorthClient.storage.guilds[guildID];
         if (!config) config = await fixGuildRecord(guildID);
-        const Embed = new Discord.MessageEmbed()
+        const Embed = new Discord.EmbedBuilder()
             .setColor(color())
             .setTitle("Command list is here!")
             .setDescription(`[**Click this**](https://northwestwind.ml/n0rthwestw1nd/manual/tradew1nd) for the user manual.\nIf you need any support, you can join the [**Support Server**](https://discord.gg/S44PNSh)\n\nI don't know if you need but [**here's N0rthWestW1nd**](https://top.gg/bot/649611982428962819) in [**Discord bot List**](https://top.gg)!`)
@@ -83,7 +83,7 @@ class HelpCommand implements FullCommand {
             .setTimestamp()
             .setFooter({ text: "Have a nice day! :)", iconURL: client.user.displayAvatarURL() });
         for (let i = 0; i < categories.length; i++) {
-            Embed.addField(`**${categories[i]}**`, Array.from(NorthClient.storage.commands.filter(x => x.category === i).keys()).join("\n"), true);
+            Embed.addFields([{ name: `**${categories[i]}**`, value: Array.from(NorthClient.storage.commands.filter(x => x.category === i).keys()).join("\n"), inline: true }]);
         }
         return Embed;
     }

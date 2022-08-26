@@ -1,4 +1,4 @@
-import { Guild, Interaction, Message, VoiceState } from "discord.js";
+import { ActivityType, ChatInputCommandInteraction, Guild, Interaction, InteractionType, Message, VoiceState } from "discord.js";
 import { checkN0rthWestW1nd, fixGuildRecord, messagePrefix, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
 import { NorthClient, GuildConfig, ISlash, IPrefix } from "./classes/NorthClient.js";
@@ -35,12 +35,13 @@ export class Handler {
     }
 
     async interactionCreate(interaction: Interaction) {
-        if (!interaction.isCommand()) return;
-        const command = NorthClient.storage.commands.get(interaction.commandName);
+        if (interaction.type !== InteractionType.ApplicationCommand) return;
+        const int = <ChatInputCommandInteraction>interaction;
+        const command = NorthClient.storage.commands.get(int.commandName);
         if (!command || !(typeof command["execute"] === "function")) return;
         try {
             const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
-            if (await filter.all(command, interaction) && (catFilter ? await catFilter(command, interaction) : true)) await (<ISlash><unknown>command).execute(interaction);
+            if (await filter.all(command, int) && (catFilter ? await catFilter(command, interaction) : true)) await (<ISlash><unknown>command).execute(int);
         } catch (err: any) {
             try {
                 if (interaction.replied || interaction.deferred) await interaction.editReply(error);
@@ -51,7 +52,7 @@ export class Handler {
     }
 
     async setPresence() {
-        this.client.user.setPresence({ activities: [{ name: `AFK | ${this.client.prefix}help`, type: "PLAYING" }], status: "idle", afk: true });
+        this.client.user.setPresence({ activities: [{ name: `AFK | ${this.client.prefix}help`, type: ActivityType.Playing }], status: "idle", afk: true });
     }
 
     async readServers() {
@@ -139,11 +140,11 @@ export class Handler {
         const guild = oldState.guild || newState.guild;
         if (isPlaying(guild.id)) return;
         const exit = NorthClient.storage.guilds[guild.id]?.exit;
-        if ((oldState.id == guild.me.id || newState.id == guild.me.id) && (!guild.me.voice?.channel)) return stop(guild);
-        if (!guild.me.voice?.channel || (newState.channelId !== guild.me.voice.channelId && oldState.channelId !== guild.me.voice.channelId)) return;
+        if ((oldState.id == guild.members.me.id || newState.id == guild.members.me.id) && (!guild.members.me.voice?.channel)) return stop(guild);
+        if (!guild.members.me.voice?.channel || (newState.channelId !== guild.members.me.voice.channelId && oldState.channelId !== guild.members.me.voice.channelId)) return;
         if (!NorthClient.storage.guilds[guild.id]) await fixGuildRecord(guild.id);
         const serverQueue = getQueue(guild.id);
-        if (guild.me.voice.channel.members.filter(member => !member.user.bot && (member.permissions.any(BigInt(56)) || serverQueue.callers.has(member.id) || !!Array.from(serverQueue.callRoles).find(role => member.roles.cache.has(role)))).size < 1) {
+        if (guild.members.me.voice.channel.members.filter(member => !member.user.bot && (member.permissions.any(BigInt(56)) || serverQueue.callers.has(member.id) || !!Array.from(serverQueue.callRoles).find(role => member.roles.cache.has(role)))).size < 1) {
             if (exit) return;
             NorthClient.storage.guilds[guild.id].exit = true;
             setTimeout(() => NorthClient.storage.guilds[guild.id]?.exit ? stop(guild) : 0, 30000);

@@ -1,5 +1,5 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
-import { Client, ClientOptions, Collection, CommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { Client, ClientOptions, Collection, ChatInputCommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { probeAndCreateResource } from "../commands/music/play.js";
 import { getStream } from "../helpers/addTrack.js";
 import { addUsing, removeUsing } from "../helpers/music.js";
@@ -29,7 +29,7 @@ export abstract class IPrefix {
 export abstract class ISlash {
     options?: any[];
     
-    abstract execute(interaction: CommandInteraction): Promise<any> | any;
+    abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
 
 export abstract class Command {
@@ -53,14 +53,14 @@ export abstract class PrefixCommand extends Command implements IPrefix {
 export abstract class SlashCommand extends Command implements ISlash {
     options?: any[];
 
-    abstract execute(interaction: CommandInteraction): Promise<any> | any;
+    abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
 
 export abstract class FullCommand extends Command implements ISlash, IPrefix {
     options?: any[];
 
     abstract run(message: Message, args: string[]): Promise<any> | any;
-    abstract execute(interaction: CommandInteraction): Promise<any> | any;
+    abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
 
 export interface GuildConfigs {
@@ -187,18 +187,7 @@ export class RadioChannel {
                 this.seek = this.player.state.status == AudioPlayerStatus.Playing ? Math.floor(this.player.state.playbackDuration / 1000) : 0;
                 this.updateSeek();
             }, 30000);
-        }).on(AudioPlayerStatus.Idle || "error", async () => {
-            clearInterval(this.interval);
-            this.seek = 0;
-            const finished = this.tracks.shift();
-            if (!finished.looped) finished.looped = 1;
-            else finished.looped++;
-            if (finished.looped <= 10 || this.tracks.length <= 10) this.tracks.push(finished);
-            else removeUsing(finished.id, true);
-            this.update();
-            this.updateSeek();
-            await this.start();
-        });
+        }).on(AudioPlayerStatus.Idle, this.next).on("error", this.next);
         for (const guild of guilds) {
             var connection = getVoiceConnection(guild);
             if (!connection) continue;
@@ -237,5 +226,17 @@ export class RadioChannel {
         try {
             await query(`UPDATE radio SET seek = "${this.seek || 0}" WHERE id = ${this.id}`);
         } catch (err) { }
+    }
+    async next() {
+        clearInterval(this.interval);
+        this.seek = 0;
+        const finished = this.tracks.shift();
+        if (!finished.looped) finished.looped = 1;
+        else finished.looped++;
+        if (finished.looped <= 10 || this.tracks.length <= 10) this.tracks.push(finished);
+        else removeUsing(finished.id, true);
+        this.update();
+        this.updateSeek();
+        await this.start();
     }
 }

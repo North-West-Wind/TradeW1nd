@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { Handler } from "./handler.js";
 import { NorthClient, ClientStorage } from "./classes/NorthClient.js";
-import { Intents, Options } from "discord.js";
+import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
 import * as fs from "fs";
 dotenv.config();
@@ -31,20 +31,20 @@ export function addBot(token: string) {
 
 function initBot(token: string) {
     const client = new NorthClient({
-        restRequestTimeout: 60000,
+        closeTimeout: 60000,
         makeCache: Options.cacheWithLimits({
             MessageManager: 50,
             PresenceManager: 0
         }),
-        partials: ['MESSAGE'],
+        partials: [Partials.Message],
         intents: [
-            Intents.FLAGS.DIRECT_MESSAGES,
-            Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
-            Intents.FLAGS.GUILDS,
-            Intents.FLAGS.GUILD_MEMBERS,
-            Intents.FLAGS.GUILD_MESSAGES,
-            Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-            Intents.FLAGS.GUILD_VOICE_STATES
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageReactions,
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.GuildMessageReactions,
+            GatewayIntentBits.GuildVoiceStates
         ]
     });
     

@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
 import { ServerQueue, FullCommand } from "../../classes/NorthClient.js";
 import { duration, ms, msgOrRes } from "../../function.js";
@@ -18,7 +18,7 @@ class SeekCommand implements FullCommand {
         type: "STRING"
     }]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         var parsed = ms(interaction.options.getString("time")) || interaction.options.getString("time");
@@ -43,9 +43,9 @@ class SeekCommand implements FullCommand {
         await this.seek(message, serverQueue, parsed);
     }
 
-    async seek(message: Message | CommandInteraction, serverQueue: ServerQueue, seek: number) {
+    async seek(message: Message | ChatInputCommandInteraction, serverQueue: ServerQueue, seek: number) {
         if (serverQueue.songs.length < 1 || !serverQueue?.player || !serverQueue.playing) return await msgOrRes(message, "There is nothing in the queue.");
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to change the time of the soundtrack begins when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to change the time of the soundtrack begins when the bot is playing!");
         if (serverQueue.songs[0].time === 0) return await msgOrRes(message, "This command does not work for live videos.");
         if (!seek) return await msgOrRes(message, "The given time is not valid!");
         if (seek > serverQueue.songs[0].time) return await msgOrRes(message, "The time specified should not be larger than the maximum length of the soundtrack!");

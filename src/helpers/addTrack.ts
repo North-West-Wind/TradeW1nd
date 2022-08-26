@@ -1,4 +1,4 @@
-import { Message, SelectMenuInteraction } from "discord.js";
+import { ButtonStyle, Message, MessageActionRowComponentBuilder, SelectMenuInteraction } from "discord.js";
 import * as mm from "music-metadata";
 import { muse, museSet } from "musescore-metadata";
 import { SCDL } from '@vncsprd/soundcloud-downloader';
@@ -121,7 +121,7 @@ export async function addYTURL(link: string, type: number = 0) {
     ];
     return { error: false, songs: songs, msg: null, message: null };
 }
-export async function addSPURL(message: Message | Discord.CommandInteraction, link: string) {
+export async function addSPURL(message: Message | Discord.ChatInputCommandInteraction, link: string) {
     var url_array = link.replace("https://", "").split("/");
     var musicID = url_array[2].split("?")[0];
     var highlight = false;
@@ -442,9 +442,9 @@ export async function addURL(link: string) {
     };
     return { error: false, songs: [song], msg: null, message: null };
 }
-export async function search(message: Message | Discord.CommandInteraction, link: string) {
-    const allEmbeds: Discord.MessageEmbed[] = [], allMenus: Discord.MessageSelectMenu[] = [];
-    const Embed = new Discord.MessageEmbed()
+export async function search(message: Message | Discord.ChatInputCommandInteraction, link: string) {
+    const allEmbeds: Discord.EmbedBuilder[] = [], allMenus: Discord.SelectMenuBuilder[] = [];
+    const Embed = new Discord.EmbedBuilder()
         .setTitle(`Search result of ${link} on YouTube`)
         .setColor(color())
         .setTimestamp()
@@ -472,11 +472,11 @@ export async function search(message: Message | Discord.CommandInteraction, link
         results.yt = ytResults;
         Embed.setDescription("This page shows search results from **YouTube**. The other page shows search results from **SoundCloud**.\nChoose the soundtrack from the menu, or click \"cancel\" to cancel.\n\n" + ytResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
         allEmbeds.push(Embed);
-        const menu = new Discord.MessageSelectMenu().setCustomId("yt").setMinValues(1).setMaxValues(ytResults.length);
+        const menu = new Discord.SelectMenuBuilder().setCustomId("yt").setMinValues(1).setMaxValues(ytResults.length);
         for (let ii = 0; ii < ytResults.length; ii++) menu.addOptions({ label: ytResults[ii].title, value: ii.toString() });
         allMenus.push(menu);
     }
-    const scEm = new Discord.MessageEmbed()
+    const scEm = new Discord.EmbedBuilder()
         .setTitle(`Search result of ${link} on SoundCloud`)
         .setColor(color())
         .setTimestamp()
@@ -506,7 +506,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
         results.sc = scResults;
         scEm.setDescription("This page shows search results from **SoundCloud**. The other page shows search results from **YouTube**.\nChoose the soundtrack from the menu, or click \"cancel\" to cancel.\n\n" + scResults.map(x => `${++num} - **[${x.title}](${x.url})** : **${!x.time ? "∞" : duration(x.time, "seconds")}**`).slice(0, 10).join("\n"));
         allEmbeds.push(scEm);
-        const menu = new Discord.MessageSelectMenu().setCustomId("sc");
+        const menu = new Discord.SelectMenuBuilder().setCustomId("sc");
         for (let ii = 0; ii < scResults.length; ii++) menu.addOptions({ label: scResults[ii].title, value: ii.toString() });
         allMenus.push(menu);
     }
@@ -516,17 +516,17 @@ export async function search(message: Message | Discord.CommandInteraction, link
     }
     var val = { error: true, songs: [], msg: null, message: null };
     var s = 0;
-    const globalRow = new Discord.MessageActionRow().addComponents(
-        new Discord.MessageButton({ label: "Next Page", emoji: "📄", customId: "next", style: "PRIMARY" }),
-        new Discord.MessageButton({ label: "Cancel", emoji: "✖️", customId: "cancel", style: "DANGER" }),
+    const globalRow = new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new Discord.ButtonBuilder({ label: "Next Page", emoji: "📄", customId: "next", style: ButtonStyle.Primary }),
+        new Discord.ButtonBuilder({ label: "Cancel", emoji: "✖️", customId: "cancel", style: ButtonStyle.Danger }),
     );
-    var msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.MessageActionRow().addComponents(allMenus[0]), globalRow] });
+    var msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow] });
     const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === message.member.user.id, idle: 60000 });
     collector.on("collect", async interaction => {
         switch (interaction.customId) {
             case "next":
                 s = (s + 1) % allEmbeds.length;
-                await interaction.update({ embeds: [allEmbeds[s]], components: [new Discord.MessageActionRow().addComponents(allMenus[s]), globalRow] });
+                await interaction.update({ embeds: [allEmbeds[s]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[s]), globalRow] });
                 break;
             case "cancel":
                 await interaction.update({});
@@ -545,7 +545,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
                     const length = !track.time ? "∞" : duration(track.time, "seconds");
                     descriptions.push(`**[${decodeHtmlEntity(track.title)}](${track.url})** : **${length}**`);
                 }
-                const chosenEmbed = new Discord.MessageEmbed()
+                const chosenEmbed = new Discord.EmbedBuilder()
                     .setColor(color())
                     .setTitle("Soundtrack(s) chosen:")
                     .setThumbnail(thumb)
@@ -560,7 +560,7 @@ export async function search(message: Message | Discord.CommandInteraction, link
     return new Promise<{ error: boolean, songs: any[], msg: Message, message: any }>(resolve => {
         collector.on("end", async () => {
             if (val.error) {
-                const cancelled = new Discord.MessageEmbed()
+                const cancelled = new Discord.EmbedBuilder()
                     .setColor(color())
                     .setTitle("Action cancelled.")
                     .setTimestamp()

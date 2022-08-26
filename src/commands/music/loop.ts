@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
@@ -10,7 +10,7 @@ class LoopCommand implements FullCommand {
     category = 0
     aliases = ["lp"]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.loop(interaction);
     }
 
@@ -18,7 +18,7 @@ class LoopCommand implements FullCommand {
         await this.loop(message);
     }
 
-    async loop(message: Message | CommandInteraction) {
+    async loop(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.looping = !serverQueue.looping;

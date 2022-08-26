@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
@@ -9,7 +9,7 @@ class ResumeCommand implements FullCommand {
     description = "Resumes the paused music."
     category = 0
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.resume(interaction);
     }
 
@@ -17,10 +17,10 @@ class ResumeCommand implements FullCommand {
         await this.resume(message);
     }
 
-    async resume(message: Message | CommandInteraction) {
+    async resume(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to resume the music when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to resume the music when the bot is playing!");
         if (!serverQueue?.player) return await msgOrRes(message, "There is nothing playing.");
         if (serverQueue.paused) {
             serverQueue.paused = false;

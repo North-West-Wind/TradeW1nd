@@ -9,6 +9,7 @@ import ytdl, { downloadOptions } from "ytdl-core";
 import { setQueue } from "./helpers/music.js";
 import fetch from "node-fetch";
 import { getClients } from "./main.js";
+import { ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 
 export function twoDigits(d) {
     if (0 <= d && d < 10) return "0" + d.toString();
@@ -84,23 +85,23 @@ export function isEquivalent(a, b) {
     }
     return true;
 }
-export async function createEmbedScrolling(message: Discord.Message | Discord.CommandInteraction | { interaction: Discord.CommandInteraction, useEdit: boolean }, allEmbeds: Discord.MessageEmbed[], post?: Function) {
+export async function createEmbedScrolling(message: Discord.Message | Discord.ChatInputCommandInteraction | { interaction: Discord.ChatInputCommandInteraction, useEdit: boolean }, allEmbeds: Discord.EmbedBuilder[], post?: Function) {
     var author: Discord.Snowflake;
     if (message instanceof Discord.Message) author = message.author.id;
-    else if (message instanceof Discord.Interaction) author = message.user.id;
+    else if (message instanceof Discord.ChatInputCommandInteraction) author = message.user.id;
     else author = message.interaction.user.id;
     const filter = (interaction: Discord.Interaction) => (interaction.user.id === author);
     var s = 0;
-    const row = new Discord.MessageActionRow().addComponents(
-        new Discord.MessageButton({ label: "<< First", style: "SECONDARY", customId: "first" }),
-        new Discord.MessageButton({ label: "< Previous", style: "PRIMARY", customId: "previous" }),
-        new Discord.MessageButton({ label: "Next >", style: "PRIMARY", customId: "next" }),
-        new Discord.MessageButton({ label: "Last >>", style: "SECONDARY", customId: "last" }),
-        new Discord.MessageButton({ label: "Stop", style: "DANGER", customId: "stop", emoji: "✖️" })
+    const row = new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new Discord.ButtonBuilder({ label: "<< First", style: ButtonStyle.Secondary, customId: "first" }),
+        new Discord.ButtonBuilder({ label: "< Previous", style: ButtonStyle.Primary, customId: "previous" }),
+        new Discord.ButtonBuilder({ label: "Next >", style: ButtonStyle.Primary, customId: "next" }),
+        new Discord.ButtonBuilder({ label: "Last >>", style: ButtonStyle.Secondary, customId: "last" }),
+        new Discord.ButtonBuilder({ label: "Stop", style: ButtonStyle.Danger, customId: "stop", emoji: "✖️" })
     );
     var msg: Discord.Message;
     if (message instanceof Discord.Message) msg = await message.channel.send({ embeds: [allEmbeds[0]], components: [row] });
-    else if (message instanceof Discord.Interaction) msg = <Discord.Message> await message.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
+    else if (message instanceof Discord.ChatInputCommandInteraction) msg = <Discord.Message> await message.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
     else {
         if (message.useEdit) msg = <Discord.Message> await message.interaction.editReply({ embeds: [allEmbeds[0]], components: [row] });
         else msg = <Discord.Message> await message.interaction.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
@@ -141,8 +142,8 @@ export async function createEmbedScrolling(message: Discord.Message | Discord.Co
     return { msg, collector };
 }
 export function genPermMsg(permissions: number, id) {
-    if (id == 0) return `You need the permissions \`${new Discord.Permissions(BigInt(permissions)).toArray().join("`, `")}\` to use this command.`;
-    else return `I need the permissions \`${new Discord.Permissions(BigInt(permissions)).toArray().join("`, `")}\` to run this command.`;
+    if (id == 0) return `You need the permissions \`${new Discord.PermissionsBitField(BigInt(permissions)).toArray().join("`, `")}\` to use this command.`;
+    else return `I need the permissions \`${new Discord.PermissionsBitField(BigInt(permissions)).toArray().join("`, `")}\` to run this command.`;
 }
 export function color() { return Math.floor(Math.random() * 16777214) + 1; }
 export async function requestStream(url) {
@@ -175,32 +176,32 @@ export function duration(seconds: number, type: moment.unitOfTime.DurationConstr
     str.push(twoDigits(duration.seconds()));
     return str.join("");
 }
-export async function msgOrRes(message: Discord.Message | Discord.CommandInteraction, str: string | Discord.MessageEmbed | Discord.MessageAttachment | { content?: string, embeds?: Discord.MessageEmbed[], files?: Discord.MessageAttachment[], components?: Discord.MessageActionRow[] }, reply: boolean = false): Promise<Discord.Message> {
+export async function msgOrRes(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string | Discord.EmbedBuilder | Discord.AttachmentBuilder | { content?: string, embeds?: Discord.EmbedBuilder[], files?: Discord.AttachmentBuilder[], components?: Discord.ActionRowBuilder<MessageActionRowComponentBuilder>[] }, reply: boolean = false): Promise<Discord.Message> {
     if (message instanceof Discord.Message) {
         if (reply) {
-            if (str instanceof Discord.MessageEmbed) return await message.reply({ embeds: [str] });
-            else if (str instanceof Discord.MessageAttachment) return await message.reply({ files: [str] });
+            if (str instanceof Discord.EmbedBuilder) return await message.reply({ embeds: [str] });
+            else if (str instanceof Discord.AttachmentBuilder) return await message.reply({ files: [str] });
             else return await message.reply(str);
         } else {
-            if (str instanceof Discord.MessageEmbed) return await message.channel.send({ embeds: [str] });
-            else if (str instanceof Discord.MessageAttachment) return await message.channel.send({ files: [str] });
+            if (str instanceof Discord.EmbedBuilder) return await message.channel.send({ embeds: [str] });
+            else if (str instanceof Discord.AttachmentBuilder) return await message.channel.send({ files: [str] });
             else return await message.channel.send(str);
         }
     } else {
         const useEdit = message.deferred, useFollowUp = message.replied;
         if (useEdit) {
-            if (str instanceof Discord.MessageEmbed) return <Discord.Message> await message.editReply({ embeds: [str] });
-            else if (str instanceof Discord.MessageAttachment) return <Discord.Message> await message.editReply({ files: [str] });
+            if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.editReply({ embeds: [str] });
+            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.editReply({ files: [str] });
             else return <Discord.Message> await message.editReply(str);
         } else if (useFollowUp) {
             if (typeof str === "string") return <Discord.Message> await message.followUp({ content: str, fetchReply: true });
-            else if (str instanceof Discord.MessageEmbed) return <Discord.Message> await message.followUp({ embeds: [str], fetchReply: true });
-            else if (str instanceof Discord.MessageAttachment) return <Discord.Message> await message.followUp({ files: [str], fetchReply: true });
+            else if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.followUp({ embeds: [str], fetchReply: true });
+            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.followUp({ files: [str], fetchReply: true });
             else return <Discord.Message> await message.followUp({ fetchReply: true, ...str });
         } else {
             if (typeof str === "string") return <Discord.Message> await message.reply({ content: str, fetchReply: true });
-            else if (str instanceof Discord.MessageEmbed) return <Discord.Message> await message.reply({ embeds: [str], fetchReply: true });
-            else if (str instanceof Discord.MessageAttachment) return <Discord.Message> await message.reply({ files: [str], fetchReply: true });
+            else if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.reply({ embeds: [str], fetchReply: true });
+            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.reply({ files: [str], fetchReply: true });
             else return <Discord.Message> await message.reply({ fetchReply: true, ...str });
         }
     }

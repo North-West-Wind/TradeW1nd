@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
@@ -10,7 +10,7 @@ class RandomCommand implements FullCommand {
     aliases = ["rnd"]
     category = 0
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         if (!interaction.guild) return await interaction.reply("This command only works on server.");
         await this.random(interaction);
     }
@@ -19,7 +19,7 @@ class RandomCommand implements FullCommand {
         await this.random(message);
     }
 
-    async random(message: Message | CommandInteraction) {
+    async random(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.random = !serverQueue.random;

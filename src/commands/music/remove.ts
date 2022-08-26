@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
@@ -26,7 +26,7 @@ class RemoveCommand implements FullCommand {
         }
     ]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const queueIndex = interaction.options.getInteger("index");
         const amount = interaction.options.getInteger("count") || 1;
         if (amount < 1) return await interaction.reply("The delete count must be larger than 0!");
@@ -41,9 +41,9 @@ class RemoveCommand implements FullCommand {
         await this.remove(message, queueIndex, amount);
     }
 
-    async remove(message: Message | CommandInteraction, queueIndex: number, amount: number) {
+    async remove(message: Message | ChatInputCommandInteraction, queueIndex: number, amount: number) {
         var serverQueue = getQueue(message.guild.id);
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
         const deleteIndex = queueIndex < 0 ? serverQueue.songs.length + queueIndex : queueIndex - 1;

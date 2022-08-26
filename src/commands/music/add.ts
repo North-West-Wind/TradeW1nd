@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, msgOrRes, wait, validMSSetURL } from "../../function.js";
@@ -18,7 +18,7 @@ class AddCommand implements FullCommand {
         type: "STRING"
     }]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
         await this.add(interaction, interaction.options.getString("link"));
     }
@@ -29,7 +29,7 @@ class AddCommand implements FullCommand {
         await this.add(message, str);
     }
 
-    async add(message: Message | CommandInteraction, str: string) {
+    async add(message: Message | ChatInputCommandInteraction, str: string) {
         var serverQueue = getQueue(message.guild.id);
         try {
             var songs = [];

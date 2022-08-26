@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
 import { categories } from "../../commands/information/help.js";
 import { msgOrRes } from "../../function.js";
@@ -20,7 +20,7 @@ class ReloadCommand implements FullCommand {
         }
     ];
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const commands = interaction.options.getString("command").split(/ +/);
         await interaction.deferReply();
         await this.reload(interaction, commands);
@@ -30,7 +30,7 @@ class ReloadCommand implements FullCommand {
         await this.reload(message, args);
     }
 
-    async reload(message: Message | CommandInteraction, commands: string[]) {
+    async reload(message: Message | ChatInputCommandInteraction, commands: string[]) {
         for (const command of commands) {
             const cmd = NorthClient.storage.commands.get(command);
             if (!cmd?.category === undefined) continue;

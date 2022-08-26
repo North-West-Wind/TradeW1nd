@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { ServerQueue, FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
@@ -25,7 +25,7 @@ class VolumeCommand implements FullCommand {
         }
     ]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const pct = interaction.options.getInteger("percentage");
@@ -41,8 +41,8 @@ class VolumeCommand implements FullCommand {
         await this.volume(message, serverQueue, Number(args[0]), !!(args[1]?.toLowerCase() === "np"));
     }
 
-    async volume(message: Message | CommandInteraction, serverQueue: ServerQueue, change: number, specific: boolean) {
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the volume when the bot is playing!");
+    async volume(message: Message | ChatInputCommandInteraction, serverQueue: ServerQueue, change: number, specific: boolean) {
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the volume when the bot is playing!");
         if (specific) {
             if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue. You cannot change the volume of current soundtrack.");
             if (!isNaN(serverQueue.songs[0].volume)) serverQueue.songs[0].volume += change / 100;

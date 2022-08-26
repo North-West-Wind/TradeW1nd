@@ -21,7 +21,7 @@ class NPCommand implements FullCommand {
     aliases = ["nowplaying"]
     category = 0
 
-    async execute(interaction: Discord.CommandInteraction) {
+    async execute(interaction: Discord.ChatInputCommandInteraction) {
         await this.nowplaying(interaction);
     }
 
@@ -29,7 +29,7 @@ class NPCommand implements FullCommand {
         await this.nowplaying(message);
     }
 
-    async nowplaying(message: Discord.Message | Discord.CommandInteraction) {
+    async nowplaying(message: Discord.Message | Discord.ChatInputCommandInteraction) {
         const getEmbed = this.getEmbed;
         var embed = getEmbed(message.guildId);
         if (!embed) return await msgOrRes(message, "There is nothing in the queue.");
@@ -47,7 +47,7 @@ class NPCommand implements FullCommand {
         await edit();
     }
 
-    getEmbed(id: Discord.Snowflake, embed: Discord.MessageEmbed = null) {
+    getEmbed(id: Discord.Snowflake, embed: Discord.EmbedBuilder = null) {
         var serverQueue = getQueue(id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(id, [], false, false);
         if (serverQueue.songs.length < 1) return null;
@@ -75,7 +75,7 @@ class NPCommand implements FullCommand {
             processBar.splice(progress, 1, "■");
         }
         var info = [];
-        if (!embed) embed = new Discord.MessageEmbed().setColor(color()).setTimestamp();
+        if (!embed) embed = new Discord.EmbedBuilder().setColor(color()).setTimestamp();
         embed.setTitle("Now playing:" + (serverQueue.playing ? "" : " (Not actually)")).setFooter({ text: `Looping: ${serverQueue.looping ? "Enabled" : "Disabled"} | Repeating: ${serverQueue.repeating ? "Enabled" : "Disabled"} | Random: ${serverQueue.random ? "Enabled" : "Disabled"}`, iconURL: getClients()[0].user.displayAvatarURL() });
 
         const songLength = !serverQueue.songs[0].time ? "∞" : duration(serverQueue.songs[0].time, "seconds");

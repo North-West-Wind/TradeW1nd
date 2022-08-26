@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes, shuffleArray } from "../../function.js";
@@ -9,7 +9,7 @@ class ShuffleCommand implements FullCommand {
     description = "Shuffles the queue."
     category = 0
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.shuffle(interaction);
     }
 
@@ -17,11 +17,11 @@ class ShuffleCommand implements FullCommand {
         await this.shuffle(message);
     }
 
-    async shuffle(message: Message | CommandInteraction) {
+    async shuffle(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!Array.isArray(serverQueue?.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (!serverQueue || serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to shuffle the queue when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to shuffle the queue when the bot is playing!");
         if (serverQueue.playing) serverQueue.songs = shuffleArray(serverQueue.songs, 1);
         else serverQueue.songs = shuffleArray(serverQueue.songs, 0);
         updateQueue(message.guild.id, serverQueue);

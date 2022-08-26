@@ -1,5 +1,5 @@
 import { joinVoiceChannel } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
@@ -19,7 +19,7 @@ class SkipCommand implements FullCommand {
         type: "INTEGER"
     }]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const skipped = interaction.options.getInteger("amount") || 1;
         await this.skip(interaction, skipped);
     }
@@ -35,12 +35,12 @@ class SkipCommand implements FullCommand {
         await this.skip(message, skipped);
     }
 
-    async skip(message: Message | CommandInteraction, skip: number) {
+    async skip(message: Message | ChatInputCommandInteraction, skip: number) {
         var serverQueue = getQueue(message.guild.id);
         const guild = message.guild;
         const member = (<GuildMember> message.member);
         if (!serverQueue || !Array.isArray(serverQueue?.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-        if ((member.voice.channelId !== guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to skip the music when the bot is playing!");
+        if ((member.voice.channelId !== guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to skip the music when the bot is playing!");
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue!");
         if (serverQueue.repeating) skip = 0;
         for (var i = 0; i < skip; i++) {

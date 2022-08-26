@@ -3,6 +3,7 @@ import * as Discord from "discord.js";
 import { color, createEmbedScrolling, duration, msgOrRes, query } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { getClients } from "../../main.js";
+import { ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 
 class QueueCommand implements FullCommand {
     name = "queue"
@@ -71,7 +72,7 @@ class QueueCommand implements FullCommand {
     ]
 
 
-    async execute(interaction: Discord.CommandInteraction) {
+    async execute(interaction: Discord.ChatInputCommandInteraction) {
         var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         const sub = interaction.options.getSubcommand();
@@ -95,7 +96,7 @@ class QueueCommand implements FullCommand {
         await this.viewQueue(message, serverQueue);
     }
 
-    async viewQueue(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue) {
+    async viewQueue(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue) {
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
         const filtered = serverQueue.songs.filter(song => !!song);
         if (serverQueue.songs.length !== filtered.length) {
@@ -107,7 +108,7 @@ class QueueCommand implements FullCommand {
         const allEmbeds = [];
         for (let i = 0; i < Math.ceil(songArray.length / 10); i++) {
             const pageArray = songArray.slice(i * 10, i * 10 + 10);
-            const queueEmbed = new Discord.MessageEmbed()
+            const queueEmbed = new Discord.EmbedBuilder()
                 .setColor(color())
                 .setTitle(`Song queue for ${message.guild.name} [${i + 1}/${Math.ceil(songArray.length / 10)}]`)
                 .setDescription(`There are ${songArray.length} tracks in total.\n\n${pageArray.join("\n")}`)
@@ -119,7 +120,7 @@ class QueueCommand implements FullCommand {
         else await createEmbedScrolling(message, allEmbeds, (msg: Discord.Message) => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
     }
 
-    async save(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async save(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
         const author = message.member.user;
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, [], false, false);
@@ -137,7 +138,7 @@ class QueueCommand implements FullCommand {
         return await msgOrRes(message, `The song queue has been stored with the name **${name}**!\nSlots used: **${results.length || 1}/10**`);
     }
 
-    async load(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async load(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
         const author = message instanceof Discord.Message ? message.author : message.user;
         if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
@@ -150,7 +151,7 @@ class QueueCommand implements FullCommand {
         return await msgOrRes(message, `The queue **${results[0].name}** has been loaded.`);
     }
 
-    async delete(message: Discord.Message | Discord.CommandInteraction, name: string) {
+    async delete(message: Discord.Message | Discord.ChatInputCommandInteraction, name: string) {
         const author = message.member.user;
         if (!name) return await msgOrRes(message, "Please provide the name of the queue.");
         const results = await query(`SELECT * FROM queue WHERE name = '${name}' AND user = '${author.id}'`);
@@ -159,13 +160,13 @@ class QueueCommand implements FullCommand {
         return await msgOrRes(message, `The stored queue **${results[0].name}** has been deleted.`);
     }
 
-    async list(message: Discord.Message | Discord.CommandInteraction) {
+    async list(message: Discord.Message | Discord.ChatInputCommandInteraction) {
         const author = message instanceof Discord.Message ? message.author : message.user;
         const results = await query(`SELECT * FROM queue WHERE user = '${author.id}'`);
         const queues = [];
         var num = 0;
         const allEmbeds = [];
-        const menu = new Discord.MessageSelectMenu().setCustomId("menu");
+        const menu = new Discord.SelectMenuBuilder().setCustomId("menu");
         for (let ii = 0; ii < results.length; ii++) {
             const result = results[ii];
             const queue = <SoundTrack[]> JSON.parse(unescape(result.queue));
@@ -179,7 +180,7 @@ class QueueCommand implements FullCommand {
                 else str = `**${++queueNum} - ** **[${song.title}](${song.url})** : **${songLength}**`;
                 return str;
             }).slice(0, 10);
-            const queueEmbed = new Discord.MessageEmbed()
+            const queueEmbed = new Discord.EmbedBuilder()
                 .setColor(color())
                 .setTitle(`Queue - ${result.name}`)
                 .setDescription(`There are ${queue.length} tracks in total.\n\n${pageArray.join("\n")}`)
@@ -187,28 +188,28 @@ class QueueCommand implements FullCommand {
                 .setFooter({ text: queue.length > pageArray.length ? "Cannot show all soundtracks here..." : "Here are all the soundtracks in this queue.", iconURL: message.client.user.displayAvatarURL() });
             allEmbeds.push(queueEmbed);
         }
-        const em = new Discord.MessageEmbed()
+        const em = new Discord.EmbedBuilder()
             .setColor(color())
             .setTitle(`Stored queues of **${author.tag}**`)
             .setDescription(`Slots used: **${results.length}/10**\n\n${queues.join("\n")}`)
             .setTimestamp()
             .setFooter({ text: "Choose a queue in the menu to view it.", iconURL: getClients()[0].user.displayAvatarURL() });
         allEmbeds.unshift(em);
-        const backButton = new Discord.MessageButton({ label: "Back", emoji: "⬅", style: "SECONDARY", disabled: true, customId: "back" });
-        const stopButton = new Discord.MessageButton({ label: "Stop", emoji: "✖️", style: "DANGER", customId: "stop" });
-        var msg = await msgOrRes(message, { embeds: [em], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
+        const backButton = new Discord.ButtonBuilder({ label: "Back", emoji: "⬅", style: ButtonStyle.Secondary, disabled: true, customId: "back" });
+        const stopButton = new Discord.ButtonBuilder({ label: "Stop", emoji: "✖️", style: ButtonStyle.Danger, customId: "stop" });
+        var msg = await msgOrRes(message, { embeds: [em], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu), new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(backButton, stopButton)] });
         const collector = msg.createMessageComponentCollector({ filter: interaction => interaction.user.id === author.id, idle: 60000 });
         collector.on("collect", async function (interaction) {
             if (interaction.isButton()) {
                 if (interaction.customId === "stop") collector.emit("end");
                 else if (interaction.customId === "back") {
                     backButton.setDisabled(true);
-                    await interaction.update({ embeds: [allEmbeds[0]], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
+                    await interaction.update({ embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>().addComponents(menu), new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>().addComponents(backButton, stopButton)] });
                 }
             } else if (interaction.isSelectMenu()) {
                 const index = parseInt(interaction.values[0]);
                 backButton.setDisabled(false);
-                await interaction.update({ embeds: [allEmbeds[index]], components: [new Discord.MessageActionRow().addComponents(menu), new Discord.MessageActionRow().addComponents(backButton, stopButton)] });
+                await interaction.update({ embeds: [allEmbeds[index]], components: [new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>().addComponents(menu), new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>().addComponents(backButton, stopButton)] });
             }
         });
         collector.on("end", function () {
@@ -217,7 +218,7 @@ class QueueCommand implements FullCommand {
         });
     }
 
-    async sync(message: Discord.Message | Discord.CommandInteraction, serverQueue: ServerQueue, name: string) {
+    async sync(message: Discord.Message | Discord.ChatInputCommandInteraction, serverQueue: ServerQueue, name: string) {
         const guild = message.guild;
         const author = message.member.user;
         if (serverQueue && serverQueue.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");

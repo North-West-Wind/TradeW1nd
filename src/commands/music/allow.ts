@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, Role, User } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, Role, User } from "discord.js";
 import { FullCommand } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 import { getQueue } from "../../helpers/music.js";
@@ -16,7 +16,7 @@ class AllowCommand implements FullCommand {
         type: "MENTIONABLE"
     }]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const mentionable = interaction.options.getMentionable("mentionable");
         if (mentionable instanceof User) return await this.addUser(interaction, mentionable);
         else if (mentionable instanceof GuildMember) return await this.addUser(interaction, mentionable.user);
@@ -36,13 +36,13 @@ class AllowCommand implements FullCommand {
         }
     }
 
-    async addUser(message: Message | CommandInteraction, user: User) {
+    async addUser(message: Message | ChatInputCommandInteraction, user: User) {
         const serverQueue = getQueue(message.guildId);
         if (!serverQueue.playing) return await msgOrRes(message, "I'm not playing!");
         serverQueue.callers.add(user.id);
     }
 
-    async addRole(message: Message | CommandInteraction, role: Role) {
+    async addRole(message: Message | ChatInputCommandInteraction, role: Role) {
         const serverQueue = getQueue(message.guildId);
         if (!serverQueue.playing) return await msgOrRes(message, "I'm not playing!");
         serverQueue.callRoles.add(role.id);

@@ -28,7 +28,7 @@
     "@vncsprd/soundcloud-downloader": "^1.2.2",
     "brstm": "^1.6.1",
     "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^13.8.1",
+    "discord.js": "^14.3.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "ffmpeg-static": "^5.0.2",
@@ -51,12 +51,17 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
+    "@eslint/create-config": "^0.3.1",
     "@types/express": "^4.17.13",
     "@types/fluent-ffmpeg": "^2.1.20",
     "@types/moment-duration-format": "^2.2.3",
     "@types/ms": "^0.7.31",
     "@types/request-promise-native": "^1.0.18",
     "@types/spotify-web-api-node": "^5.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
+    "eslint": "^8.22.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "typescript": "^4.8.2"
   }
 }

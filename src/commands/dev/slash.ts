@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { NorthClient, FullCommand, ISlash } from "../../classes/NorthClient.js";
 import { msgOrRes } from "../../function.js";
 
@@ -29,7 +29,7 @@ class DevSlashCommand implements FullCommand {
         }
     ];
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const sub = interaction.options.getSubcommand();
         if (sub === "register") return await this.register(interaction);
         if (sub === "refresh") return await this.refresh(interaction);
@@ -42,7 +42,7 @@ class DevSlashCommand implements FullCommand {
         if (args[0] === "delete") return await this.delete(message);
     }
     
-    async register(message: Message | CommandInteraction) {
+    async register(message: Message | ChatInputCommandInteraction) {
         const msg = await msgOrRes(message, `Registering Slash Commands...`);
         const client = message.client;
         for (const command of NorthClient.storage.commands.values()) {
@@ -62,7 +62,7 @@ class DevSlashCommand implements FullCommand {
         await msg.edit(`Registered all Slash Commands.`);
     }
 
-    async refresh(message: Message | CommandInteraction) {
+    async refresh(message: Message | ChatInputCommandInteraction) {
         const msg = await msgOrRes(message, `Refreshing Slash Commands...`);
         const client = message.client;
         const commands = await client.application.commands.fetch();
@@ -87,7 +87,7 @@ class DevSlashCommand implements FullCommand {
         await msg.edit(`Refreshed all Slash Commands.`);
     }
 
-    async delete(message: Message | CommandInteraction) {
+    async delete(message: Message | ChatInputCommandInteraction) {
         const msg = await msgOrRes(message, `Deleting Slash Commands...`);
         const client = message.client;
         const commands = await client.application.commands.fetch();

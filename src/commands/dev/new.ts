@@ -1,21 +1,20 @@
-import { CommandInteraction, Modal, TextInputComponent, MessageActionRow } from "discord.js";
+import { ChatInputCommandInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
 import { SlashCommand } from "../../classes/NorthClient.js";
-import * as fs from "fs";
 import { addBot } from "../../main.js";
 
 class NewCommand implements SlashCommand {
 	name = "new";
 	description = "Adds a new bot to the list.";
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		await interaction.deferReply({ ephemeral: true });
 		await this.addBot(interaction);
 	}
 
-	async addBot(interaction: CommandInteraction) {
-		const modal = new Modal().setCustomId("new").setTitle("Add a new bot");
-		const tokenInput = new TextInputComponent().setCustomId("token").setLabel("Token").setStyle("SHORT");
-		modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(tokenInput));
+	async addBot(interaction: ChatInputCommandInteraction) {
+		const modal = new ModalBuilder().setCustomId("new").setTitle("Add a new bot");
+		const tokenInput = new TextInputBuilder().setCustomId("token").setLabel("Token").setStyle(TextInputStyle.Short);
+		modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(tokenInput));
 		await interaction.showModal(modal);
 		const submit = await interaction.awaitModalSubmit({ filter: int => int.user.id === interaction.user.id, time: 60000 }).catch(() => {});
 		if (!submit) return await interaction.editReply("Timed out");

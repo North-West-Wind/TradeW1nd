@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
@@ -10,7 +10,7 @@ class RepeatCommand implements FullCommand {
     aliases = ["rep", "rp"]
     category = 0
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.repeat(interaction);
     }
 
@@ -18,7 +18,7 @@ class RepeatCommand implements FullCommand {
         await this.repeat(message);
     }
 
-    async repeat(message: Message | CommandInteraction) {
+    async repeat(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         serverQueue.repeating = !serverQueue.repeating;

@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes, mutate } from "../../function.js";
@@ -26,7 +26,7 @@ class MoveCommand implements FullCommand {
         }
     ]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.move(interaction, interaction.options.getInteger("target"), interaction.options.getInteger("destination"));
     }
 
@@ -38,9 +38,9 @@ class MoveCommand implements FullCommand {
         await this.move(message, queueIndex, dest);
     }
 
-    async move(message: Message | CommandInteraction, queueIndex: number, dest: number) {
+    async move(message: Message | ChatInputCommandInteraction, queueIndex: number, dest: number) {
         var serverQueue = getQueue(message.guild.id);
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
         const targetIndex = queueIndex - 1;

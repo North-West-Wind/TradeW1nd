@@ -1,5 +1,5 @@
 import { joinVoiceChannel } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, VoiceChannel } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
@@ -19,7 +19,7 @@ class UnSkipCommand implements FullCommand {
         type: "INTEGER"
     }]
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         const skipped = interaction.options.getInteger("amount") || 1;
         await this.unskip(interaction, skipped);
     }
@@ -35,12 +35,12 @@ class UnSkipCommand implements FullCommand {
         await this.unskip(message, skipped);
     }
 
-    async unskip(message: Message | CommandInteraction, unskip: number) {
+    async unskip(message: Message | ChatInputCommandInteraction, unskip: number) {
         var serverQueue = getQueue(message.guild.id);
         const guild = message.guild;
         const member = (<GuildMember> message.member);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-        if ((member.voice.channelId !== guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message,"You have to be in a voice channel to unskip the music when the bot is playing!");
+        if ((member.voice.channelId !== guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message,"You have to be in a voice channel to unskip the music when the bot is playing!");
         if (serverQueue.songs.length < 1) return await msgOrRes(message,"There is nothing in the queue!");
         if (serverQueue.repeating) unskip = 0;
         for (var i = 0; i < unskip; i++) {

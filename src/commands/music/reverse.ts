@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
 import { FullCommand } from "../../classes/NorthClient.js";
 import { moveArray, msgOrRes } from "../../function.js";
@@ -11,7 +11,7 @@ class ReverseCommand implements FullCommand {
     aliases = ["rev"]
     category = 0
 
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await this.reverse(interaction);
     }
 
@@ -19,11 +19,11 @@ class ReverseCommand implements FullCommand {
         await this.reverse(message);
     }
 
-    async reverse(message: Message | CommandInteraction) {
+    async reverse(message: Message | ChatInputCommandInteraction) {
         var serverQueue = getQueue(message.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
         if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
+        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
         var oldSong = serverQueue.songs[0];
         serverQueue.songs.reverse();
         await msgOrRes(message, "The queue has been reversed!");
