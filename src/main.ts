@@ -57,8 +57,10 @@ function initBot(token: string) {
 const app = express();
 
 app.get("/", (_req, res) => {
-    const [client] = clients;
-    res.json({ version: client.version, size: client.guilds.cache.size, lastReady: client.readyAt.getTime(), uptime: client.uptime });
+    const data = [];
+    for (const client of clients)
+        data.push({ id: client.user.id, version: client.version, size: client.guilds.cache.size, lastReady: client.readyAt.getTime(), uptime: client.uptime });
+    res.json(data);
 });
 
 app.get("/checkGuild/:guild", async (req, res) => {
