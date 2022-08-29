@@ -3,8 +3,8 @@ import * as Discord from "discord.js";
 import * as Stream from 'stream';
 import * as fs from "fs";
 import { GatewayVoiceServerUpdateDispatchData, GatewayVoiceStateUpdateDispatchData } from "discord-api-types/v9";
-import { ServerQueue, SoundTrack } from "../classes/NorthClient.js";
-import { humanDurationToNum, query } from "../function.js";
+import { NorthClient, ServerQueue, SoundTrack } from "../classes/NorthClient.js";
+import { fixGuildRecord, humanDurationToNum, query } from "../function.js";
 const queue = new Discord.Collection<Discord.Snowflake, ServerQueue>();
 const using: { [key: string]: number } = {};
 
@@ -12,6 +12,7 @@ export function getQueue(id: Discord.Snowflake) {
 	return queue.get(id);
 }
 export async function updateQueue(id: Discord.Snowflake, serverQueue: ServerQueue, update = true) {
+	if (!NorthClient.storage.guilds[id]) await fixGuildRecord(id);
 	if (!serverQueue) queue.delete(id);
 	else queue.set(id, serverQueue);
 	if (!update) return;
