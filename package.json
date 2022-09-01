@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/main.js",
-    "tsc": "tsc",
+    "tsc": "node fix.js && tsc",
     "test": "npm run tsc && npm start"
   },
   "engines": {
