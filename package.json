@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --optimize_for_size --max_old_space_size=2048 --gc_interval=100 --experimental-json-modules out/main.js",
-    "tsc": "node fix.js && tsc",
+    "tsc": "tsc",
     "test": "npm run tsc && npm start"
   },
   "engines": {
@@ -30,9 +30,9 @@
     "brstm": "^1.6.1",
     "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.3.0",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.0.2",
     "express": "^4.18.1",
-    "ffmpeg-static": "^5.0.2",
+    "ffmpeg-static": "^5.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "is-online": "^10.0.0",
     "moment": "^2.29.4",
@@ -40,7 +40,7 @@
     "music-metadata": "^8.0.1",
     "node-fetch": "^3.2.10",
     "opusscript": "^0.0.8",
-    "puppeteer-core": "^16.2.0",
+    "puppeteer-core": "^17.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "sanitize-filename": "^1.6.3",
@@ -59,9 +59,9 @@
     "@types/ms": "^0.7.31",
     "@types/request-promise-native": "^1.0.18",
     "@types/spotify-web-api-node": "^5.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.35.1",
-    "@typescript-eslint/parser": "^5.35.1",
-    "eslint": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "^5.36.1",
+    "@typescript-eslint/parser": "^5.36.1",
+    "eslint": "^8.23.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "typescript": "^4.8.2"
   }
