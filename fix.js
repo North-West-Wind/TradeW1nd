@@ -13,7 +13,7 @@ const ytdlFix = `const ytdl = async (link, options) => {
 module.exports = ytdl;`;
 const ytdlSigFix = `const end = body.indexOf('.join("")};', ndx);
 const subBody = body.slice(ndx, end);
-const functionBody = \`${subBody}.join("")};${functionName}(ncode);\`;`
+const functionBody = \`\${subBody}.join("")};\${functionName}(ncode);\`;`
 
 readFile("./node_modules/ytdl-core/lib/index.js", { encoding: "utf8" }, function (_err, data) {
     var formatted = data.replace(/const ytdl = \((.|\n)*ytdl;/gm, ytdlFix);
