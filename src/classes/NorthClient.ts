@@ -1,5 +1,5 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
-import { Client, ClientOptions, Collection, ChatInputCommandInteraction, Snowflake, TextChannel, VoiceChannel, ApplicationCommandOption } from "discord.js";
+import { Client, ClientOptions, Collection, ChatInputCommandInteraction, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { probeAndCreateResource } from "../commands/music/play.js";
 import { getStream } from "../helpers/addTrack.js";
 import { addUsing, removeUsing } from "../helpers/music.js";
