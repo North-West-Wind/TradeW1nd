@@ -4,7 +4,13 @@ import { NorthClient, ClientStorage, ISlash } from "./classes/NorthClient.js";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
 import * as fs from "fs";
+import { removeUsing } from "./helpers/music.js";
 dotenv.config();
+
+for (const file of fs.readdirSync(process.env.CACHE_DIR)) {
+    if (fs.statSync(`${process.env.CACHE_DIR}/${file}`).isDirectory()) continue;
+    removeUsing(file);
+}
 
 const config = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
 const clients: NorthClient[] = [];

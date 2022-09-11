@@ -61,8 +61,8 @@ export function addUsing(hashed: string) {
 	if (hashed) using[hashed]++;
 }
 export function removeUsing(hashed: string, all = false) {
-	if (!hashed || !using[hashed]) return;
-	if (all || !(using[hashed] -= 1))
+	if (!hashed) return;
+	if (all || !using[hashed] || !(using[hashed] -= 1))
 		setTimeout(() => {
 			const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 			delete using[hashed];
