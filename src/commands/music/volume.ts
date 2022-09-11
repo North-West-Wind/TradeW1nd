@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember } from "discord.js";
 import { ServerQueue, SlashCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 

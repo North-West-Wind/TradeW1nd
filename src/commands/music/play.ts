@@ -8,6 +8,7 @@ import * as Stream from 'stream';
 import { AudioPlayerError, AudioPlayerStatus, createAudioPlayer, createAudioResource, demuxProbe, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from "@discordjs/voice";
 import Ffmpeg from "fluent-ffmpeg";
 import { getClients } from "../../main.js";
+import { ApplicationCommandOptionType } from "discord.js";
 
 function createPlayer(guild: Discord.Guild) {
   let serverQueue = getQueue(guild.id);

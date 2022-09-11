@@ -1,5 +1,5 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
-import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel, Attachment } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel, Attachment, ApplicationCommandOptionType } from "discord.js";
 import { SlashCommand } from "../../classes/NorthClient.js";
 import { color, duration, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";

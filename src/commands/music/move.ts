@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient.js";
 import { moveArray, mutate } from "../../function.js";

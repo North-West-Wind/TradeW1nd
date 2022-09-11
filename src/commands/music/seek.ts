@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, GuildMember, VoiceChannel } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, VoiceChannel } from "discord.js";
 
 import { ServerQueue, SlashCommand } from "../../classes/NorthClient.js";
 import { duration, ms } from "../../function.js";

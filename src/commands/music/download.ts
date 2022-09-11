@@ -16,7 +16,7 @@ class DownloadCommand implements SlashCommand {
         name: "keywords",
         description: "Index/Link/Keywords of soundtrack.",
         required: false,
-        type: ApplicationCommandOptionType.String
+        type: Discord.ApplicationCommandOptionType.String
     }]
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {

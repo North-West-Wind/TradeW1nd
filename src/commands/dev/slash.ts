@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import { NorthClient, ISlash, SlashCommand } from "../../classes/NorthClient.js";
 
 class DevSlashCommand implements SlashCommand {
