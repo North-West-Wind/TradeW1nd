@@ -55,7 +55,7 @@ export async function addAttachment(file: Discord.Attachment) {
         type: 2,
         time: length,
         volume: 1,
-        thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
+        thumbnail: "https://www.dropbox.com/s/ms27gzjcz4c3h3z/audio-x-generic.svg?dl=1",
         isLive: false
     }];
     return { error: false, songs, msg: null, message: null };
@@ -431,7 +431,7 @@ export async function addURL(link: string) {
         type: 2,
         time: length,
         volume: 1,
-        thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
+        thumbnail: "https://www.dropbox.com/s/ms27gzjcz4c3h3z/audio-x-generic.svg?dl=1",
         isLive: false
     };
     return { error: false, songs: [song], msg: null, message: null };
@@ -449,7 +449,7 @@ export async function search(interaction: Discord.ChatInputCommandInteraction, l
         var video = <Video[]>searched.items.filter(x => x.type === "video" && !x.isUpcoming);
     } catch (err: any) {
         console.error(err);
-        await (interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply)("There was an error trying to search the videos!");
+        await await interaction.editReply("There was an error trying to search the videos!");
         return { error: true, msg: null, songs: [], message: err.message };
     }
     const ytResults = video.map(x => ({
@@ -484,7 +484,7 @@ export async function search(interaction: Discord.ChatInputCommandInteraction, l
         num = 0;
     } catch (err: any) {
         console.error(err);
-        await (interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply)("There was an error trying to search the videos!");
+        await await interaction.editReply("There was an error trying to search the videos!");
         return { error: true, msg: null, songs: [], message: err.message };
     }
     const scResults = (<TrackInfo[]>scSearched.collection).map(x => ({
@@ -505,7 +505,7 @@ export async function search(interaction: Discord.ChatInputCommandInteraction, l
         allMenus.push(menu);
     }
     if (allEmbeds.length < 1) {
-        await (interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply)("Cannot find any result with the given string.");
+        await await interaction.editReply("Cannot find any result with the given string.");
         return { error: true, msg: null, songs: [], message: null };
     }
     let val = { error: true, songs: [], msg: null, message: null };
@@ -514,7 +514,7 @@ export async function search(interaction: Discord.ChatInputCommandInteraction, l
         new Discord.ButtonBuilder({ label: "Next Page", emoji: "📄", customId: "next", style: ButtonStyle.Primary }),
         new Discord.ButtonBuilder({ label: "Cancel", emoji: "✖️", customId: "cancel", style: ButtonStyle.Danger }),
     );
-    const msg = await (interaction.replied || interaction.deferred ? interaction.editReply : interaction.reply)(<any>{ embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow], fetchReply: true });
+    const msg = await interaction.editReply({ embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow] });
     const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === interaction.member.user.id, idle: 60000 });
     collector.on("collect", async interaction => {
         switch (interaction.customId) {
