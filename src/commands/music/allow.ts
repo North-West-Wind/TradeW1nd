@@ -12,7 +12,7 @@ class AllowCommand implements SlashCommand {
         name: "mentionable",
         description: "The user or role to allow.",
         required: true,
-        type: "MENTIONABLE"
+        type: ApplicationCommandOptionType.Mentionable
     }]
 
     async execute(interaction: ChatInputCommandInteraction) {

@@ -23,7 +23,7 @@ export class NorthClient extends Client {
 }
 
 export abstract class ISlash {
-    options?: ApplicationCommandOption[];
+    options?: any[];
     
     abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }

@@ -1,4 +1,4 @@
-import { Attachment, ChatInputCommandInteraction, Message } from "discord.js";
+import { ApplicationCommandOptionType, Attachment, ChatInputCommandInteraction, Message } from "discord.js";
 
 import { SlashCommand } from "../../classes/NorthClient.js";
 import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, wait, validMSSetURL } from "../../function.js";
@@ -16,13 +16,13 @@ class AddCommand implements SlashCommand {
             name: "link",
             description: "The link of the soundtrack or the keywords to search for.",
             required: true,
-            type: "STRING"
+            type: ApplicationCommandOptionType.String
         },
         {
             name: "attachment",
             description: "An attachment of the audio file.",
             required: false,
-            type: "ATTACHMENT"
+            type: ApplicationCommandOptionType.Attachment
         }
     ]
 

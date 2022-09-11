@@ -3,7 +3,7 @@ import * as Discord from "discord.js";
 import { color, createEmbedScrolling, duration, query } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { getClients } from "../../main.js";
-import { ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import { ApplicationCommandOptionType, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 
 class QueueCommand implements SlashCommand {
     name = "queue"
@@ -18,55 +18,55 @@ class QueueCommand implements SlashCommand {
         {
             name: "current",
             description: "Displays the current soundtrack queue.",
-            type: "SUB_COMMAND"
+            type: ApplicationCommandOptionType.Subcommand
         },
         {
             name: "save",
             description: "Saves the current queue to the database.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "name",
                 description: "The name of the queue.",
                 required: true,
-                type: "STRING"
+                type: ApplicationCommandOptionType.String
             }]
         },
         {
             name: "load",
             description: "Loads a queue from the database.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "name",
                 description: "The name of the queue.",
                 required: true,
-                type: "STRING"
+                type: ApplicationCommandOptionType.String
             }]
         },
         {
             name: "delete",
             description: "Deletes a queue from the database.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "name",
                 description: "The name of the queue.",
                 required: true,
-                type: "STRING"
+                type: ApplicationCommandOptionType.String
             }]
         },
         {
             name: "list",
             description: "Lists all the queues of a user.",
-            type: "SUB_COMMAND"
+            type: ApplicationCommandOptionType.Subcommand
         },
         {
             name: "sync",
             description: "Synchronizes the queue with another server you are in.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "name",
                 description: "The name of the server.",
                 required: true,
-                type: "STRING"
+                type: ApplicationCommandOptionType.String
             }]
         },
     ]

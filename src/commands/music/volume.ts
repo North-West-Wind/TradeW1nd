@@ -13,13 +13,13 @@ class VolumeCommand implements SlashCommand {
             name: "percentage",
             description: "The percentage change of the volume.",
             required: false,
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         },
         {
             name: "nowplaying",
             description: "Whether or not to perform soundtrack-specific action.",
             required: false,
-            type: "BOOLEAN"
+            type: ApplicationCommandOptionType.Boolean
         }
     ]
 

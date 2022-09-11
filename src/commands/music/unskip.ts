@@ -14,7 +14,7 @@ class UnSkipCommand implements SlashCommand {
         name: "amount",
         description: "The amount of soundtrack to go back.",
         required: false,
-        type: "INTEGER"
+        type: ApplicationCommandOptionType.Integer
     }]
 
     async execute(interaction: ChatInputCommandInteraction) {

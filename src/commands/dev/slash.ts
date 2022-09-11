@@ -14,17 +14,17 @@ class DevSlashCommand implements SlashCommand {
         {
             name: "register",
             description: "Register all Slash Commands.",
-            type: "SUB_COMMAND"
+            type: ApplicationCommandOptionType.Subcommand
         },
         {
             name: "refresh",
             description: "Refresh all Slash Commands.",
-            type: "SUB_COMMAND"
+            type: ApplicationCommandOptionType.Subcommand
         },
         {
             name: "delete",
             description: "Delete all Slash Commands.",
-            type: "SUB_COMMAND"
+            type: ApplicationCommandOptionType.Subcommand
         }
     ];
 

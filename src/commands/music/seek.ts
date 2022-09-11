@@ -15,7 +15,7 @@ class SeekCommand implements SlashCommand {
         name: "time",
         description: "The position to skip to.",
         required: true,
-        type: "STRING"
+        type: ApplicationCommandOptionType.String
     }]
 
     async execute(interaction: ChatInputCommandInteraction) {

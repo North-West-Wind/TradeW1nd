@@ -16,13 +16,13 @@ class RemoveCommand implements SlashCommand {
             name: "index",
             description: "The index of the soundtrack to be removed.",
             required: true,
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         },
         {
             name: "count",
             description: "The amount of soundtrack to delete after the index.",
             required: false,
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         }
     ]
 

@@ -14,7 +14,7 @@ class SkipCommand implements SlashCommand {
         name: "amount",
         description: "The amount of soundtrack to skip.",
         required: false,
-        type: "INTEGER"
+        type: ApplicationCommandOptionType.Integer
     }]
 
     async execute(interaction: ChatInputCommandInteraction) {

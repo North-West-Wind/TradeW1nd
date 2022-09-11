@@ -28,67 +28,67 @@ class RadioCommand implements SlashCommand {
         {
             name: "tune",
             description: "Connects to one of the radio channels.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "channel",
                 description: "The radio channel to connect to.",
                 required: true,
-                type: "INTEGER",
+                type: ApplicationCommandOptionType.Integer,
                 choices: [{name:"1",value:1},{name:"2",value:2},{name:"3",value:3},{name:"4",value:4},{name:"5",value:5},{name:"6",value:6},{name:"7",value:7},{name:"8",value:8},{name:"9",value:9},{name:"10",value:10}]
             }]
         },
         {
             name: "off",
             description: "Disconnects from a radio channel and the voice channel.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
         },
         {
             name: "add",
             description: "Adds a soundtrack to the radio channel queue.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [
                 {
                     name: "channel",
                     description: "The radio channel to add the soundtrack to.",
                     required: true,
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     choices: [{name:"1",value:1},{name:"2",value:2},{name:"3",value:3},{name:"4",value:4},{name:"5",value:5},{name:"6",value:6},{name:"7",value:7},{name:"8",value:8},{name:"9",value:9},{name:"10",value:10}]
                 },
                 {
                     name: "track",
                     description: "The soundtrack to add.",
                     required: true,
-                    type: "STRING"
+                    type: ApplicationCommandOptionType.String
                 },
                 {
                     name: "attachment",
                     description: "An attachment of the audio file.",
                     required: false,
-                    type: "ATTACHMENT"
+                    type: ApplicationCommandOptionType.Attachment
                 }
             ]
         },
         {
             name: "info",
             description: "Retrieves information of a radio channel.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "channel",
                 description: "The radio channel to get the information of.",
                 required: true,
-                type: "INTEGER",
+                type: ApplicationCommandOptionType.Integer,
                 choices: [{name:"1",value:1},{name:"2",value:2},{name:"3",value:3},{name:"4",value:4},{name:"5",value:5},{name:"6",value:6},{name:"7",value:7},{name:"8",value:8},{name:"9",value:9},{name:"10",value:10}]
             }]
         },
         {
             name: "copy",
             description: "Copies the radio queue to the current server.",
-            type: "SUB_COMMAND",
+            type: ApplicationCommandOptionType.Subcommand,
             options: [{
                 name: "channel",
                 description: "The radio channel to copy.",
                 required: true,
-                type: "INTEGER",
+                type: ApplicationCommandOptionType.Integer,
                 choices: [{name:"1",value:1},{name:"2",value:2},{name:"3",value:3},{name:"4",value:4},{name:"5",value:5},{name:"6",value:6},{name:"7",value:7},{name:"8",value:8},{name:"9",value:9},{name:"10",value:10}]
             }]
         }

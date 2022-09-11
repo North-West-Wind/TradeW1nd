@@ -162,13 +162,13 @@ class PlayCommand implements SlashCommand {
       name: "link",
       description: "The link of the soundtrack or keywords to search for.",
       required: false,
-      type: "STRING"
+      type: ApplicationCommandOptionType.String
     },
     {
         name: "attachment",
         description: "An attachment of the audio file.",
         required: false,
-        type: "ATTACHMENT"
+        type: ApplicationCommandOptionType.Attachment
     }
   ]
 

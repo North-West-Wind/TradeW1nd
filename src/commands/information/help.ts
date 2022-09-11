@@ -2,6 +2,7 @@ import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
 import { color, deepReaddir, fixGuildRecord } from "../../function.js";
 import * as Discord from "discord.js";
 import { getClients } from "../../main.js";
+import { ApplicationCommandOptionType } from "discord.js";
 
 export const categories = ["Music", "Information", "Dev"];
 
@@ -18,7 +19,7 @@ class HelpCommand implements SlashCommand {
             {
                 name: "all",
                 description: "Display all the commands.",
-                type: "SUB_COMMAND"
+                type: ApplicationCommandOptionType.Subcommand
             }
         ];
         const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
@@ -27,13 +28,13 @@ class HelpCommand implements SlashCommand {
                 name: "command",
                 description: "The command to fetch.",
                 required: true,
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: commandFiles.map(async file => (await import(file)).default).filter(command => command.category === categories.indexOf(category)).map(x => ({ name: x.name, value: x.name }))
             };
             const option = {
                 name: category.toLowerCase(),
                 description: `${category} - Command Category`,
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [fetchOpt]
             };
             this.options.push(option);

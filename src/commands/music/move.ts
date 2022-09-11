@@ -16,13 +16,13 @@ class MoveCommand implements SlashCommand {
             name: "target",
             description: "The soundtrack to be moved.",
             required: true,
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         },
         {
             name: "destination",
             description: "The new position of the soundtrack.",
             required: true,
-            type: "INTEGER"
+            type: ApplicationCommandOptionType.Integer
         }
     ]
 
