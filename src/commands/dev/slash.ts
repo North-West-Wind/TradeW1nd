@@ -39,7 +39,6 @@ class DevSlashCommand implements SlashCommand {
         await interaction.reply(`Registering Slash Commands...`);
         const client = interaction.client;
         for (const command of NorthClient.storage.commands.values()) {
-            if (command.category === 5 || !(typeof command["execute"] === "function")) continue;
             try {
                 const options = {
                     name: command.name,
@@ -62,7 +61,7 @@ class DevSlashCommand implements SlashCommand {
         for (const command of commands.values()) {
             try {
                 const cmd = NorthClient.storage.commands.get(command.name);
-                if (!cmd || !(typeof command["execute"] === "function")) {
+                if (!cmd) {
                     await client.application.commands.delete(command.id);
                     continue;
                 }

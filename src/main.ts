@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { Handler } from "./handler.js";
-import { NorthClient, ClientStorage } from "./classes/NorthClient.js";
+import { NorthClient, ClientStorage, ISlash } from "./classes/NorthClient.js";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
 import * as fs from "fs";
@@ -84,6 +84,28 @@ app.get("/checkGuild/:guild", async (req, res) => {
 app.post("/update/:guild", (req, res) => {
     NorthClient.storage.guilds[req.params.guild] = req.body;
     res.sendStatus(200);
+});
+
+var registering = false;
+app.post("/reg-slash", async (req, res) => {
+    if (req.body.token !== process.env.DB_TOKEN) return res.sendStatus(403);
+    if (registering) return res.sendStatus(429);
+    res.sendStatus(200);
+    for (const client of clients) {
+        for (const command of NorthClient.storage.commands.values()) {
+            try {
+                const options = {
+                    name: command.name,
+                    description: command.description,
+                    options: (<ISlash><unknown>command).options
+                };
+                await client.application.commands.create(options);
+            } catch (err: any) {
+                console.log("Failed to create slash command " + command.name);
+                console.error(err);
+            }
+        }
+    }
 });
 
 app.listen(process.env.PORT || 3000);
