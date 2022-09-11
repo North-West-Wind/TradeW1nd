@@ -87,10 +87,12 @@ app.post("/update/:guild", (req, res) => {
 });
 
 var registering = false;
-app.post("/reg-slash", async (req, res) => {
-    if (req.body.token !== process.env.DB_TOKEN) return res.sendStatus(403);
+app.get("/reg-slash", async (req, res) => {
+    if (req.query.token !== process.env.DB_TOKEN) return res.sendStatus(403);
     if (registering) return res.sendStatus(429);
+    console.log("Received slash register request")
     res.sendStatus(200);
+    registering = true;
     for (const client of clients) {
         for (const command of NorthClient.storage.commands.values()) {
             try {
@@ -106,6 +108,7 @@ app.post("/reg-slash", async (req, res) => {
             }
         }
     }
+    registering = false;
 });
 
 app.listen(process.env.PORT || 3000);
