@@ -5,6 +5,7 @@ import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
 import * as fs from "fs";
 import { removeUsing } from "./helpers/music.js";
+import { downloading } from "./commands/music/download.js";
 dotenv.config();
 
 for (const file of fs.readdirSync(process.env.CACHE_DIR)) {
@@ -90,6 +91,13 @@ app.get("/checkGuild/:guild", async (req, res) => {
 app.post("/update/:guild", (req, res) => {
     NorthClient.storage.guilds[req.params.guild] = req.body;
     res.sendStatus(200);
+});
+
+app.get("/download/:guild", (req, res) => {
+    if (!downloading.has(req.params.guild)) {
+        if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.sendStatus(201).sendFile(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)
+        else res.json({ downloading: false });
+    } else res.json({ downloading: true, percentage: downloading.get(req.params.guild) });
 });
 
 var registering = false;
