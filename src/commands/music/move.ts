@@ -1,11 +1,11 @@
-import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember } from "discord.js";
 
-import { FullCommand } from "../../classes/NorthClient.js";
-import { moveArray, msgOrRes, mutate } from "../../function.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { moveArray, mutate } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
 
-class MoveCommand implements FullCommand {
+class MoveCommand implements SlashCommand {
     name = "move"
     description = "Moves a soundtrack to a specific position of the queue."
     usage = "<target> <destination>"
@@ -30,35 +30,27 @@ class MoveCommand implements FullCommand {
         await this.move(interaction, interaction.options.getInteger("target"), interaction.options.getInteger("destination"));
     }
 
-    async run(message: Message, args: string[]) {
-        const queueIndex = parseInt(args[0]);
-        const dest = parseInt(args[1]);
-        if (isNaN(queueIndex)) return await message.channel.send("The target provided is not a number.");
-        if (isNaN(dest)) return await message.channel.send("The destination provided is not a number.");
-        await this.move(message, queueIndex, dest);
-    }
-
-    async move(message: Message | ChatInputCommandInteraction, queueIndex: number, dest: number) {
-        let serverQueue = getQueue(message.guild.id);
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-        if (serverQueue.songs.length < 1) return await msgOrRes(message, "There is nothing in the queue.");
+    async move(interaction: ChatInputCommandInteraction, queueIndex: number, dest: number) {
+        let serverQueue = getQueue(interaction.guild.id);
+        if (((<GuildMember> interaction.member).voice.channelId !== interaction.guild.members.me.voice.channelId) && serverQueue.playing) return await interaction.reply("You have to be in a voice channel to alter the queue when the bot is playing!");
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
+        if (serverQueue.songs.length < 1) return await interaction.reply("There is nothing in the queue.");
         const targetIndex = queueIndex - 1;
         const destIndex = dest - 1;
-        if (targetIndex > serverQueue.songs.length - 1) return await msgOrRes(message, `You cannot move a soundtrack that doesn't exist.`);
+        if (targetIndex > serverQueue.songs.length - 1) return await interaction.reply(`You cannot move a soundtrack that doesn't exist.`);
         const title = serverQueue.songs[targetIndex].title;
         mutate(serverQueue.songs, targetIndex, destIndex);
-        updateQueue(message.guild.id, serverQueue);
-        await msgOrRes(message, `**${title}** has been moved from **#${queueIndex}** to **#${dest}**.`);
+        updateQueue(interaction.guild.id, serverQueue);
+        await interaction.reply(`**${title}** has been moved from **#${queueIndex}** to **#${dest}**.`);
         if ((!targetIndex || !destIndex) && serverQueue.playing) {
             serverQueue.stop();
-            if (!serverQueue.random) await play(message.guild, serverQueue.songs[0]);
+            if (!serverQueue.random) await play(interaction.guild, serverQueue.songs[0]);
             else {
                 const int = Math.floor(Math.random() * serverQueue.songs.length);
                 const pending = serverQueue.songs[int];
                 serverQueue.songs = moveArray(serverQueue.songs, int);
-                updateQueue(message.guild.id, serverQueue);
-                await play(message.guild, pending);
+                updateQueue(interaction.guild.id, serverQueue);
+                await play(interaction.guild, pending);
             }
         }
     }

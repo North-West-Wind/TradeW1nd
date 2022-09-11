@@ -1,9 +1,8 @@
-import { ChatInputCommandInteraction, GuildMember, Message, Role, User } from "discord.js";
-import { FullCommand } from "../../classes/NorthClient.js";
-import { msgOrRes } from "../../function.js";
+import { ChatInputCommandInteraction, GuildMember, Role, User } from "discord.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
 import { getQueue } from "../../helpers/music.js";
 
-class AllowCommand implements FullCommand {
+class AllowCommand implements SlashCommand {
     name = "allow"
     description = "Allows a user or role to alter the queue."
     aliases = ["al"]
@@ -24,27 +23,15 @@ class AllowCommand implements FullCommand {
         await interaction.reply("The type of mention is unknown!");
     }
 
-    async run(message: Message, args: string[]) {
-        const extracted = args[0].replace(/[^0-9]/g, "");
-        try {
-            const role = await message.guild.roles.fetch(extracted);
-            return await this.addRole(message, role);
-        } catch (err) {
-            const user = await message.guild.members.fetch(extracted).catch(() => null);
-            if (user) return await this.addUser(message, user.user);
-            else await message.channel.send("The type of mention is unknown!");
-        }
-    }
-
-    async addUser(message: Message | ChatInputCommandInteraction, user: User) {
-        const serverQueue = getQueue(message.guildId);
-        if (!serverQueue.playing) return await msgOrRes(message, "I'm not playing!");
+    async addUser(interaction: ChatInputCommandInteraction, user: User) {
+        const serverQueue = getQueue(interaction.guildId);
+        if (!serverQueue.playing) return await interaction.reply("I'm not playing!");
         serverQueue.callers.add(user.id);
     }
 
-    async addRole(message: Message | ChatInputCommandInteraction, role: Role) {
-        const serverQueue = getQueue(message.guildId);
-        if (!serverQueue.playing) return await msgOrRes(message, "I'm not playing!");
+    async addRole(interaction: ChatInputCommandInteraction, role: Role) {
+        const serverQueue = getQueue(interaction.guildId);
+        if (!serverQueue.playing) return await interaction.reply("I'm not playing!");
         serverQueue.callRoles.add(role.id);
     }
 }

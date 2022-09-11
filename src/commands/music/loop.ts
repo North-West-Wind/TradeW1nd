@@ -1,10 +1,9 @@
-import { ChatInputCommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
-import { FullCommand } from "../../classes/NorthClient.js";
-import { msgOrRes } from "../../function.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class LoopCommand implements FullCommand {
+class LoopCommand implements SlashCommand {
     name = "loop"
     description = "Toggles loop of the queue."
     category = 0
@@ -14,24 +13,20 @@ class LoopCommand implements FullCommand {
         await this.loop(interaction);
     }
 
-    async run(message: Message) {
-        await this.loop(message);
-    }
-
-    async loop(message: Message | ChatInputCommandInteraction) {
-        let serverQueue = getQueue(message.guild.id);
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
+    async loop(interaction: ChatInputCommandInteraction) {
+        let serverQueue = getQueue(interaction.guild.id);
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         serverQueue.looping = !serverQueue.looping;
         if (serverQueue.repeating && serverQueue.looping) {
             serverQueue.repeating = false;
-            await msgOrRes(message, "Disabled repeating to prevent conflict.");
+            await interaction.reply("Disabled repeating to prevent conflict.");
         }
         try {
-            updateQueue(message.guild.id, serverQueue);
-            if (serverQueue.looping) await msgOrRes(message, "The queue is now being looped.");
-            else await msgOrRes(message, "The queue is no longer being looped.");
+            updateQueue(interaction.guild.id, serverQueue);
+            if (serverQueue.looping) await interaction.reply("The queue is now being looped.");
+            else await interaction.reply("The queue is no longer being looped.");
         } catch (err: any) {
-            await msgOrRes(message, "There was an error trying to update the status!");
+            await interaction.reply("There was an error trying to update the status!");
         }
     }
 }

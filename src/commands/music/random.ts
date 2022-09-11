@@ -1,10 +1,9 @@
-import { ChatInputCommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 
-import { FullCommand } from "../../classes/NorthClient.js";
-import { msgOrRes } from "../../function.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
-class RandomCommand implements FullCommand {
+class RandomCommand implements SlashCommand {
     name = "random"
     description = "Plays the queue randomly."
     aliases = ["rnd"]
@@ -15,25 +14,17 @@ class RandomCommand implements FullCommand {
         await this.random(interaction);
     }
 
-    async run(message: Message) {
-        await this.random(message);
-    }
-
-    async random(message: Message | ChatInputCommandInteraction) {
-        let serverQueue = getQueue(message.guild.id);
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
+    async random(interaction: ChatInputCommandInteraction) {
+        let serverQueue = getQueue(interaction.guild.id);
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
         serverQueue.random = !serverQueue.random;
         if (serverQueue.repeating && serverQueue.random) {
             serverQueue.repeating = false;
-            await msgOrRes(message, "Disabled repeating to prevent conflict.");
+            await interaction.reply("Disabled repeating to prevent conflict.");
         }
-        try {
-            updateQueue(message.guild.id, serverQueue);
-            if (serverQueue.random) await msgOrRes(message, "The queue will be played randomly.");
-            else await msgOrRes(message, "The queue will be played in order.");
-        } catch (err: any) {
-            await msgOrRes(message, "There was an error trying to update the status!");
-        }
+        if (serverQueue.random) await interaction.reply("The queue will be played randomly.");
+        else await interaction.reply("The queue will be played in order.");
+        updateQueue(interaction.guild.id, serverQueue);
     }
 }
 

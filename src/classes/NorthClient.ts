@@ -1,5 +1,5 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, getVoiceConnection, NoSubscriberBehavior, VoiceConnection } from "@discordjs/voice";
-import { Client, ClientOptions, Collection, ChatInputCommandInteraction, Message, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { Client, ClientOptions, Collection, ChatInputCommandInteraction, Snowflake, TextChannel, VoiceChannel, ApplicationCommandOption } from "discord.js";
 import { probeAndCreateResource } from "../commands/music/play.js";
 import { getStream } from "../helpers/addTrack.js";
 import { addUsing, removeUsing } from "../helpers/music.js";
@@ -22,12 +22,8 @@ export class NorthClient extends Client {
     setVersion(version: string) { this.version = version; }
 }
 
-export abstract class IPrefix {
-    abstract run(message: Message, args: string[]): Promise<any> | any;
-}
-
 export abstract class ISlash {
-    options?: any[];
+    options?: ApplicationCommandOption[];
     
     abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
@@ -46,20 +42,9 @@ export abstract class Command {
     permissions?: { guild?: { user?: number, me?: number }, channel?: { user?: number, me?: number } };
 }
 
-export abstract class PrefixCommand extends Command implements IPrefix {
-    abstract run(message: Message, args: string[]): Promise<any> | any;
-}
-
 export abstract class SlashCommand extends Command implements ISlash {
     options?: any[];
 
-    abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
-}
-
-export abstract class FullCommand extends Command implements ISlash, IPrefix {
-    options?: any[];
-
-    abstract run(message: Message, args: string[]): Promise<any> | any;
     abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
 

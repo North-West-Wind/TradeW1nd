@@ -1,7 +1,7 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
-import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel } from "discord.js";
-import { FullCommand } from "../../classes/NorthClient.js";
-import { color, duration, msgOrRes, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
+import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel, Attachment } from "discord.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { color, duration, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio.js";
@@ -16,7 +16,7 @@ const type = [
     "MSCZ/MSCX"
 ];
 
-class RadioCommand implements FullCommand {
+class RadioCommand implements SlashCommand {
     name = "radio";
     description = "Plays music in a channel 24/7!";
     usage = "<subcommand>";
@@ -59,6 +59,12 @@ class RadioCommand implements FullCommand {
                     description: "The soundtrack to add.",
                     required: true,
                     type: "STRING"
+                },
+                {
+                    name: "attachment",
+                    description: "An attachment of the audio file.",
+                    required: false,
+                    type: "ATTACHMENT"
                 }
             ]
         },
@@ -98,98 +104,69 @@ class RadioCommand implements FullCommand {
         else if (sub === "off") return await this.off(interaction);
         else if (sub === "add") {
             await interaction.deferReply();
-            return await this.add(interaction, interaction.options.getString("track"), interaction.options.getInteger("channel"));
+            return await this.add(interaction, interaction.options.getString("track"), interaction.options.getAttachment("attachment"), interaction.options.getInteger("channel"));
         } else if (sub === "info") return await this.info(interaction, interaction.options.getInteger("channel"));
         else if (sub === "copy") return await this.copy(interaction, interaction.options.getInteger("channel"));
     }
 
-    async run(message: Message, args: string[]) {
-        if (!this.subcommands.includes(args[0])) return await message.channel.send("There is no such subcommand!");
-        if (args[0] === "tune") {
-            const channel = parseInt(args[1]);
-            if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
-            return await this.tune(message, channel);
-        } else if (args[0] === "off") return await this.off(message);
-        else if (args[0] === "add") {
-            if (!args[1]) return await message.channel.send("Please provide a channel number!");
-            if (!args[2]) return await message.channel.send("No link/keywords/attachments!");
-            const channel = parseInt(args[1]);
-            if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
-            return await this.add(message, args.slice(2).join(" "), channel);
-        } else if (args[0] === "info") {
-            const channel = parseInt(args[1]);
-            if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
-            return await this.info(message, channel);
-        } else if (args[0] === "copy") {
-            const channel = parseInt(args[1]);
-            if (isNaN(channel)) return await message.channel.send("The channel number is not valid!");
-            if (!this.checkChannel(channel)) return await message.channel.send("The channel number should be an interger between 1 and 10!");
-            return await this.copy(message, channel);
-        }
-    }
-
-    async tune(message: Message | ChatInputCommandInteraction, channel: number) {
-        let connection = getVoiceConnection(message.guildId);
+    async tune(interaction: ChatInputCommandInteraction, channel: number) {
+        let connection = getVoiceConnection(interaction.guildId);
         if (!connection) {
-            const member = <GuildMember>message.member;
-            if (!member.voice.channelId) return await msgOrRes(message, "You are not in any voice channel!");
-            connection = joinVoiceChannel({ channelId: member.voice.channelId, guildId: message.guildId, adapterCreator: createDiscordJSAdapter(<VoiceChannel>member.voice.channel) });
+            const member = <GuildMember>interaction.member;
+            if (!member.voice.channelId) return await interaction.reply("You are not in any voice channel!");
+            connection = joinVoiceChannel({ channelId: member.voice.channelId, guildId: interaction.guildId, adapterCreator: createDiscordJSAdapter(<VoiceChannel>member.voice.channel) });
         }
         const radioCh = players[channel - 1];
-        if (!radioCh) return await msgOrRes(message, "That channel is not available!");
+        if (!radioCh) return await interaction.reply("That channel is not available!");
         connection.subscribe(radioCh.player);
-        addPlaying(channel, message.guildId);
-        await msgOrRes(message, "Connected!");
+        addPlaying(channel, interaction.guildId);
+        await interaction.reply("Connected!");
     }
 
-    async off(message: Message | ChatInputCommandInteraction) {
-        if (!isPlaying(message.guildId)) return await msgOrRes(message, "Radio isn't connected to this server!");
-        const connection = getVoiceConnection(message.guildId);
+    async off(interaction: ChatInputCommandInteraction) {
+        if (!isPlaying(interaction.guildId)) return await interaction.reply("Radio isn't connected to this server!");
+        const connection = getVoiceConnection(interaction.guildId);
         if (connection) connection.destroy();
-        removePlaying(message.guildId);
-        await msgOrRes(message, "Disconnected!");
+        removePlaying(interaction.guildId);
+        await interaction.reply("Disconnected!");
     }
 
-    async add(message: Message | ChatInputCommandInteraction, str: string, channel: number) {
+    async add(interaction: ChatInputCommandInteraction, str: string, att: Attachment, channel: number) {
         try {
-            let songs = [];
             let result = { error: true, message: "No link/keywords/attachments!", songs: [], msg: null };
-            if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
+            if (att) result = await addAttachment(att);
+            else if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
             else if (validYTURL(str)) result = await addYTURL(str);
-            else if (validSPURL(str)) result = await addSPURL(message, str);
+            else if (validSPURL(str)) result = await addSPURL(interaction, str);
             else if (validSCURL(str)) result = await addSCURL(str);
             else if (validGDFolderURL(str)) {
-                const msg = await msgOrRes(message, "Processing track: (Initializing)");
+                const msg = await interaction.editReply("Processing track: (Initializing)");
                 result = await addGDFolderURL(str, async (i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
                 result.msg = msg;
             } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);
             else if (validMSSetURL(str)) result = await addMSSetURL(str);
             else if (validMSURL(str)) result = await addMSURL(str);
             else if (validURL(str)) result = await addURL(str);
-            else if (message instanceof Message && message.attachments.size > 0) result = await addAttachment(message);
-            else result = await search(message, str);
-            if (result.error) return await msgOrRes(message, result.message || "Failed to add soundtrack");
-            songs = result.songs;
-            if (!songs || songs.length < 1) return await msgOrRes(message, "There was an error trying to add the soundtrack!");
+            else result = await search(interaction, str);
+            if (result.error) return await interaction.editReply(result.message || "Failed to add soundtrack");
+            const songs = result.songs;
+            if (!songs || songs.length < 1) return await interaction.editReply("There was an error trying to add the soundtrack!");
             const Embed = createEmbed(songs);
             await players[channel - 1].add(songs);
             let msg: Message;
             if (result.msg) msg = await result.msg.edit({ content: null, embeds: [Embed] });
-            else msg = await msgOrRes(message, Embed);
+            else msg = await interaction.editReply({ embeds: [Embed] });
             await wait(30000);
             await msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0].title}]**` });
         } catch (err) {
-            await msgOrRes(message, "There was an error trying to add the soundtrack to the queue!");
+            await interaction.editReply("There was an error trying to add the soundtrack to the queue!");
             console.error(err);
         }
     }
 
-    async info(message: Message | ChatInputCommandInteraction, channel: number) {
+    async info(interaction: ChatInputCommandInteraction, channel: number) {
         const radio = players[channel - 1];
-        if (!radio.tracks.length) return await msgOrRes(message, "There are currently no tracks in this radio channel.");
+        if (!radio.tracks.length) return await interaction.reply("There are currently no tracks in this radio channel.");
         const position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
         const processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
@@ -216,25 +193,25 @@ class RadioCommand implements FullCommand {
             .setColor(color())
             .setTitle("Information of Radio Channel #" + channel)
             .setTimestamp()
-            .setFooter({ text: `Coming up next: ${next}`, iconURL: message.client.user.displayAvatarURL() });
+            .setFooter({ text: `Coming up next: ${next}`, iconURL: interaction.client.user.displayAvatarURL() });
 
         const songLength = !radio.tracks[0].time ? "∞" : duration(radio.tracks[0].time, "seconds");
         if (radio.tracks[0].type === 1) info = [`**[${radio.tracks[0].title}](${radio.tracks[0].spot})**\nLength: **${songLength}**`, radio.tracks[0].thumbnail];
         else info = [`**[${radio.tracks[0].title}](${radio.tracks[0].url})**\nLive: **${isLive ? "Yes" : "No"}**\nType: **${type[radio.tracks[0].type]}**`, radio.tracks[0].thumbnail];
         embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength || "Unknown"}`).setThumbnail(info[1]);
-        const msg = await msgOrRes(message, embed);
-        setTimeout(() => msg.edit({ content: "**[Outdated Radio Information]**", embeds: [] }).catch(() => {}), 60000);
+        await interaction.reply({ embeds: [embed] });
+        setTimeout(() => interaction.editReply({ content: "**[Outdated Radio Information]**", embeds: [] }).catch(() => {}), 60000);
     }
 
-    async copy(message: Message | ChatInputCommandInteraction, channel: number) {
-        let serverQueue = getQueue(message.guildId);
-        if (serverQueue?.playing) return await msgOrRes(message, "Someone is listening to the music. Don't ruin their day.");
+    async copy(interaction: ChatInputCommandInteraction, channel: number) {
+        let serverQueue = getQueue(interaction.guildId);
+        if (serverQueue?.playing) return await interaction.editReply("Someone is listening to the music. Don't ruin their day.");
         const radio = players[channel - 1];
-        if (radio.tracks.length == 0) return await msgOrRes(message, "The queue of this radio channel is empty!");
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guildId, radio.tracks, false, false);
+        if (radio.tracks.length == 0) return await interaction.editReply("The queue of this radio channel is empty!");
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guildId, radio.tracks, false, false);
         else serverQueue.songs = radio.tracks;
-        updateQueue(message.guildId, serverQueue);
-        return await msgOrRes(message, `Copied the queue from radio channel #${channel}.`);
+        updateQueue(interaction.guildId, serverQueue);
+        return await interaction.editReply(`Copied the queue from radio channel #${channel}.`);
     }
 }
 

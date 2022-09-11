@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
-import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, msgOrRes, wait, duration, validMSSetURL } from "../../function.js";
+import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, wait, duration, validMSSetURL } from "../../function.js";
 import { migrate as music } from "./migrate.js";
-import { NorthClient, FullCommand, SoundTrack } from "../../classes/NorthClient.js";
+import { NorthClient, SoundTrack, SlashCommand } from "../../classes/NorthClient.js";
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream, addMSSetURL } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';
@@ -151,120 +151,122 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
   }
 }
 
-class PlayCommand implements FullCommand {
+class PlayCommand implements SlashCommand {
   name = "play"
   description = "Plays music with the link or keywords provided."
   aliases = ["p"]
   usage = "[link | keywords]"
   category = 0
-  options = [{
-    name: "link",
-    description: "The link of the soundtrack or keywords to search for.",
-    required: false,
-    type: "STRING"
-  }]
+  options = [
+    {
+      name: "link",
+      description: "The link of the soundtrack or keywords to search for.",
+      required: false,
+      type: "STRING"
+    },
+    {
+        name: "attachment",
+        description: "An attachment of the audio file.",
+        required: false,
+        type: "ATTACHMENT"
+    }
+  ]
 
   async execute(interaction: Discord.ChatInputCommandInteraction) {
     await interaction.deferReply();
-    await this.logic(interaction, interaction.options.getString("link"));
+    await this.logic(interaction, interaction.options.getString("link"), interaction.options.getAttachment("attachment"));
   }
 
-  async run(message: Discord.Message, args: string[]) {
-    await this.logic(message, args.join(" "));
-  }
-
-  async logic(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string) {
-    let serverQueue = getQueue(message.guild.id);
-    const voiceChannel = <Discord.VoiceChannel>(<Discord.GuildMember>message.member).voice.channel;
-    if (!voiceChannel) return await msgOrRes(message, "You need to be in a voice channel to play music!");
-    if (!voiceChannel.permissionsFor(message.guild.members.me).has(BigInt(3145728))) return await msgOrRes(message, "I can't play in your voice channel!");
-    if (!str && ((message instanceof Discord.Message && message.attachments.size < 1) || message instanceof Discord.ChatInputCommandInteraction)) {
-      if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-      if (serverQueue.songs.length < 1) return await msgOrRes(message, "The queue is empty for this server! Please provide a link or keywords to get a music played!");
-      if ((serverQueue.playing && message.guild.members.me.voice?.channelId) || NorthClient.storage.migrating.find(x => x === message.guild.id)) return await music(message);
+  async logic(interaction: Discord.ChatInputCommandInteraction, str: string, att: Discord.Attachment) {
+    let serverQueue = getQueue(interaction.guild.id);
+    const voiceChannel = <Discord.VoiceChannel>(<Discord.GuildMember>interaction.member).voice.channel;
+    if (!voiceChannel) return await interaction.editReply("You need to be in a voice channel to play music!");
+    if (!voiceChannel.permissionsFor(interaction.guild.members.me).has(BigInt(3145728))) return await interaction.editReply("I can't play in your voice channel!");
+    if (!str && !att) {
+      if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
+      if (serverQueue.songs.length < 1) return await interaction.editReply("The queue is empty for this server! Please provide a link or keywords to get a music played!");
+      if ((serverQueue.playing && interaction.guild.members.me.voice?.channelId) || NorthClient.storage.migrating.find(x => x === interaction.guild.id)) return await music(interaction);
       try {
-        if (message.guild.members.me.voice?.channelId === voiceChannel.id) serverQueue.connection = getVoiceConnection(message.guild.id);
+        if (interaction.guild.members.me.voice?.channelId === voiceChannel.id) serverQueue.connection = getVoiceConnection(interaction.guild.id);
         else {
           serverQueue?.destroy();
-          serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
+          serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: interaction.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
         }
-        if (message.guild.members.me.voice?.channelId && !message.guild.members.me.voice.selfDeaf) message.guild.members.me.voice.setDeaf(true).catch(() => { });
+        if (interaction.guild.members.me.voice?.channelId && !interaction.guild.members.me.voice.selfDeaf) interaction.guild.members.me.voice.setDeaf(true).catch(() => { });
       } catch (err: any) {
-        await msgOrRes(message, "There was an error trying to connect to the voice channel!");
-        if (err.message) await message.channel.send(err.message);
+        await interaction.editReply("There was an error trying to connect to the voice channel!");
+        if (err.message) await interaction.channel.send(err.message);
         console.error(err);
         return serverQueue?.destroy();
       }
       serverQueue.voiceChannel = voiceChannel;
       serverQueue.playing = true;
-      serverQueue.textChannel = <Discord.TextChannel>message.channel;
-      serverQueue.callers.add(message.member.user.id);
-      if (!serverQueue.player) serverQueue.player = createPlayer(message.guild);
+      serverQueue.textChannel = <Discord.TextChannel>interaction.channel;
+      serverQueue.callers.add(interaction.member.user.id);
+      if (!serverQueue.player) serverQueue.player = createPlayer(interaction.guild);
       await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
       serverQueue.connection.subscribe(serverQueue.player);
-      updateQueue(message.guild.id, serverQueue);
-      if (!serverQueue.random) await play(message.guild, serverQueue.songs[0]);
+      updateQueue(interaction.guild.id, serverQueue);
+      if (!serverQueue.random) await play(interaction.guild, serverQueue.songs[0]);
       else {
         const int = Math.floor(Math.random() * serverQueue.songs.length);
         const pending = serverQueue.songs[int];
         serverQueue.songs = moveArray(serverQueue.songs, int);
-        updateQueue(message.guild.id, serverQueue);
-        await play(message.guild, pending);
+        updateQueue(interaction.guild.id, serverQueue);
+        await play(interaction.guild, pending);
       }
-      if (message instanceof Discord.ChatInputCommandInteraction) await message.deleteReply();
+      if (interaction instanceof Discord.ChatInputCommandInteraction) await interaction.deleteReply();
       return;
     }
-    if (!str) return await msgOrRes(message, "You didn't provide any link or keywords!");
     try {
-      let songs = [];
-      let result = { error: true, songs: [], msg: null, message: null };
-      if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
+      let result = { error: true, songs: [], msg: null, message: "No link/keywords/attachments!" };
+      if (att) result = await addAttachment(att);
+      else if (validYTPlaylistURL(str)) result = await addYTPlaylist(str);
       else if (validYTURL(str)) result = await addYTURL(str);
-      else if (validSPURL(str)) result = await addSPURL(message, str);
+      else if (validSPURL(str)) result = await addSPURL(interaction, str);
       else if (validSCURL(str)) result = await addSCURL(str);
       else if (validGDFolderURL(str)) {
-        const msg = await msgOrRes(message, "Processing track: (Initializing)");
+        const msg = await interaction.editReply("Processing track: (Initializing)");
         result = await addGDFolderURL(str, async (i, l) => await msg.edit(`Processing track: **${i}/${l}**`));
         await msg.delete();
       } else if (validGDURL(str) || validGDDLURL(str)) result = await addGDURL(str);
       else if (validMSSetURL(str)) result = await addMSSetURL(str);
       else if (validMSURL(str)) result = await addMSURL(str);
       else if (validURL(str)) result = await addURL(str);
-      else if (message instanceof Discord.Message && message.attachments.size > 0) result = await addAttachment(message);
-      else result = await search(message, str);
-      if (result.error) return await msgOrRes(message, result.message || "Failed to add soundtracks");
-      songs = result.songs;
-      if (!songs || songs.length < 1) return await msgOrRes(message, "There was an error trying to add the soundtrack!");
+      else result = await search(interaction, str);
+      if (result.error) return await interaction.editReply(result.message || "Failed to add soundtracks");
+      const songs = result.songs;
+      if (!songs || songs.length < 1) return await interaction.editReply("There was an error trying to add the soundtrack!");
       const Embed = createEmbed(songs);
-      if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, songs, false, false);
-      else serverQueue.songs = ((!message.guild.members.me.voice.channel || !serverQueue.playing) ? songs : serverQueue.songs).concat((!message.guild.members.me.voice.channel || !serverQueue.playing) ? serverQueue.songs : songs);
+      if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, songs, false, false);
+      else serverQueue.songs = ((!interaction.guild.members.me.voice.channel || !serverQueue.playing) ? songs : serverQueue.songs).concat((!interaction.guild.members.me.voice.channel || !serverQueue.playing) ? serverQueue.songs : songs);
       let msg: Discord.Message;
       if (result.msg) await result.msg.edit({ content: null, embeds: [Embed] });
-      else await msgOrRes(message, Embed);
+      else await interaction.editReply({ embeds: [Embed] });
       setTimeout(() => { try { msg.edit({ embeds: [], content: `**[Added Track: ${songs.length > 1 ? songs.length + " in total" : songs[0]?.title}]**` }).catch(() => { }) } catch (err: any) { } }, 30000);
-      updateQueue(message.guild.id, serverQueue);
-      if (!serverQueue.player) serverQueue.player = createPlayer(message.guild);
+      updateQueue(interaction.guild.id, serverQueue);
+      if (!serverQueue.player) serverQueue.player = createPlayer(interaction.guild);
       serverQueue.voiceChannel = voiceChannel;
-      serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: message.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
-      serverQueue.textChannel = <Discord.TextChannel>message.channel;
-      serverQueue.callers.add(message.member.user.id);
-      message.guild.members.me.voice?.setDeaf(true).catch(() => { });
+      serverQueue.connection = joinVoiceChannel({ channelId: voiceChannel.id, guildId: interaction.guild.id, adapterCreator: createDiscordJSAdapter(voiceChannel) });
+      serverQueue.textChannel = <Discord.TextChannel>interaction.channel;
+      serverQueue.callers.add(interaction.member.user.id);
+      interaction.guild.members.me.voice?.setDeaf(true).catch(() => { });
       await entersState(serverQueue.connection, VoiceConnectionStatus.Ready, 30e3);
       serverQueue.connection.subscribe(serverQueue.player);
-      updateQueue(message.guild.id, serverQueue, false);
+      updateQueue(interaction.guild.id, serverQueue, false);
       if (!serverQueue.playing) {
-        if (!serverQueue.random) await play(message.guild, serverQueue.songs[0]);
+        if (!serverQueue.random) await play(interaction.guild, serverQueue.songs[0]);
         else {
           const int = Math.floor(Math.random() * serverQueue.songs.length);
           const pending = serverQueue.songs[int];
           serverQueue.songs = moveArray(serverQueue.songs, int);
-          updateQueue(message.guild.id, serverQueue);
-          await play(message.guild, pending);
+          updateQueue(interaction.guild.id, serverQueue);
+          await play(interaction.guild, pending);
         }
       }
     } catch (err: any) {
-      await msgOrRes(message, "There was an error trying to connect to the voice channel!");
-      if (err.message) await message.channel.send(err.message);
+      await interaction.editReply("There was an error trying to connect to the voice channel!");
+      if (err.message) await interaction.channel.send(err.message);
       if (serverQueue) {
         serverQueue.destroy();
         serverQueue.clean();

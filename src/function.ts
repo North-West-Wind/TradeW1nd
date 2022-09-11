@@ -17,15 +17,15 @@ export function twoDigits(d) {
     return d.toString();
 }
 
-export function validURL(str: string) { return !!str.match(/^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?.*)?(\#[-a-z\d_]*)?$/i); }
+export function validURL(str: string) { return !!str.match(/^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[-a-z\d%_.~+]*)*(\?.*)?(#[-a-z\d_]*)?$/i); }
 export function validYTURL(str: string) { return !!str.match(/^(https?:\/\/)?((w){3}.)?youtu(be|.be)?(.com)?\/.+/); }
 export function validYTPlaylistURL(str: string) { return !!str.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(.com)?\/playlist\?list=\w+/); }
 export function validSPURL(str: string) { return !!str.match(/^(spotify:|https:\/\/[a-z]+\.spotify\.com\/)/); }
 export function validGDURL(str: string) { return !!str.match(/^(https?)?:\/\/drive\.google\.com\/(file\/d\/(?<id>.*?)\/(?:edit|view)\?usp=sharing|open\?id=(?<id1>.*?)$)/); }
-export function validGDFolderURL(str: string) { return !!str.match(/^(https?)?:\/\/drive\.google\.com\/drive\/folders\/[\w\-]+(\?usp=sharing)?$/); }
+export function validGDFolderURL(str: string) { return !!str.match(/^(https?)?:\/\/drive\.google\.com\/drive\/folders\/[\w-]+(\?usp=sharing)?$/); }
 export function validGDDLURL(str: string) { return !!str.match(/^(https?)?:\/\/drive\.google\.com\/uc\?export=download&id=[\w-]+/); }
 export function validSCURL(str: string) { return !!str.match(/^https?:\/\/(soundcloud\.com|snd\.sc)\/(.+)?/); }
-export function validMSURL(str: string) { return !!str.match(/^(https?:\/\/)?musescore\.com\/(user\/\d+\/scores\/\d+|[\w-]+\/(scores\/\d+|[\w-]+))[#\?]?$/); }
+export function validMSURL(str: string) { return !!str.match(/^(https?:\/\/)?musescore\.com\/(user\/\d+\/scores\/\d+|[\w-]+\/(scores\/\d+|[\w-]+))[#?]?$/); }
 export function validMSSetURL(str: string) { return !!str.match(/^https?:\/\/musescore.com\/user\/[\w-]+\/sets\/[\w-]+$/); }
 export function decodeHtmlEntity(str: string) { return str?.replace(/&#(\d+);/g, (_match, dec) => String.fromCharCode(dec)).replace(/&quot;/g, `"`).replace(/&amp;/g, `&`); }
 
@@ -85,11 +85,10 @@ export function isEquivalent(a, b) {
     }
     return true;
 }
-export async function createEmbedScrolling(message: Discord.Message | Discord.ChatInputCommandInteraction | { interaction: Discord.ChatInputCommandInteraction, useEdit: boolean }, allEmbeds: Discord.EmbedBuilder[], post?: Function) {
+export async function createEmbedScrolling(interaction: Discord.ChatInputCommandInteraction | { interaction: Discord.ChatInputCommandInteraction, useEdit: boolean }, allEmbeds: Discord.EmbedBuilder[], post?: Function) {
     let author: Discord.Snowflake;
-    if (message instanceof Discord.Message) author = message.author.id;
-    else if (message instanceof Discord.ChatInputCommandInteraction) author = message.user.id;
-    else author = message.interaction.user.id;
+    if (interaction instanceof Discord.ChatInputCommandInteraction) author = interaction.user.id;
+    else author = interaction.interaction.user.id;
     const filter = (interaction: Discord.Interaction) => (interaction.user.id === author);
     let s = 0;
     const row = new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -100,11 +99,10 @@ export async function createEmbedScrolling(message: Discord.Message | Discord.Ch
         new Discord.ButtonBuilder({ label: "Stop", style: ButtonStyle.Danger, customId: "stop", emoji: "✖️" })
     );
     let msg: Discord.Message;
-    if (message instanceof Discord.Message) msg = await message.channel.send({ embeds: [allEmbeds[0]], components: [row] });
-    else if (message instanceof Discord.ChatInputCommandInteraction) msg = <Discord.Message> await message.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
+    if (interaction instanceof Discord.ChatInputCommandInteraction) msg = <Discord.Message> await interaction.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
     else {
-        if (message.useEdit) msg = <Discord.Message> await message.interaction.editReply({ embeds: [allEmbeds[0]], components: [row] });
-        else msg = <Discord.Message> await message.interaction.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
+        if (interaction.useEdit) msg = <Discord.Message> await interaction.interaction.editReply({ embeds: [allEmbeds[0]], components: [row] });
+        else msg = <Discord.Message> await interaction.interaction.reply({ embeds: [allEmbeds[0]], components: [row], fetchReply: true });
     }
     const collector = msg.createMessageComponentCollector({ filter, idle: 60000 });
     collector.on("collect", async (interaction) => {
@@ -176,36 +174,6 @@ export function duration(seconds: number, type: moment.unitOfTime.DurationConstr
     str.push(twoDigits(duration.seconds()));
     return str.join("");
 }
-export async function msgOrRes(message: Discord.Message | Discord.ChatInputCommandInteraction, str: string | Discord.EmbedBuilder | Discord.AttachmentBuilder | { content?: string, embeds?: Discord.EmbedBuilder[], files?: Discord.AttachmentBuilder[], components?: Discord.ActionRowBuilder<MessageActionRowComponentBuilder>[] }, reply = false): Promise<Discord.Message> {
-    if (message instanceof Discord.Message) {
-        if (reply) {
-            if (str instanceof Discord.EmbedBuilder) return await message.reply({ embeds: [str] });
-            else if (str instanceof Discord.AttachmentBuilder) return await message.reply({ files: [str] });
-            else return await message.reply(str);
-        } else {
-            if (str instanceof Discord.EmbedBuilder) return await message.channel.send({ embeds: [str] });
-            else if (str instanceof Discord.AttachmentBuilder) return await message.channel.send({ files: [str] });
-            else return await message.channel.send(str);
-        }
-    } else {
-        const useEdit = message.deferred, useFollowUp = message.replied;
-        if (useEdit) {
-            if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.editReply({ embeds: [str] });
-            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.editReply({ files: [str] });
-            else return <Discord.Message> await message.editReply(str);
-        } else if (useFollowUp) {
-            if (typeof str === "string") return <Discord.Message> await message.followUp({ content: str, fetchReply: true });
-            else if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.followUp({ embeds: [str], fetchReply: true });
-            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.followUp({ files: [str], fetchReply: true });
-            else return <Discord.Message> await message.followUp({ fetchReply: true, ...str });
-        } else {
-            if (typeof str === "string") return <Discord.Message> await message.reply({ content: str, fetchReply: true });
-            else if (str instanceof Discord.EmbedBuilder) return <Discord.Message> await message.reply({ embeds: [str], fetchReply: true });
-            else if (str instanceof Discord.AttachmentBuilder) return <Discord.Message> await message.reply({ files: [str], fetchReply: true });
-            else return <Discord.Message> await message.reply({ fetchReply: true, ...str });
-        }
-    }
-}
 export function deepReaddir(dir) {
     let results = [];
     const list = fs.readdirSync(dir);
@@ -240,14 +208,14 @@ export function mutate(array: any[], fromIndex: number, toIndex: number) {
 
 export function requestYTDLStream(url: string, opts: downloadOptions & { timeout?: number }) {
     const timeoutMS = opts.timeout || 120000;
-    const getStream = new Promise(async(resolve, reject) => {
+    const getStream = new Promise((resolve, reject) => {
         const options = <any> opts;
         if (process.env.COOKIE) {
           options.requestOptions = {};
           options.requestOptions.headers = { cookie: process.env.COOKIE };
           if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
         }
-        const stream = await ytdl(url, options);
+        const stream = ytdl(url, options);
         stream.on("finish", () => resolve(stream)).on("error", err => reject(err));
     });
     return Promise.race([wait(timeoutMS), getStream]);
@@ -285,10 +253,6 @@ export async function fixGuildRecord(id: Discord.Snowflake) {
         } catch (err: any) { }
     }
     return NorthClient.storage.guilds[id];
-}
-
-export function messagePrefix(message: Discord.Message, client: NorthClient): string {
-    return NorthClient.storage.guilds[message.guildId]?.prefix || client.prefix;
 }
 
 export function humanDurationToNum(duration: string) {

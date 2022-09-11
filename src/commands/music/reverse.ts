@@ -1,11 +1,11 @@
-import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember } from "discord.js";
 
-import { FullCommand } from "../../classes/NorthClient.js";
-import { moveArray, msgOrRes } from "../../function.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
+import { moveArray } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { play } from "./play.js";
 
-class ReverseCommand implements FullCommand {
+class ReverseCommand implements SlashCommand {
     name = "reverse"
     description = "Reverses the order of the server queue."
     aliases = ["rev"]
@@ -15,28 +15,24 @@ class ReverseCommand implements FullCommand {
         await this.reverse(interaction);
     }
 
-    async run(message: Message) {
-        await this.reverse(message);
-    }
-
-    async reverse(message: Message | ChatInputCommandInteraction) {
-        let serverQueue = getQueue(message.guild.id);
-        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(message.guild.id, [], false, false);
-        if (serverQueue.songs.length < 1) return await msgOrRes(message, "Nothing is in the queue now.");
-        if (((<GuildMember> message.member).voice.channelId !== message.guild.members.me.voice.channelId) && serverQueue.playing) return await msgOrRes(message, "You have to be in a voice channel to alter the queue when the bot is playing!");
+    async reverse(interaction: ChatInputCommandInteraction) {
+        let serverQueue = getQueue(interaction.guild.id);
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
+        if (serverQueue.songs.length < 1) return await interaction.reply("Nothing is in the queue now.");
+        if (((<GuildMember> interaction.member).voice.channelId !== interaction.guild.members.me.voice.channelId) && serverQueue.playing) return await interaction.reply("You have to be in a voice channel to alter the queue when the bot is playing!");
         const oldSong = serverQueue.songs[0];
         serverQueue.songs.reverse();
-        await msgOrRes(message, "The queue has been reversed!");
-        updateQueue(message.guild.id, serverQueue);
+        await interaction.reply("The queue has been reversed!");
+        updateQueue(interaction.guild.id, serverQueue);
         if (oldSong != serverQueue.songs[0] && serverQueue.playing) {
             serverQueue.stop();
-            if (!serverQueue.random) await play(message.guild, serverQueue.songs[0]);
+            if (!serverQueue.random) await play(interaction.guild, serverQueue.songs[0]);
             else {
                 const int = Math.floor(Math.random() * serverQueue.songs.length);
                 const pending = serverQueue.songs[int];
                 serverQueue.songs = moveArray(serverQueue.songs, int);
-                updateQueue(message.guild.id, serverQueue);
-                await play(message.guild, pending);
+                updateQueue(interaction.guild.id, serverQueue);
+                await play(interaction.guild, pending);
             }
         }
     }

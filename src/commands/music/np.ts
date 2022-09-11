@@ -1,7 +1,6 @@
-
-import { FullCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
-import { color, duration, msgOrRes, wait } from "../../function.js";
+import { color, duration, wait } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { getClients } from "../../main.js";
 
@@ -15,7 +14,7 @@ const type = [
     "MSCZ/MSCX"
 ];
 
-class NPCommand implements FullCommand {
+class NPCommand implements SlashCommand {
     name = "np"
     description = "Displays information about the soundtrack being played."
     aliases = ["nowplaying"]
@@ -25,22 +24,18 @@ class NPCommand implements FullCommand {
         await this.nowplaying(interaction);
     }
 
-    async run(message: Discord.Message) {
-        await this.nowplaying(message);
-    }
-
-    async nowplaying(message: Discord.Message | Discord.ChatInputCommandInteraction) {
+    async nowplaying(interaction: Discord.ChatInputCommandInteraction) {
         const getEmbed = this.getEmbed;
-        let embed = getEmbed(message.guildId);
-        if (!embed) return await msgOrRes(message, "There is nothing in the queue.");
+        let embed = getEmbed(interaction.guildId);
+        if (!embed) return await interaction.reply("There is nothing in the queue.");
         let counter = 0;
-        const msg = await msgOrRes(message, embed);
+        await interaction.reply({ embeds: [embed] });
         async function edit() {
             await wait(5000);
             counter++;
-            if (counter >= 12 || !(embed = getEmbed(message.guildId, embed))) return await msg.edit({ content: "**[Outdated Now-Playing Information]**", embeds: [] });
+            if (counter >= 12 || !(embed = getEmbed(interaction.guildId, embed))) return await interaction.editReply({ content: "**[Outdated Now-Playing Information]**", embeds: [] });
             try {
-                await msg.edit({ embeds: [embed] });
+                await interaction.editReply({ embeds: [embed] });
                 await edit();
             } catch (err) { }
         }

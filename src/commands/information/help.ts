@@ -1,11 +1,11 @@
-import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
-import { color, deepReaddir, fixGuildRecord, messagePrefix, wait } from "../../function.js";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { color, deepReaddir, fixGuildRecord } from "../../function.js";
 import * as Discord from "discord.js";
 import { getClients } from "../../main.js";
 
 export const categories = ["Music", "Information", "Dev"];
 
-class HelpCommand implements FullCommand {
+class HelpCommand implements SlashCommand {
     name = "help"
     description = "Sends you a DM with an embed of all available commands and the user manual."
     usage = "[command]"
@@ -52,22 +52,6 @@ class HelpCommand implements FullCommand {
         } else {
             const name = interaction.options.getString("command").toLowerCase();
             await interaction.reply({ content: this.getCommand(name, "/").join("\n"), ephemeral: true });
-        }
-    }
-
-    async run(message: Discord.Message, args: string[]) {
-        if (!args.length) {
-            try {
-                await message.author.send({ embeds: [await this.getAllCommands(message.guildId)] });
-                await message.react("💨");
-            } catch (err) {
-                const msg = await message.channel.send({ embeds: [await this.getAllCommands(message.guildId)] });
-                await wait(30000);
-                msg.delete().catch(() => { });
-            }
-        } else {
-            const name = args[0].toLowerCase();
-            await message.channel.send(this.getCommand(name, messagePrefix(message, <NorthClient>message.client)).join("\n"));
         }
     }
 

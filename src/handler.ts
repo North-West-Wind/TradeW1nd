@@ -1,7 +1,7 @@
-import { ActivityType, ChatInputCommandInteraction, Guild, Interaction, InteractionType, Message, VoiceState } from "discord.js";
-import { checkN0rthWestW1nd, fixGuildRecord, messagePrefix, query } from "./function.js";
+import { ActivityType, ChatInputCommandInteraction, Guild, Interaction, InteractionType, VoiceState } from "discord.js";
+import { checkN0rthWestW1nd, fixGuildRecord, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
-import { NorthClient, GuildConfig, ISlash, IPrefix } from "./classes/NorthClient.js";
+import { NorthClient, GuildConfig, ISlash } from "./classes/NorthClient.js";
 import * as filter from "./helpers/filter.js";
 import common from "./common.js";
 import { init } from "./helpers/addTrack.js";
@@ -26,7 +26,6 @@ export class Handler {
         client.on("guildCreate", guild => this.guildCreate(guild));
         client.on("guildDelete", guild => this.guildDelete(guild));
         client.on("voiceStateUpdate", (oldState, newState) => this.voiceStateUpdate(<VoiceState>oldState, <VoiceState>newState));
-        client.on("messageCreate", message => this.message(message));
         client.on("interactionCreate", interaction => this.interactionCreate(interaction));
 
         setInterval(async () => {
@@ -149,25 +148,5 @@ export class Handler {
             NorthClient.storage.guilds[guild.id].exit = true;
             setTimeout(() => NorthClient.storage.guilds[guild.id]?.exit ? stop(guild) : 0, 30000);
         } else NorthClient.storage.guilds[guild.id].exit = false;
-    }
-
-    async message(message: Message) {
-        const client = <NorthClient>message.client;
-        const prefix = messagePrefix(message, client);
-        if (!message.content.startsWith(prefix)) return;
-        const args = message.content.slice(prefix.length).split(/ +/);
-        const commandName = args.shift().toLowerCase();
-        const command = NorthClient.storage.commands.get(commandName) || NorthClient.storage.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-        if (!command || !(typeof command["run"] === "function")) return;
-        try {
-            const catFilter = filter[categories.map(x => x.toLowerCase())[(command.category)]];
-            if (await filter.all(command, message, args) && (catFilter ? await catFilter(command, message) : true)) await (<IPrefix><unknown>command).run(message, args);
-        } catch (err: any) {
-            console.error(`Error in command ${command.name}!`);
-            console.error(err);
-            try {
-                await message.reply(error);
-            } catch (err: any) { }
-        }
     }
 }

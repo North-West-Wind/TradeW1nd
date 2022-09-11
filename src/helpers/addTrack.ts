@@ -5,7 +5,7 @@ import { SCDL } from '@vncsprd/soundcloud-downloader';
 import ytdl from "ytdl-core";
 import ytpl from "ytpl";
 import ytsr, { Video } from "ytsr";
-import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, msgOrRes, humanDurationToNum, requestStream, duration } from "../function.js";
+import { decodeHtmlEntity, isGoodMusicVideoContent, validGDDLURL, color, humanDurationToNum, requestStream, duration } from "../function.js";
 import * as Stream from 'stream';
 import SpotifyWebApi from "spotify-web-api-node";
 import * as crypto from "crypto";
@@ -38,30 +38,26 @@ export function init() {
     fetchToken();
 }
 
-export async function addAttachment(message: Message) {
-    const files = message.attachments;
-    const songs = [];
-    for (const file of files.values()) {
-        const stream = <Stream.Readable>await fetch(file.url).then(res => res.body);
-        try {
-            var metadata = await mm.parseStream(stream, {}, { duration: true });
-        } catch (err: any) {
-            return { error: true, message: "The audio format is not supported!", msg: null, songs: [] };
-        }
-        if (!metadata) {
-            return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
-        }
-        const length = Math.round(metadata.format.duration);
-        songs.push({
-            title: (file.name ? file.name.split(".").slice(0, -1).join(".") : file.url.split("/").slice(-1)[0].split(".").slice(0, -1).join(".")).replace(/_/g, " "),
-            url: file.url,
-            type: 2,
-            time: length,
-            volume: 1,
-            thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
-            isLive: false
-        });
+export async function addAttachment(file: Discord.Attachment) {
+    const stream = <Stream.Readable>await fetch(file.url).then(res => res.body);
+    try {
+        var metadata = await mm.parseStream(stream, {}, { duration: true });
+    } catch (err: any) {
+        return { error: true, message: "The audio format is not supported!", msg: null, songs: [] };
     }
+    if (!metadata) {
+        return { error: true, message: "An error occured while parsing the audio file into stream! Maybe it is not link to the file?", msg: null, songs: [] };
+    }
+    const length = Math.round(metadata.format.duration);
+    const songs = [{
+        title: (file.name ? file.name.split(".").slice(0, -1).join(".") : file.url.split("/").slice(-1)[0].split(".").slice(0, -1).join(".")).replace(/_/g, " "),
+        url: file.url,
+        type: 2,
+        time: length,
+        volume: 1,
+        thumbnail: "https://drive.google.com/uc?export=download&id=13Tv_R7KeYxjV2UMdndEH_rGgUAN7FSne",
+        isLive: false
+    }];
     return { error: false, songs, msg: null, message: null };
 }
 export async function addYTPlaylist(link: string) {
@@ -121,7 +117,7 @@ export async function addYTURL(link: string, type = 0) {
     ];
     return { error: false, songs: songs, msg: null, message: null };
 }
-export async function addSPURL(message: Message | Discord.ChatInputCommandInteraction, link: string) {
+export async function addSPURL(interaction: Discord.ChatInputCommandInteraction, link: string) {
     const url_array = link.replace("https://", "").split("/");
     let musicID = url_array[2].split("?")[0];
     let highlight = false;
@@ -143,7 +139,7 @@ export async function addSPURL(message: Message | Discord.ChatInputCommandIntera
                 }
             }
             await checkAll();
-            var mesg = await msgOrRes(message, `Processing track: **0/${tracks.length}**`);
+            var mesg = await interaction.editReply(`Processing track: **0/${tracks.length}**`);
             for (const track of <SpotifyApi.PlaylistTrackObject[]>tracks) {
                 await mesg.edit(`Processing track: **${++counter}/${tracks.length}**`).catch(() => { });
                 var results = [];
@@ -199,7 +195,7 @@ export async function addSPURL(message: Message | Discord.ChatInputCommandIntera
                 const data = await spotifyApi.getTracks([musicID]);
                 tracks = data.body.tracks;
             }
-            var mesg = await msgOrRes(message, `Processing track: **0/${tracks.length}**`);
+            var mesg = await interaction.editReply(`Processing track: **0/${tracks.length}**`);
             for (const track of <SpotifyApi.TrackObjectFull[]>tracks) {
                 await mesg.edit(`Processing track: **${++counter}/${tracks.length}**`).catch(() => { });
                 var results = [];
@@ -221,7 +217,6 @@ export async function addSPURL(message: Message | Discord.ChatInputCommandIntera
                         s = results.length - 1;
                     }
                     if (s + 1 == results.length) {
-                        const songLength = !results[o].live ? results[o].duration : "∞";
                         songs.push({
                             title: track.name,
                             url: results[o].link,
@@ -259,7 +254,6 @@ export async function addSPURL(message: Message | Discord.ChatInputCommandIntera
                         s = resultss.length - 1;
                     }
                     if (s + 1 == resultss.length) {
-                        const songLength = !resultss[o].live ? resultss[o].duration : "∞";
                         songs.push({
                             title: track.name,
                             url: resultss[o].link,
@@ -442,20 +436,20 @@ export async function addURL(link: string) {
     };
     return { error: false, songs: [song], msg: null, message: null };
 }
-export async function search(message: Message | Discord.ChatInputCommandInteraction, link: string) {
+export async function search(interaction: Discord.ChatInputCommandInteraction, link: string) {
     const allEmbeds: Discord.EmbedBuilder[] = [], allMenus: Discord.SelectMenuBuilder[] = [];
     const Embed = new Discord.EmbedBuilder()
         .setTitle(`Search result of ${link} on YouTube`)
         .setColor(color())
         .setTimestamp()
-        .setFooter({ text: "Please do so within 60 seconds.", iconURL: message.client.user.displayAvatarURL() });
+        .setFooter({ text: "Please do so within 60 seconds.", iconURL: interaction.client.user.displayAvatarURL() });
     const results = { yt: [], sc: [] };
     try {
         const searched = await ytsr(link, { limit: 20 });
         var video = <Video[]>searched.items.filter(x => x.type === "video" && !x.isUpcoming);
     } catch (err: any) {
         console.error(err);
-        await msgOrRes(message, "There was an error trying to search the videos!");
+        await interaction.reply("There was an error trying to search the videos!");
         return { error: true, msg: null, songs: [], message: err.message };
     }
     const ytResults = video.map(x => ({
@@ -480,7 +474,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         .setTitle(`Search result of ${link} on SoundCloud`)
         .setColor(color())
         .setTimestamp()
-        .setFooter({ text: "Please do so within 60 seconds.", iconURL: message.client.user.displayAvatarURL() });
+        .setFooter({ text: "Please do so within 60 seconds.", iconURL: interaction.client.user.displayAvatarURL() });
     try {
         var scSearched = await scdl.search({
             limit: 20,
@@ -490,7 +484,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         num = 0;
     } catch (err: any) {
         console.error(err);
-        await msgOrRes(message, "There was an error trying to search the videos!");
+        await interaction.reply("There was an error trying to search the videos!");
         return { error: true, msg: null, songs: [], message: err.message };
     }
     const scResults = (<TrackInfo[]>scSearched.collection).map(x => ({
@@ -511,7 +505,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         allMenus.push(menu);
     }
     if (allEmbeds.length < 1) {
-        await msgOrRes(message, "Cannot find any result with the given string.");
+        await interaction.reply("Cannot find any result with the given string.");
         return { error: true, msg: null, songs: [], message: null };
     }
     let val = { error: true, songs: [], msg: null, message: null };
@@ -520,8 +514,8 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
         new Discord.ButtonBuilder({ label: "Next Page", emoji: "📄", customId: "next", style: ButtonStyle.Primary }),
         new Discord.ButtonBuilder({ label: "Cancel", emoji: "✖️", customId: "cancel", style: ButtonStyle.Danger }),
     );
-    const msg = <Message>await msgOrRes(message, { embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow] });
-    const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === message.member.user.id, idle: 60000 });
+    const msg = await interaction.reply({ embeds: [allEmbeds[0]], components: [new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(allMenus[0]), globalRow], fetchReply: true });
+    const collector = msg.createMessageComponentCollector({ filter: int => int.user.id === interaction.member.user.id, idle: 60000 });
     collector.on("collect", async interaction => {
         switch (interaction.customId) {
             case "next":
@@ -537,7 +531,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
                 const descriptions: string[] = [];
                 const tracks = [];
                 var thumb: string;
-                for (const val of (<SelectMenuInteraction> interaction).values) {
+                for (const val of (<SelectMenuInteraction>interaction).values) {
                     const o = parseInt(val);
                     const track = results[interaction.customId][o];
                     tracks.push(track);
@@ -551,7 +545,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
                     .setThumbnail(thumb)
                     .setDescription(descriptions.join("\n"))
                     .setTimestamp()
-                    .setFooter({ text: "Have a nice day :)", iconURL: message.client.user.displayAvatarURL() });
+                    .setFooter({ text: "Have a nice day :)", iconURL: interaction.client.user.displayAvatarURL() });
                 await interaction.update({ embeds: [chosenEmbed] });
                 val = { error: false, songs: tracks, msg, message: null };
                 collector.emit("end");
@@ -564,7 +558,7 @@ export async function search(message: Message | Discord.ChatInputCommandInteract
                     .setColor(color())
                     .setTitle("Action cancelled.")
                     .setTimestamp()
-                    .setFooter({ text: "Have a nice day! :)", iconURL: message.client.user.displayAvatarURL() });
+                    .setFooter({ text: "Have a nice day! :)", iconURL: interaction.client.user.displayAvatarURL() });
                 msg.edit({ embeds: [cancelled], components: [] }).then(msg => setTimeout(() => msg.edit({ content: "**[Added Track: No track added]**" }).catch(() => { }), 30000));
             }
             msg.edit({ components: [] });

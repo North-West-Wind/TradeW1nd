@@ -1,9 +1,8 @@
-import { ChatInputCommandInteraction, Message } from "discord.js";
-import { NorthClient, FullCommand } from "../../classes/NorthClient.js";
+import { ChatInputCommandInteraction } from "discord.js";
+import { NorthClient, SlashCommand, Command } from "../../classes/NorthClient.js";
 import { categories } from "../../commands/information/help.js";
-import { msgOrRes } from "../../function.js";
 
-class ReloadCommand implements FullCommand {
+class ReloadCommand implements SlashCommand {
     name = "reload";
     description = "Reload command(s).";
     usage = "<command>";
@@ -26,20 +25,16 @@ class ReloadCommand implements FullCommand {
         await this.reload(interaction, commands);
     }
 
-    async run(message: Message, args: string[]) {
-        await this.reload(message, args);
-    }
-
-    async reload(message: Message | ChatInputCommandInteraction, commands: string[]) {
+    async reload(interaction: ChatInputCommandInteraction, commands: string[]) {
         for (const command of commands) {
             const cmd = NorthClient.storage.commands.get(command);
             if (!cmd?.category === undefined) continue;
             const path = `${__dirname}/../${categories[cmd.category].toLowerCase()}.js`;
             delete require.cache[require.resolve(path)];
-            const comd = <FullCommand> (await import(path)).default;
+            const comd = <Command> (await import(path)).default;
             if (comd.name) NorthClient.storage.commands.set(comd.name, comd);
         }
-        await msgOrRes(message, `Reloaded \`${commands.join("`, `")}\``);
+        await interaction.editReply(`Reloaded \`${commands.join("`, `")}\``);
     }
 }
 
