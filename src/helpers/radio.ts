@@ -14,7 +14,7 @@ export async function makePlayers() {
 }
 
 function findPlaying(guildId: Snowflake) {
-    for (let i = 0; i < 10; i++) { if (players[i].guilds.has(guildId)) return i; }
+    for (let i = 0; i < 10; i++) { if (players[i]?.guilds.has(guildId)) return i; }
     return -1;
 }
 
