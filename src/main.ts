@@ -97,9 +97,15 @@ app.post("/update/:guild", (req, res) => {
 
 app.get("/download/:guild", (req, res) => {
     if (!downloading.has(req.params.guild)) {
-        if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.sendStatus(201).sendFile(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)
-        else res.json({ downloading: false });
-    } else res.json({ downloading: true, percentage: downloading.get(req.params.guild) });
+        if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.json({ downloading: false, finished: true, percentage: 1 });
+        else res.json({ downloading: false, finished: true, percentage: 0 });
+    } else res.json({ downloading: true, finished: false, percentage: downloading.get(req.params.guild) });
+});
+
+app.get("/download/file/:guild", (req, res) => {
+    if (!downloading.has(req.params.guild)) res.sendStatus(404);
+    else if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.sendFile(`${process.env.CACHE_DIR}/${req.params.guild}.zip`);
+    else res.sendStatus(404);
 });
 
 var registering = false;
