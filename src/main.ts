@@ -3,6 +3,7 @@ import { Handler } from "./handler.js";
 import { NorthClient, ClientStorage, ISlash } from "./classes/NorthClient.js";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
+import cors from "cors";
 import * as fs from "fs";
 import { removeUsing } from "./helpers/music.js";
 import { downloading } from "./commands/music/download.js";
@@ -62,6 +63,7 @@ function initBot(token: string) {
 }
 
 const app = express();
+app.use(cors());
 
 app.get("/", (_req, res) => {
     const data = [];
