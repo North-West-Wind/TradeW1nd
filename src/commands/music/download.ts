@@ -140,7 +140,7 @@ class DownloadCommand implements SlashCommand {
         const output = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
         archive.pipe(output);
         await archive.directory(`${process.env.CACHE_DIR}/${interaction.guildId}`, false).finalize();
-        await interaction.user.send(`Your download has finished! Go to [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to download it.\nThe file will be deleted after 2 hours.`);
+        await interaction.user.send(`Your download has finished! Go to the link below to download it.\nThe file will be deleted after 2 hours.\nhttps://northwestwind.ml/tradew1nd/download/${interaction.guildId}`);
         downloading.delete(interaction.guildId);
         if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}`)) fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}`, { recursive: true });
         setTimeout(() => {
