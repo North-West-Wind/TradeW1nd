@@ -7,6 +7,16 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import * as fs from "fs";
 import archiver from "archiver";
 
+const type = [
+    "YouTube",
+    "Spotify",
+    "URL/Attachment",
+    "SoundCloud",
+    "Google Drive",
+    "Musescore",
+    "MSCZ/MSCX"
+];
+
 export const downloading = new Discord.Collection<Discord.Snowflake, number>();
 
 class DownloadCommand implements SlashCommand {
@@ -127,6 +137,7 @@ class DownloadCommand implements SlashCommand {
                         if (result.songs[0]?.isLive) continue;
                 }
             } catch (err: any) { continue; }
+            console.debug("Downloading", track.title, track.url, "Type:", type[track.type]);
             const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${sanitize(track.title)}.mp3`);
             let stream: NodeJS.ReadableStream;
             try {
@@ -134,8 +145,10 @@ class DownloadCommand implements SlashCommand {
                 if (!stream) throw new Error("Cannot receive stream");
             } catch (err: any) { continue; }
             await new Promise(res => stream.pipe(writeStream).on("close", res));
+            fs.writeFileSync(`${process.env.CACHE_DIR}/${interaction.guildId}/progress.json`, JSON.stringify({ count, initializer: interaction.user.id }, null, 2));
             downloading.set(interaction.guildId, ++count / serverQueue.songs.length);
         }
+        fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}/progress.json`);
         const archive = archiver.create("zip");
         const output = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
         archive.pipe(output);
