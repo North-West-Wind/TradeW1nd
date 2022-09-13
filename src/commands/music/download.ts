@@ -102,7 +102,7 @@ class DownloadCommand implements SlashCommand {
 
     async downloadAll(interaction: Discord.ChatInputCommandInteraction, serverQueue: ServerQueue) {
         if (downloading.has(interaction.guildId)) return await interaction.reply(`The download is already in progress! Use this [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to track its progress.`);
-        if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}`)) {
+        if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`)) {
             const row = new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>().addComponents(
                 new Discord.ButtonBuilder({ label: "Yes", style: Discord.ButtonStyle.Success, customId: "yes" }),
                 new Discord.ButtonBuilder({ label: "No", style: Discord.ButtonStyle.Danger, customId: "no" })
@@ -112,8 +112,8 @@ class DownloadCommand implements SlashCommand {
             if (!int) return await interaction.editReply({ content: "No response received. Download cancelled.", components: [] });
             if (int.customId === "no") return await int.update({ content: "Download cancelled.", components: [] });
             await int.update({ content: `Download started. Use this [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to track its progress.`, components: [] });
-            fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}`, { recursive: true });
-            if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`)) fs.unlinkSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
+            if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}`)) fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}`, { recursive: true });
+            fs.unlinkSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
         } else await interaction.reply(`Download started. Use this [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to track its progress.`);
         downloading.set(interaction.guildId, 0);
         fs.mkdirSync(`${process.env.CACHE_DIR}/${interaction.guildId}`);
@@ -142,8 +142,8 @@ class DownloadCommand implements SlashCommand {
         await archive.directory(`${process.env.CACHE_DIR}/${interaction.guildId}`, false).finalize();
         await interaction.user.send(`Your download has finished! Go to [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to download it.\nThe file will be deleted after 2 hours.`);
         downloading.delete(interaction.guildId);
+        if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}`)) fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}`, { recursive: true });
         setTimeout(() => {
-            if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}`)) fs.rmdirSync(`${process.env.CACHE_DIR}/${interaction.guildId}`);
             if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`)) fs.rmSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
         }, 7200000);
     }

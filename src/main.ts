@@ -10,7 +10,7 @@ import { downloading } from "./commands/music/download.js";
 dotenv.config();
 
 for (const file of fs.readdirSync(process.env.CACHE_DIR)) {
-    if (fs.statSync(`${process.env.CACHE_DIR}/${file}`).isDirectory()) continue;
+    if (fs.statSync(`${process.env.CACHE_DIR}/${file}`).isDirectory()) fs.rmSync(`${process.env.CACHE_DIR}/${file}`, { recursive: true });
     removeUsing(file);
 }
 
