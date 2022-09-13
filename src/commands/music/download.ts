@@ -127,7 +127,7 @@ class DownloadCommand implements SlashCommand {
                         if (result.songs[0]?.isLive) continue;
                 }
             } catch (err: any) { continue; }
-            const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${track.title}.mp3`);
+            const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${sanitize(track.title)}.mp3`);
             let stream: NodeJS.ReadableStream;
             try {
                 stream = await getStream(track, { type: "download" });
