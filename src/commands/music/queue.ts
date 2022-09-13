@@ -94,7 +94,7 @@ class QueueCommand implements SlashCommand {
         }
         let index = 0;
         const songArray = serverQueue.songs.map(song => `**${++index} - ** **[${song.title}](${song.type === 1 ? song.spot : song.url})** : **${!song.time ? "∞" : duration(song.time, "seconds")}**`);
-        const allEmbeds = [];
+        const allEmbeds: Discord.EmbedBuilder[] = [];
         for (let i = 0; i < Math.ceil(songArray.length / 10); i++) {
             const pageArray = songArray.slice(i * 10, i * 10 + 10);
             const queueEmbed = new Discord.EmbedBuilder()
@@ -105,7 +105,7 @@ class QueueCommand implements SlashCommand {
                 .setFooter({ text: `Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")} | LP: ${serverQueue.looping ? "Y" : "N"} | RP: ${serverQueue.repeating ? "Y" : "N"} | RD: ${serverQueue.random ? "Y" : "N"}`, iconURL: interaction.client.user.displayAvatarURL() });
             allEmbeds.push(queueEmbed);
         }
-        if (allEmbeds.length == 1) await interaction.reply(allEmbeds[0]).then(msg => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
+        if (allEmbeds.length == 1) await interaction.reply({ embeds: [allEmbeds[0]], fetchReply: true }).then(msg => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
         else await createEmbedScrolling(interaction, allEmbeds, (msg: Discord.Message) => setTimeout(() => msg.edit({ embeds: [], content: `**[Queue: ${songArray.length} tracks in total]**` }).catch(() => {}), 60000));
     }
 
