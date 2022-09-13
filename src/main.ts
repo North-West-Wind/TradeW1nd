@@ -104,7 +104,7 @@ app.get("/download/:guild", (req, res) => {
 
 app.get("/download/file/:guild", (req, res) => {
     if (!downloading.has(req.params.guild)) res.sendStatus(404);
-    else if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.sendFile(`${process.env.CACHE_DIR}/${req.params.guild}.zip`);
+    else if (fs.existsSync(`${process.env.CACHE_DIR}/${req.params.guild}.zip`)) res.download(`${process.env.CACHE_DIR}/${req.params.guild}.zip`);
     else res.sendStatus(404);
 });
 
