@@ -143,14 +143,18 @@ class DownloadCommand implements SlashCommand {
             console.debug(`[${count + 1}] Created file`);
             let stream: Readable;
             async function doIt() {
-                stream = await getStream(track, { type: "download" });
-                if (!stream) throw new Error("Cannot receive stream");
-                console.debug(`[${count + 1}] Obtained stream`);
                 let retry = false;
-                await Promise.race([new Promise(res => stream.pipe(writeStream).on("close", res)), async () => { await wait(30000); retry = true; }]);
+                await Promise.race([
+                    async () => {
+                        stream = await getStream(track, { type: "download" });
+                        if (!stream) throw new Error("Cannot receive stream");
+                        console.debug(`[${count + 1}] Obtained stream`);
+                    }, async () => { await wait(30000); retry = true; }
+                ]);
+                if (!retry) await Promise.race([new Promise(res => stream.pipe(writeStream).on("close", res)), async () => { await wait(30000); retry = true; }]);
                 if (retry) {
-                    stream.destroy();
-                    writeStream.destroy();
+                    stream?.destroy();
+                    writeStream?.destroy();
                     console.debug(`[${count + 1}] Halting for 30 seconds`);
                     await wait(30000);
                     console.debug(`[${count + 1}] Retrying`);

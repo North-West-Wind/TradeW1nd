@@ -614,9 +614,10 @@ export async function getStream(track: SoundTrack, data: { type: "server" | "rad
                     options.requestOptions.headers = { cookie: process.env.COOKIE };
                     if (process.env.YT_TOKEN) options.requestOptions.headers["x-youtube-identity-token"] = process.env.YT_TOKEN;
                 }
-                if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", dlChunkSize: 0, highWaterMark: 1 << 62 });
+                if (!track?.isPastLive) Object.assign(options, { filter: "audioonly", highWaterMark: 1 << 62 });
+                if (data.type !== "download") Object.assign(options, { dlChunkSize: 0 });
                 else Object.assign(options, { highWaterMark: 1 << 62 });
-                stream = await ytdl(track.url, options);
+                stream = ytdl(track.url, options);
                 if (!stream) throw new Error("Failed to get YouTube video stream.");
                 cacheFound = true;
                 break;
