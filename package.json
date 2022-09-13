@@ -1,6 +1,6 @@
 {
   "name": "tradew1nd",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "N0rthWestW1nd with only music functions.",
   "exports": "./out/main.js",
   "type": "module",
