@@ -390,7 +390,7 @@ export async function addGDFolderURL(link: string, cb: Function = async () => { 
 }
 export async function addMSSetURL(link: string) {
     try {
-        var data = await museSet(link);
+        var data = await museSet(link, { all: true });
     } catch (err: any) {
         return { error: true, message: "Failed to fetch metadata of the set!", msg: null, songs: [] };
     }
