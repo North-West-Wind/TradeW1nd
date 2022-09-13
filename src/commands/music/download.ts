@@ -1,7 +1,8 @@
 import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
-import { isEquivalent, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, validMSSetURL } from "../../function.js";
+import { Readable } from "stream";
+import { isEquivalent, validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDURL, validMSURL, validURL, validMSSetURL, wait } from "../../function.js";
 import { addYTURL, addYTPlaylist, addSPURL, addSCURL, addMSURL, search, addMSSetURL, getStream } from "../../helpers/addTrack.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import * as fs from "fs";
@@ -71,7 +72,7 @@ class DownloadCommand implements SlashCommand {
             return await interaction.editReply(`There was an error trying to download the soundtrack!`);
         }
         const msg = await interaction.editReply(`Downloading... (Soundtrack Type: **Type ${song.type}**)`);
-        let stream: NodeJS.ReadableStream;
+        let stream: Readable;
         try {
             stream = await getStream(song, { type: "download" });
             if (!stream) throw new Error("Cannot receive stream");
@@ -140,13 +141,24 @@ class DownloadCommand implements SlashCommand {
             console.debug(`[${count + 1}] Downloading `, track.title, " ", track.url, " Type: ", type[track.type]);
             const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${sanitize(track.title)}.mp3`);
             console.debug(`[${count + 1}] Created file`);
-            let stream: NodeJS.ReadableStream;
-            try {
+            let stream: Readable;
+            async function doIt() {
                 stream = await getStream(track, { type: "download" });
                 if (!stream) throw new Error("Cannot receive stream");
                 console.debug(`[${count + 1}] Obtained stream`);
-                await new Promise(res => stream.pipe(writeStream).on("close", res));
-                console.debug(`[${count + 1}] Stream saved`);
+                let retry = false;
+                await Promise.race([new Promise(res => stream.pipe(writeStream).on("close", res)), async () => { await wait(30000); retry = true; }]);
+                if (retry) {
+                    stream.destroy();
+                    writeStream.destroy();
+                    console.debug(`[${count + 1}] Halting for 30 seconds`);
+                    await wait(30000);
+                    console.debug(`[${count + 1}] Retrying`);
+                    return await doIt();
+                } else console.debug(`[${count + 1}] Stream saved`);
+            }
+            try {
+                await doIt();
             } catch (err: any) { }
             console.debug(`[${count + 1}] Saving progress`);
             fs.writeFileSync(`${process.env.CACHE_DIR}/${interaction.guildId}/progress.json`, JSON.stringify({ count, initializer: interaction.user.id }, null, 2));
