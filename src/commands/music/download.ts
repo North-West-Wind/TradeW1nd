@@ -138,30 +138,25 @@ class DownloadCommand implements SlashCommand {
                         if (result.songs[0]?.isLive) continue;
                 }
             } catch (err: any) { continue; }
-            console.debug(`[${count + 1}] Downloading `, track.title, " ", track.url, " Type: ", type[track.type]);
-            const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${sanitize(track.title)}.mp3`);
-            console.debug(`[${count + 1}] Created file`);
             let stream: Readable | boolean;
             async function doIt() {
+                const writeStream = fs.createWriteStream(`${process.env.CACHE_DIR}/${interaction.guildId}/${sanitize(track.title)}.mp3`);
                 let retry = false;
-                stream = await Promise.race([getStream(track, { type: "download" }), new Promise<boolean>(res => setTimeout(() => { retry = true; res(true); }, 30000))])
+                if ([0, 1].includes(track.type)) stream = await Promise.race([getStream(track, { type: "download" }), new Promise<boolean>(res => setTimeout(() => { retry = true; res(true); }, 30000))]);
+                else stream = await getStream(track, { type: "download" });
                 if (stream && typeof stream === "boolean") retry = true;
                 if (!stream) throw new Error("Cannot receive stream");
-                console.debug(`[${count + 1}] Obtained stream`);
-                if (!retry) await Promise.race([new Promise(res => (<Readable>stream).pipe(writeStream).on("close", res)), new Promise(res => setTimeout(() => { retry = true; res(undefined); }, 30000))]);
+                if (!retry) await new Promise(res => (<Readable>stream).pipe(writeStream).on("close", res));
                 if (retry) {
                     (<Readable>stream)?.destroy();
                     writeStream?.destroy();
-                    console.debug(`[${count + 1}] Halting for 30 seconds`);
                     await wait(30000);
-                    console.debug(`[${count + 1}] Retrying`);
                     return await doIt();
-                } else console.debug(`[${count + 1}] Stream saved`);
+                }
             }
             try {
                 await doIt();
             } catch (err: any) { }
-            console.debug(`[${count + 1}] Saving progress`);
             fs.writeFileSync(`${process.env.CACHE_DIR}/${interaction.guildId}/progress.json`, JSON.stringify({ count, initializer: interaction.user.id }, null, 2));
             downloading.set(interaction.guildId, ++count / serverQueue.songs.length);
         }
