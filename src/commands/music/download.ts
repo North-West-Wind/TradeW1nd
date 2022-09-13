@@ -112,7 +112,8 @@ class DownloadCommand implements SlashCommand {
             if (!int) return await interaction.editReply({ content: "No response received. Download cancelled.", components: [] });
             if (int.customId === "no") return await int.update({ content: "Download cancelled.", components: [] });
             await int.update({ content: `Download started. Use this [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to track its progress.`, components: [] });
-            fs.unlinkSync(`${process.env.CACHE_DIR}/${interaction.guildId}`);
+            fs.rmdirSync(`${process.env.CACHE_DIR}/${interaction.guildId}`);
+            if (fs.existsSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`)) fs.unlinkSync(`${process.env.CACHE_DIR}/${interaction.guildId}.zip`);
         } else await interaction.reply(`Download started. Use this [link](https://northwestwind.ml/tradew1nd/download/${interaction.guildId}) to track its progress.`);
         downloading.set(interaction.guildId, 0);
         fs.mkdirSync(`${process.env.CACHE_DIR}/${interaction.guildId}`);
