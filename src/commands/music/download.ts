@@ -143,8 +143,8 @@ class DownloadCommand implements SlashCommand {
             try {
                 stream = await getStream(track, { type: "download" });
                 if (!stream) throw new Error("Cannot receive stream");
-            } catch (err: any) { continue; }
-            await new Promise(res => stream.pipe(writeStream).on("close", res));
+                await new Promise(res => stream.pipe(writeStream).on("close", res));
+            } catch (err: any) { }
             fs.writeFileSync(`${process.env.CACHE_DIR}/${interaction.guildId}/progress.json`, JSON.stringify({ count, initializer: interaction.user.id }, null, 2));
             downloading.set(interaction.guildId, ++count / serverQueue.songs.length);
         }
