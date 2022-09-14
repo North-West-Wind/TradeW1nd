@@ -67,14 +67,18 @@ export function removeUsing(hashed: string, all = false) {
 			const filePath = `${process.env.CACHE_DIR}/${hashed}`;
 			delete using[hashed];
 			if (isUsing(hashed)) waitHalfMin(hashed);
-			else if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+			else if (fs.existsSync(filePath)) {
+				if (!fs.statSync(filePath).isDirectory()) fs.unlinkSync(filePath);
+			}
 		}, 3600000);
 }
 function waitHalfMin(hashed: string) {
 	if (isUsing(hashed)) setTimeout(() => waitHalfMin(hashed), 30000);
 	else {
 		const filePath = `${process.env.CACHE_DIR}/${hashed}`
-		if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+		if (fs.existsSync(filePath)) {
+			if (!fs.statSync(filePath).isDirectory()) fs.unlinkSync(filePath);
+		}
 	}
 }
 
