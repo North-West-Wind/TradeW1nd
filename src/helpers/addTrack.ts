@@ -623,6 +623,6 @@ export async function getStream(track: SoundTrack, data: { type: "server" | "rad
                 break;
         }
     }
-    if (!cacheFound && data.type !== "download") stream = await cacheTrack(track.id, stream);
+    if (!cacheFound) stream = await cacheTrack(track.id, stream);
     return stream;
 }

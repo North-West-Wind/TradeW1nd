@@ -146,7 +146,7 @@ class DownloadCommand implements SlashCommand {
                 else stream = await getStream(track, { type: "download" });
                 if (stream && typeof stream === "boolean") retry = true;
                 if (!stream) throw new Error("Cannot receive stream");
-                if (!retry) await new Promise(res => (<Readable>stream).pipe(writeStream).on("close", res));
+                if (!retry) await Promise.race([new Promise(res => (<Readable>stream).pipe(writeStream).on("close", res)), new Promise(res => setTimeout(() => { retry = true; res(undefined); }, 60000))]);
                 if (retry) {
                     (<Readable>stream)?.destroy();
                     writeStream?.destroy();
