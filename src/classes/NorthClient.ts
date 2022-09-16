@@ -28,17 +28,10 @@ export abstract class ISlash {
     abstract execute(interaction: ChatInputCommandInteraction): Promise<any> | any;
 }
 
-export abstract class Command {
+abstract class Command {
     name: string;
     description: string;
-    args?: number;
-    usage?: string;
     category?: number;
-    aliases?: string[];
-    subcommands?: string[];
-    subaliases?: string[];
-    subdesc?: string[];
-    subusage?: (string | number)[];
     permissions?: { guild?: { user?: number, me?: number }, channel?: { user?: number, me?: number } };
 }
 
@@ -65,7 +58,7 @@ export class GuildConfig {
 
 export class ClientStorage {
     guilds: GuildConfigs = {};
-    commands: Collection<string, Command> = new Collection();
+    commands: Collection<string, SlashCommand> = new Collection();
     migrating: any[] = [];
 }
 

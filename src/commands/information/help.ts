@@ -5,6 +5,7 @@ import { getClients } from "../../main.js";
 import { ApplicationCommandOptionType } from "discord.js";
 
 export const categories = ["Music", "Information", "Dev"];
+const typeArray = Object.keys(ApplicationCommandOptionType);
 
 class HelpCommand implements SlashCommand {
     name = "help"
@@ -76,29 +77,42 @@ class HelpCommand implements SlashCommand {
     getCommand(name: string, prefix: string) {
         const data = [];
         const { commands } = NorthClient.storage;
-        const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+        const command = commands.get(name);
         if (!command) return ["That's not a valid command!"];
         data.push(`**Name:** ${command.name}`);
 
-        if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(", ")}`);
         if (command.description) data.push(`**Description:** ${command.description}`);
-        if (command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
-        else data.push(`**Usage:** ${prefix}${command.name}`);
-        if (command.subcommands) {
-            const strs = [];
-            for (let i = 0; i < command.subcommands.length; i++) {
-                let str = "    • ";
-                if (command.subaliases) str = `**${command.subcommands[i]} | ${command.subaliases[i]}**${command.subdesc ? ` - ${command.subdesc[i]}` : ""}`;
-                else str = `**${command.subcommands[i]}**${command.subdesc ? ` - ${command.subdesc[i]}` : ""}`;
-                str += "\n        • "
-                if (command.subusage && (command.subusage[i] || command.subusage[i] == 0) && !isNaN(<number>command.subusage[i])) str += `${prefix}${command.name} ${command.subusage[command.subusage[i]].replace("<subcommand>", command.subcommands[i])}`;
-                else if (command.subusage && command.subusage[i]) str += `${prefix}${command.name} ${command.subusage[i].toString().replace("<subcommand>", command.subcommands[i])}`;
-                else str += `${prefix}${command.name} ${command.usage ? command.usage.replace(/(?!\s)[<[\w\s|]*subcommand[\w\s|>\]]*/, command.subcommands[i]) : command.subcommands[i]}`;
-                strs.push(str);
+        function writeArguments(upperOption: any, strPrefix = "") {
+            let addition = "";
+            for (let kk = 0; kk < upperOption.options.length; kk++) {
+                const opt = upperOption.options[kk];
+                addition += ` \`${opt.name}: ${typeArray[opt.type - 1]}\``;
+                data.push(`${strPrefix}• **${opt.namme}:** ${opt.description}`);
             }
-            data.push(`**Subcommands:**\n${strs.join("\n")}`);
+            return addition;
         }
-        if (command.subcommands) data.push("\nIf you want to know how subcommands work, please refer to the manual.");
+        function writeSubcommands(upperOption: any, strPrefix = "") {
+            data.push(`${strPrefix}${strPrefix ? "  " : ""}**Subcommand(s):**`);
+            for (let jj = 0; jj < upperOption.options.length; jj++) {
+                const sub = upperOption.options[jj];
+                data.push(`${strPrefix}\t• **${sub.name}**: ${sub.description}`);
+                const index = data.length;
+                data[index] = `${strPrefix}\t  **Usage(s):** ${prefix}${command.name} ${upperOption.name} ${sub.name}`;
+                if (sub.options)
+                    data[index] += writeArguments(sub, strPrefix + "\t\t");
+            }
+        }
+        if (command.options) {
+            if (command.options[0].type === ApplicationCommandOptionType.SubcommandGroup) {
+                data.push("**Subcommand Group(s):**");
+                for (let ii = 0; ii < command.options.length; ii++) {
+                    const subGroup = command.options[ii];
+                    data.push(`\t• **${subGroup.name}**: ${subGroup.description}`);
+                    writeSubcommands("\t");
+                }
+            } else if (command.options[0].type === ApplicationCommandOptionType.Subcommand) writeSubcommands(command);
+            else writeArguments(command);
+        }
         return data;
     }
 }

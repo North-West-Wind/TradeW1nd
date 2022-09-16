@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { NorthClient, SlashCommand, Command } from "../../classes/NorthClient.js";
+import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
 import { categories } from "../../commands/information/help.js";
 
 class ReloadCommand implements SlashCommand {
@@ -31,7 +31,7 @@ class ReloadCommand implements SlashCommand {
             if (!cmd?.category === undefined) continue;
             const path = `${__dirname}/../${categories[cmd.category].toLowerCase()}.js`;
             delete require.cache[require.resolve(path)];
-            const comd = <Command> (await import(path)).default;
+            const comd = <SlashCommand> (await import(path)).default;
             if (comd.name) NorthClient.storage.commands.set(comd.name, comd);
         }
         await interaction.editReply(`Reloaded \`${commands.join("`, `")}\``);

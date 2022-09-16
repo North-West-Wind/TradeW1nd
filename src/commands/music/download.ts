@@ -8,16 +8,6 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import * as fs from "fs";
 import archiver from "archiver";
 
-const type = [
-    "YouTube",
-    "Spotify",
-    "URL/Attachment",
-    "SoundCloud",
-    "Google Drive",
-    "Musescore",
-    "MSCZ/MSCX"
-];
-
 export const downloading = new Discord.Collection<Discord.Snowflake, number>();
 
 class DownloadCommand implements SlashCommand {
@@ -28,30 +18,45 @@ class DownloadCommand implements SlashCommand {
     category = 0
     options = [
         {
-            name: "keywords",
-            description: "Index/Link/Keywords of soundtrack. Type \"all\" to download the entire queue.",
-            required: false,
-            type: Discord.ApplicationCommandOptionType.String
+            name: "queue",
+            description: "Downloads a single soundtrack of the queue.",
+            type: Discord.ApplicationCommandOptionType.Subcommand,
+            options: [{
+                name: "index",
+                description: "The position of the soundtrack in the queue.",
+                required: false,
+                type: Discord.ApplicationCommandOptionType.Integer
+            }]
+        },
+        {
+            name: "online",
+            description: "Downloads a soundtrack from the Internet.",
+            type: Discord.ApplicationCommandOptionType.Subcommand,
+            options: [{
+                name: "link",
+                description: "The link of the soundtrack or keywords to search for.",
+                required: true,
+                type: Discord.ApplicationCommandOptionType.String
+            }]
         },
         {
             name: "all",
-            description: "Whether or not to download the entire queue. When enabled, keywords will be ignored.",
-            required: false,
-            type: Discord.ApplicationCommandOptionType.Boolean
+            description: "Downloads the entire server queue.",
+            type: Discord.ApplicationCommandOptionType.Subcommand
         }
     ]
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {
         var serverQueue = getQueue(interaction.guild.id);
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(interaction.guild.id, [], false, false);
-        if (interaction.options.getBoolean("all")) return await this.downloadAll(interaction, serverQueue);
-        const keywords = interaction.options.getString("keywords");
+        const subcommannd = interaction.options.getSubcommand();
+        if (subcommannd === "all") return await this.downloadAll(interaction, serverQueue);
         await interaction.deferReply();
-        if (keywords && isNaN(parseInt(keywords))) return await this.downloadFromArgs(interaction, serverQueue, keywords);
+        if (subcommannd === "online") return await this.downloadFromArgs(interaction, serverQueue, interaction.options.getString("link"));
         if (serverQueue.songs.length < 1) return await interaction.editReply("There is nothing in the queue.");
+        const index = interaction.options.getInteger("index");
         var song = serverQueue.songs[0];
-        const parsed = keywords ? parseInt(keywords) : -1;
-        if (parsed <= serverQueue.songs.length && parsed > 0) song = serverQueue.songs[parsed - 1];
+        if (index && index <= serverQueue.songs.length && index > 0) song = serverQueue.songs[index - 1];
         await this.download(interaction, serverQueue, song);
     }
 

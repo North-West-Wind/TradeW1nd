@@ -1,4 +1,4 @@
-import { ClientStorage, NorthClient, Command } from "./classes/NorthClient.js";
+import { ClientStorage, NorthClient, SlashCommand } from "./classes/NorthClient.js";
 import { deepReaddir } from "./function.js";
 import * as fs from "fs";
 import isOnline from "is-online";
@@ -54,7 +54,7 @@ export default async (client: NorthClient) => {
   console.trace = (message: string, ...data: any[]) => logger.trace(message, ...data);
   const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
   for (const file of commandFiles) {
-    const command = <Command>(await import(file)).default;
+    const command = <SlashCommand>(await import(file)).default;
     NorthClient.storage.commands.set(command.name, command);
   }
   if (!fs.existsSync(process.env.CACHE_DIR)) fs.mkdirSync(process.env.CACHE_DIR);

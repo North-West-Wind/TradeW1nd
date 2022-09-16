@@ -70,7 +70,7 @@ export function removeUsing(hashed: string, all = false) {
 			else if (fs.existsSync(filePath)) {
 				if (!fs.statSync(filePath).isDirectory()) fs.unlinkSync(filePath);
 			}
-		}, 3600000);
+		}, 7200000);
 }
 function waitHalfMin(hashed: string) {
 	if (isUsing(hashed)) setTimeout(() => waitHalfMin(hashed), 30000);

@@ -1,5 +1,5 @@
 import { ActivityType, ChatInputCommandInteraction, GuildMember, PermissionsBitField, TextChannel } from "discord.js";
-import { Command, NorthClient } from "../classes/NorthClient.js";
+import { NorthClient, SlashCommand } from "../classes/NorthClient.js";
 import { genPermMsg, getOwner } from "../function.js";
 import { getQueue } from "./music.js";
 import { isPlaying } from "./radio.js";
@@ -10,7 +10,7 @@ export function canReset() {
     return !timeout;
 }
 
-export async function all(command: Command, interaction: ChatInputCommandInteraction) {
+export async function all(command: SlashCommand, interaction: ChatInputCommandInteraction) {
     if (command.permissions && interaction.guild) {
         if (command.permissions.guild) {
             if (command.permissions.guild.user && !(<GuildMember>interaction.member).permissions.has(BigInt(command.permissions.guild.user))) {
@@ -44,7 +44,7 @@ export async function all(command: Command, interaction: ChatInputCommandInterac
     return true;
 }
 
-export async function information(_command: Command, interaction: ChatInputCommandInteraction) {
+export async function information(_command: SlashCommand, interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) return true;
     try {
         if (await interaction.guild.members.fetch("649611982428962819")) return false;
@@ -52,7 +52,7 @@ export async function information(_command: Command, interaction: ChatInputComma
     return true;
 }
 
-export async function music(command: Command, interaction: ChatInputCommandInteraction) {
+export async function music(command: SlashCommand, interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
         await interaction.reply("You can only use music commands in server!");
         return false;
@@ -69,7 +69,7 @@ export async function music(command: Command, interaction: ChatInputCommandInter
     return true;
 }
 
-export async function dev(_command: Command, interaction: ChatInputCommandInteraction) {
+export async function dev(_command: SlashCommand, interaction: ChatInputCommandInteraction) {
     if (interaction.user.id != await getOwner()) {
         await interaction.reply("Please don't use Dev Commands.");
         return false;
