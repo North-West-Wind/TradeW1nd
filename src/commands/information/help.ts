@@ -22,7 +22,7 @@ class HelpCommand implements SlashCommand {
     ];
 
     constructor() {
-        const commandFiles = deepReaddir("..").filter(file => file.endsWith(".js"));
+        const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
         console.debug(commandFiles);
         (async () => {
             const preloaded: SlashCommand[] = [];
