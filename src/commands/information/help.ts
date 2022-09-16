@@ -13,33 +13,40 @@ class HelpCommand implements SlashCommand {
     usage = "[command]"
     cooldown = 5
     category = 1
-    options: any[];
+    options = [
+        {
+            name: "all",
+            description: "Display all the commands.",
+            type: ApplicationCommandOptionType.Subcommand
+        }
+    ];
 
     constructor() {
-        this.options = [
-            {
-                name: "all",
-                description: "Display all the commands.",
-                type: ApplicationCommandOptionType.Subcommand
+        const commandFiles = deepReaddir("..").filter(file => file.endsWith(".js"));
+        console.debug(commandFiles);
+        (async () => {
+            const preloaded: SlashCommand[] = [];
+            for (const file of commandFiles) {
+                const command = <SlashCommand>(await import(file)).default;
+                preloaded.push(command);
             }
-        ];
-        const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
-        for (const category of categories) {
-            const fetchOpt = {
-                name: "command",
-                description: "The command to fetch.",
-                required: true,
-                type: ApplicationCommandOptionType.String,
-                choices: commandFiles.map(async file => (await import(file)).default).filter(command => command.category === categories.indexOf(category)).map(x => ({ name: x.name, value: x.name }))
-            };
-            const option = {
-                name: category.toLowerCase(),
-                description: `${category} - Command Category`,
-                type: ApplicationCommandOptionType.Subcommand,
-                options: [fetchOpt]
-            };
-            this.options.push(option);
-        }
+            for (const category of categories) {
+                const fetchOpt = {
+                    name: "command",
+                    description: "The command to fetch.",
+                    required: true,
+                    type: ApplicationCommandOptionType.String,
+                    choices: preloaded.filter(command => command.category === categories.indexOf(category)).map(x => ({ name: x.name, value: x.name }))
+                };
+                const option = {
+                    name: category.toLowerCase(),
+                    description: `${category} - Command Category`,
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [fetchOpt]
+                };
+                this.options.push(option);
+            }
+        })();
     }
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {
