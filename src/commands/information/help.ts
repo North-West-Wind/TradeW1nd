@@ -83,7 +83,8 @@ class HelpCommand implements SlashCommand {
             let addition = "";
             for (let kk = 0; kk < upperOption.options.length; kk++) {
                 const opt = upperOption.options[kk];
-                addition += ` \`${opt.name}: ${ApplicationCommandOptionType[opt.type]}\``;
+                const wrap = opt.required;
+                addition += ` \`${wrap ? "[" : ""}${opt.name}: ${ApplicationCommandOptionType[opt.type]}${wrap ? "[" : ""}\``;
                 data.push(`${strPrefix}• **${opt.name}:** ${opt.description}`);
             }
             return addition;
@@ -109,7 +110,11 @@ class HelpCommand implements SlashCommand {
                     writeSubcommands("\t");
                 }
             } else if (command.options[0].type === ApplicationCommandOptionType.Subcommand) writeSubcommands(command);
-            else writeArguments(command);
+            else {
+                const index = data.length;
+                data[index] = `**Usage(s):** ${prefix}${command.name}`;
+                data[index] += writeArguments(command, "\t");
+            }
         }
         return data;
     }
