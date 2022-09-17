@@ -83,8 +83,8 @@ class HelpCommand implements SlashCommand {
             let addition = "";
             for (let kk = 0; kk < upperOption.options.length; kk++) {
                 const opt = upperOption.options[kk];
-                const wrap = opt.required;
-                addition += ` \`${wrap ? "[" : ""}${opt.name}: ${ApplicationCommandOptionType[opt.type]}${wrap ? "[" : ""}\``;
+                const wrap = !opt.required;
+                addition += ` \`${wrap ? "[" : ""}${opt.name}: ${ApplicationCommandOptionType[opt.type]}${wrap ? "]" : ""}\``;
                 data.push(`${strPrefix}• **${opt.name}:** ${opt.description}`);
             }
             return addition;
