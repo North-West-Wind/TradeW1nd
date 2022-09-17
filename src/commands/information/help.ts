@@ -5,7 +5,6 @@ import { getClients } from "../../main.js";
 import { ApplicationCommandOptionType } from "discord.js";
 
 export const categories = ["Music", "Information", "Dev"];
-const typeArray = Object.keys(ApplicationCommandOptionType);
 
 class HelpCommand implements SlashCommand {
     name = "help"
@@ -84,8 +83,8 @@ class HelpCommand implements SlashCommand {
             let addition = "";
             for (let kk = 0; kk < upperOption.options.length; kk++) {
                 const opt = upperOption.options[kk];
-                addition += ` \`${opt.name}: ${typeArray[opt.type - 1]}\``;
-                data.push(`${strPrefix}• **${opt.namme}:** ${opt.description}`);
+                addition += ` \`${opt.name}: ${ApplicationCommandOptionType[opt.type - 1]}\``;
+                data.push(`${strPrefix}• **${opt.name}:** ${opt.description}`);
             }
             return addition;
         }
@@ -95,9 +94,10 @@ class HelpCommand implements SlashCommand {
                 const sub = upperOption.options[jj];
                 data.push(`${strPrefix}\t• **${sub.name}**: ${sub.description}`);
                 const index = data.length;
-                data[index] = `${strPrefix}\t  **Usage(s):** ${prefix}${command.name} ${upperOption.name} ${sub.name}`;
-                if (sub.options)
-                    data[index] += writeArguments(sub, strPrefix + "\t\t");
+                data[index] = `${strPrefix}\t  **Usage(s):** ${prefix}${command.name}`;
+                if (upperOption.type === ApplicationCommandOptionType.SubcommandGroup) data[index] += ` ${upperOption.name}`;
+                data[index] += ` ${sub.name}`;
+                if (sub.options) data[index] += writeArguments(sub, strPrefix + "\t\t");
             }
         }
         if (command.options) {
