@@ -6,7 +6,6 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 class RepeatCommand implements SlashCommand {
     name = "repeat"
     description = "Toggles repeat of a soundtrack."
-    aliases = ["rep", "rp"]
     category = 0
 
     async execute(interaction: ChatInputCommandInteraction) {

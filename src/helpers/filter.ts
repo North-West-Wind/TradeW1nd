@@ -44,14 +44,6 @@ export async function all(command: SlashCommand, interaction: ChatInputCommandIn
     return true;
 }
 
-export async function information(_command: SlashCommand, interaction: ChatInputCommandInteraction) {
-    if (!interaction.guild) return true;
-    try {
-        if (await interaction.guild.members.fetch("649611982428962819")) return false;
-    } catch (err) {}
-    return true;
-}
-
 export async function music(command: SlashCommand, interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
         await interaction.reply("You can only use music commands in server!");

@@ -155,8 +155,6 @@ export async function play(guild: Discord.Guild, song: SoundTrack) {
 class PlayCommand implements SlashCommand {
   name = "play"
   description = "Plays music with the link or keywords provided."
-  aliases = ["p"]
-  usage = "[link | keywords]"
   category = 0
   options = [
     {

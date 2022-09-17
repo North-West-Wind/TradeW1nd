@@ -5,10 +5,7 @@ import { categories } from "../../commands/information/help.js";
 class ReloadCommand implements SlashCommand {
     name = "reload";
     description = "Reload command(s).";
-    usage = "<command>";
-    aliases = ["rl"];
     category = 2;
-    args = 1;
 
     options = [
         {

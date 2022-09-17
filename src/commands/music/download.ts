@@ -13,8 +13,6 @@ export const downloading = new Discord.Collection<Discord.Snowflake, number>();
 class DownloadCommand implements SlashCommand {
     name = "download"
     description = "Downloads the soundtrack from the server queue or online."
-    usage = "[index | link | keywords]"
-    aliases = ["dl"]
     category = 0
     options = [
         {

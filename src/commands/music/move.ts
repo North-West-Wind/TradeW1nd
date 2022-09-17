@@ -8,9 +8,7 @@ import { play } from "./play.js";
 class MoveCommand implements SlashCommand {
     name = "move"
     description = "Moves a soundtrack to a specific position of the queue."
-    usage = "<target> <destination>"
     category = 0
-    args = 2
     options = [
         {
             name: "target",

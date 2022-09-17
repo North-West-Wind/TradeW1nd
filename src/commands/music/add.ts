@@ -9,7 +9,6 @@ import { createEmbed } from "./play.js";
 class AddCommand implements SlashCommand {
     name = "add"
     description = "Adds soundtracks to the queue without playing it."
-    usage = "[link | keywords]"
     category = 0
     options = [
         {

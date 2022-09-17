@@ -7,8 +7,6 @@ import { createDiscordJSAdapter, getQueue, setQueue } from "../../helpers/music.
 class UnSkipCommand implements SlashCommand {
     name = "unskip"
     description = "Goes to the previous soundtrack in the queue."
-    usage = "[amount]"
-    aliases = ["us"]
     category = 0
     options = [{
         name: "amount",

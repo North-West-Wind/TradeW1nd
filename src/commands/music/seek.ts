@@ -8,8 +8,6 @@ import { joinVoiceChannel } from "@discordjs/voice";
 class SeekCommand implements SlashCommand {
     name = "seek"
     description = "Skips to the time specified for the current playing soundtrack."
-    usage = "<time>"
-    aliases = ["skipto"]
     category = 0
     options = [{
         name: "time",

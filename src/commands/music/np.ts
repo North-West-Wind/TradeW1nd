@@ -17,7 +17,6 @@ const type = [
 class NPCommand implements SlashCommand {
     name = "np"
     description = "Displays information about the soundtrack being played."
-    aliases = ["nowplaying"]
     category = 0
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {

@@ -7,7 +7,6 @@ class LoopCommand implements SlashCommand {
     name = "loop"
     description = "Toggles loop of the queue."
     category = 0
-    aliases = ["lp"]
 
     async execute(interaction: ChatInputCommandInteraction) {
         await this.loop(interaction);

@@ -6,7 +6,6 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 class RandomCommand implements SlashCommand {
     name = "random"
     description = "Plays the queue randomly."
-    aliases = ["rnd"]
     category = 0
 
     async execute(interaction: ChatInputCommandInteraction) {

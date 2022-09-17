@@ -8,7 +8,6 @@ import { play } from "./play.js";
 class ReverseCommand implements SlashCommand {
     name = "reverse"
     description = "Reverses the order of the server queue."
-    aliases = ["rev"]
     category = 0
 
     async execute(interaction: ChatInputCommandInteraction) {

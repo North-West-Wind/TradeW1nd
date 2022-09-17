@@ -5,8 +5,6 @@ import { getQueue } from "../../helpers/music.js";
 class AllowCommand implements SlashCommand {
     name = "allow"
     description = "Allows a user or role to alter the queue."
-    aliases = ["al"]
-    usage = "<user | role>"
     category = 0
     options = [{
         name: "mentionable",

@@ -6,7 +6,6 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 class StopCommand implements SlashCommand {
     name = "stop"
     description = "Stops the music and disconnect the bot from the voice channel."
-    aliases = ["end", "disconnect", "dis"]
     category = 0
 
     async execute(interaction: ChatInputCommandInteraction) {

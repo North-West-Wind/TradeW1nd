@@ -10,8 +10,6 @@ const typeArray = Object.keys(ApplicationCommandOptionType);
 class HelpCommand implements SlashCommand {
     name = "help"
     description = "Sends you a DM with an embed of all available commands and the user manual."
-    usage = "[command]"
-    cooldown = 5
     category = 1
     options = [
         {
@@ -23,7 +21,6 @@ class HelpCommand implements SlashCommand {
 
     constructor() {
         const commandFiles = deepReaddir("./out/commands").filter(file => file.endsWith(".js"));
-        console.debug(commandFiles);
         (async () => {
             const preloaded: SlashCommand[] = [];
             for (const file of commandFiles) {
@@ -51,15 +48,9 @@ class HelpCommand implements SlashCommand {
 
     async execute(interaction: Discord.ChatInputCommandInteraction) {
         const sub = interaction.options.getSubcommand();
-        if (sub === "all") {
-            try {
-                await interaction.user.send({ embeds: [await this.getAllCommands(interaction.guildId)] });
-                await interaction.reply({ content: "Slid into your DM!", ephemeral: true });
-            } catch (err) {
-                await interaction.reply({ embeds: [await this.getAllCommands(interaction.guildId)], ephemeral: true });
-            }
-        } else {
-            const name = interaction.options.getString("command").toLowerCase();
+        if (sub === "all") await interaction.reply({ embeds: [await this.getAllCommands(interaction.guildId)], ephemeral: true });
+        else {
+            const name = interaction.options.getString("command");
             await interaction.reply({ content: this.getCommand(name, "/").join("\n"), ephemeral: true });
         }
     }

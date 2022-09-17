@@ -5,8 +5,6 @@ import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 class VolumeCommand implements SlashCommand {
     name = "volume"
     description = "Turns the volume of music up or down by percentage."
-    usage = "[percentage]"
-    aliases = ["vol"]
     category = 0
     options = [
         {

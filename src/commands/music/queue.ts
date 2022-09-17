@@ -8,11 +8,6 @@ import { ApplicationCommandOptionType, ButtonStyle, MessageActionRowComponentBui
 class QueueCommand implements SlashCommand {
     name = "queue"
     description = "Displays the current song queue."
-    aliases = ["q"]
-    subcommands = ["save", "load", "delete", "list", "sync"]
-    subdesc = ["Saves the current queue to the database.", "Loads a queue from the database.", "Deletes a queue from the database.", "Lists all the queues of a user.", "Synchronizes the queue with another server you are in."]
-    subusage = ["<subcommand> <name>", 0, 0]
-    subaliases = ["s", "l", "d", "li", "sy"]
     category = 0
     options = [
         {

@@ -4,12 +4,7 @@ import { NorthClient, ISlash, SlashCommand } from "../../classes/NorthClient.js"
 class DevSlashCommand implements SlashCommand {
     name = "slash";
     description = "TradeW1nd's Slash Command Manager.";
-    usage = "<subcommand>";
-    aliases = ["scm"];
     category = 2;
-    args = 1;
-    subcommands = ["register", "refresh"];
-    subdesc = ["Register all Slash Commands.", "Refresh all Slash Commands."];
     options = [
         {
             name: "register",

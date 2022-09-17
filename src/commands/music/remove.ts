@@ -8,9 +8,7 @@ import { play } from "./play.js";
 class RemoveCommand implements SlashCommand {
     name = "remove"
     description = "Removes soundtrack(s) from the queue."
-    usage = "<index | starting index> [delete count]"
     category = 0
-    args = 1
     options = [
         {
             name: "index",
