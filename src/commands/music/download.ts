@@ -1,4 +1,4 @@
-import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/NorthClient.js";
+import { ServerQueue, SlashCommand, SoundTrack } from "../../classes/index.js";
 import * as Discord from "discord.js";
 import sanitize from "sanitize-filename";
 import { Readable } from "stream";

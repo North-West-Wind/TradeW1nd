@@ -1,4 +1,4 @@
-import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, SlashCommand } from "../../classes/index.js";
 import { color, deepReaddir, fixGuildRecord } from "../../function.js";
 import * as Discord from "discord.js";
 import { getClients } from "../../main.js";

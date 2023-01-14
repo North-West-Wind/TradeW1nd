@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { addBot } from "../../main.js";
 
 class NewCommand implements SlashCommand {

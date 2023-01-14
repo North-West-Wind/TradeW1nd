@@ -1,7 +1,7 @@
 import { ActivityType, ChatInputCommandInteraction, Guild, Interaction, InteractionType, VoiceState } from "discord.js";
 import { checkN0rthWestW1nd, fixGuildRecord, query } from "./function.js";
 import { getQueue, setQueue, stop } from "./helpers/music.js";
-import { NorthClient, GuildConfig, ISlash } from "./classes/NorthClient.js";
+import { NorthClient, GuildConfig, ISlash } from "./classes/index.js";
 import * as filter from "./helpers/filter.js";
 import common from "./common.js";
 import { init } from "./helpers/addTrack.js";

@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, VoiceChannel } from "discord.js";
 
-import { ServerQueue, SlashCommand } from "../../classes/NorthClient.js";
+import { ServerQueue, SlashCommand } from "../../classes/index.js";
 import { duration, ms } from "../../function.js";
 import { createDiscordJSAdapter, getQueue, setQueue } from "../../helpers/music.js";
 import { joinVoiceChannel } from "@discordjs/voice";

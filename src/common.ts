@@ -1,4 +1,4 @@
-import { ClientStorage, NorthClient, SlashCommand } from "./classes/NorthClient.js";
+import { ClientStorage, NorthClient, SlashCommand } from "./classes/index.js";
 import { deepReaddir } from "./function.js";
 import * as fs from "fs";
 import isOnline from "is-online";

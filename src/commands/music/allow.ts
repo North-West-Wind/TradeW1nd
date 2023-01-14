@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Role, User } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { getQueue } from "../../helpers/music.js";
 
 class AllowCommand implements SlashCommand {

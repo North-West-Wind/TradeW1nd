@@ -1,4 +1,4 @@
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import * as Discord from "discord.js";
 import { color, duration, wait } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";

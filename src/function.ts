@@ -1,4 +1,4 @@
-import { GuildConfig, NorthClient } from "./classes/NorthClient.js";
+import { GuildConfig, NorthClient } from "./classes/client.js";
 import * as Discord from "discord.js";
 import superms from "ms";
 import * as fs from "fs";

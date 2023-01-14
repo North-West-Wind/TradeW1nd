@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { Handler } from "./handler.js";
-import { NorthClient, ClientStorage, ISlash } from "./classes/NorthClient.js";
+import { NorthClient, ClientStorage, ISlash } from "./classes/index.js";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import express from "express";
 import cors from "cors";
@@ -14,7 +14,6 @@ for (const file of fs.readdirSync(process.env.CACHE_DIR)) {
     removeUsing(file);
 }
 
-const config = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
 const clients: NorthClient[] = [];
 NorthClient.storage = new ClientStorage();
 
@@ -56,7 +55,7 @@ function initBot(token: string) {
         ]
     });
     
-    client.prefix = process.env.PREFIX || config.prefix0;
+    client.prefix = process.env.PREFIX;
     client.id = ii;
     Handler.setup(client, token);
     clients.push(client);

@@ -1,10 +1,11 @@
 import { AudioPlayerStatus, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { ChatInputCommandInteraction, GuildMember, Message, EmbedBuilder, VoiceChannel, Attachment, ApplicationCommandOptionType } from "discord.js";
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { color, duration, validGDDLURL, validGDFolderURL, validGDURL, validMSSetURL, validMSURL, validSCURL, validSPURL, validURL, validYTPlaylistURL, validYTURL, wait } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { createDiscordJSAdapter, getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { addPlaying, isPlaying, players, removePlaying } from "../../helpers/radio.js";
+import { getClients } from "../../main.js";
 import { createEmbed } from "./play.js";
 const type = [
     "YouTube",
@@ -160,9 +161,29 @@ class RadioCommand implements SlashCommand {
     }
 
     async info(interaction: ChatInputCommandInteraction, channel: number) {
+        const getEmbed = this.getEmbed;
+        let embed = getEmbed(channel);
+        if (!embed) return await interaction.reply("There are currently no tracks in this radio channel.");
+        let counter = 0;
+        await interaction.reply({ embeds: [embed] });
+        async function edit() {
+            await wait(5000);
+            counter++;
+            if (counter >= 12 || !(embed = getEmbed(channel, embed))) return await interaction.editReply({ content: "**[Outdated Now-Playing Information]**", embeds: [] });
+            try {
+                await interaction.editReply({ embeds: [embed] });
+                await edit();
+            } catch (err) { }
+        }
+        await edit();
+    }
+
+    getEmbed(channel: number, embed: EmbedBuilder = null) {
         const radio = players[channel - 1];
-        if (!radio.tracks.length) return await interaction.reply("There are currently no tracks in this radio channel.");
-        const position = radio.player.state.status == AudioPlayerStatus.Playing ? radio.player.state.playbackDuration : 0;
+        if (!radio.tracks.length) return null;
+        let position = 0;
+        const streamTime = radio.getPlaybackDuration();
+        if (streamTime) position = Math.round((streamTime - (radio.startTime || 0)) / 1000);
         const processBar = [];
         for (let i = 0; i < 20; i++) processBar.push("═");
         let progress = 0;
@@ -173,29 +194,25 @@ class RadioCommand implements SlashCommand {
             processBar.splice(19, 1, "■");
             positionTime = "∞";
         } else {
-            positionTime = duration(Math.round(position / 1000), "seconds");
+            positionTime = duration(position, "seconds");
             if (position === 0 || isNaN(position))
-                positionTime = "0:00";
+                positionTime = "00:00";
             progress = Math.floor((position / length) * processBar.length);
             processBar.splice(progress, 1, "■");
         }
         let next: string;
         if (radio.tracks[1]) next = `${radio.tracks[1].title} : ${duration(radio.tracks[1].time, "seconds")}`;
-        else if ((radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${duration(radio.tracks[0].time, "seconds")}`;
+        else if (radio.tracks.length == 1 || (radio.tracks[0].looped || 0) < 3) next = `${radio.tracks[0].title} : ${duration(radio.tracks[0].time, "seconds")}`;
         else next = "Empty";
         let info = [];
-        const embed = new EmbedBuilder()
-            .setColor(color())
-            .setTitle("Information of Radio Channel #" + channel)
-            .setTimestamp()
-            .setFooter({ text: `Coming up next: ${next}`, iconURL: interaction.client.user.displayAvatarURL() });
-
+        if (!embed) embed = new EmbedBuilder().setColor(color()).setTimestamp();
+        embed.setTitle("Information of Radio Channel #" + channel).setFooter({ text: `Coming up next: ${next}`, iconURL: getClients()[0].user.displayAvatarURL() });
         const songLength = !radio.tracks[0].time ? "∞" : duration(radio.tracks[0].time, "seconds");
         if (radio.tracks[0].type === 1) info = [`**[${radio.tracks[0].title}](${radio.tracks[0].spot})**\nLength: **${songLength}**`, radio.tracks[0].thumbnail];
         else info = [`**[${radio.tracks[0].title}](${radio.tracks[0].url})**\nLive: **${isLive ? "Yes" : "No"}**\nType: **${type[radio.tracks[0].type]}**`, radio.tracks[0].thumbnail];
         embed.setDescription(`${info[0]}\n\n${positionTime} \`${processBar.join("")}\` ${songLength || "Unknown"}`).setThumbnail(info[1]);
-        await interaction.reply({ embeds: [embed] });
-        setTimeout(() => interaction.editReply({ content: "**[Outdated Radio Information]**", embeds: [] }).catch(() => {}), 60000);
+
+        return embed;
     }
 
     async copy(interaction: ChatInputCommandInteraction, channel: number) {

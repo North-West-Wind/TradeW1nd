@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import { validURL, validYTURL, validSPURL, validGDURL, validGDFolderURL, validYTPlaylistURL, validSCURL, validMSURL, moveArray, color, validGDDLURL, wait, duration, validMSSetURL } from "../../function.js";
 import { migrate as music } from "./migrate.js";
-import { NorthClient, SoundTrack, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, SoundTrack, SlashCommand } from "../../classes/index.js";
 import { getQueue, updateQueue, setQueue, createDiscordJSAdapter, addUsing, removeUsing } from "../../helpers/music.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, getStream, addMSSetURL } from "../../helpers/addTrack.js";
 import * as Stream from 'stream';

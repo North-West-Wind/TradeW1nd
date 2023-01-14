@@ -1,6 +1,6 @@
-import { ServerQueue, SoundTrack, SlashCommand } from "../../classes/NorthClient.js";
+import { ServerQueue, SoundTrack, SlashCommand } from "../../classes/index.js";
 import * as Discord from "discord.js";
-import { color, createEmbedScrolling, duration, query, wait } from "../../function.js";
+import { color, duration, query, wait } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 import { getClients } from "../../main.js";
 import { ApplicationCommandOptionType, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
@@ -111,7 +111,7 @@ class QueueCommand implements SlashCommand {
             return response;
         }
         var ss = 0, counter = 0;
-        async function resend(int: Discord.MessageComponentInteraction = null, ended: boolean = false) {
+        async function resend(int: Discord.MessageComponentInteraction = null, ended = false) {
             const embed = otfEmbed(ss);
             if (ended) {
                 await interaction.editReply(embed);

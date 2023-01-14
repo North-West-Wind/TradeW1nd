@@ -1,5 +1,5 @@
 import { ActivityType, ChatInputCommandInteraction, GuildMember, PermissionsBitField, TextChannel } from "discord.js";
-import { NorthClient, SlashCommand } from "../classes/NorthClient.js";
+import { NorthClient, SlashCommand } from "../classes/index.js";
 import { genPermMsg, getOwner } from "../function.js";
 import { getQueue } from "./music.js";
 import { isPlaying } from "./radio.js";

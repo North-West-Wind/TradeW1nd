@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, GuildMember } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { shuffleArray } from "../../function.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 

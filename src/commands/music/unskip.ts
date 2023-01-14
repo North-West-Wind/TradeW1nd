@@ -1,7 +1,7 @@
 import { joinVoiceChannel } from "@discordjs/voice";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, VoiceChannel } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { createDiscordJSAdapter, getQueue, setQueue } from "../../helpers/music.js";
 
 class UnSkipCommand implements SlashCommand {

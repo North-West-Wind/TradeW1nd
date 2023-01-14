@@ -12,7 +12,7 @@ import * as crypto from "crypto";
 import rp from "request-promise-native";
 import * as cheerio from "cheerio";
 import * as Discord from "discord.js";
-import { ServerQueue, SoundTrack } from "../classes/NorthClient.js";
+import { ServerQueue, SoundTrack } from "../classes/index.js";
 import { getMP3 } from "./musescore.js";
 import { cacheTrack, findCache, updateQueue } from "./music.js";
 import { TrackInfo } from "@vncsprd/soundcloud-downloader/dist/info.js";

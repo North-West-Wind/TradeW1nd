@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { NorthClient, SlashCommand } from "../../classes/NorthClient.js";
+import { NorthClient, SlashCommand } from "../../classes/index.js";
 import { categories } from "../../commands/information/help.js";
 
 class ReloadCommand implements SlashCommand {

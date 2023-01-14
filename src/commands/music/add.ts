@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, Attachment, ChatInputCommandInteraction, Message } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { validYTPlaylistURL, validYTURL, validSPURL, validSCURL, validGDFolderURL, validGDURL, validGDDLURL, validMSURL, validURL, wait, validMSSetURL } from "../../function.js";
 import { addYTPlaylist, addYTURL, addSPURL, addSCURL, addGDFolderURL, addGDURL, addMSURL, addURL, addAttachment, search, addMSSetURL } from "../../helpers/addTrack.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";

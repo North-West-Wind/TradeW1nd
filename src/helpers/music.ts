@@ -3,7 +3,7 @@ import * as Discord from "discord.js";
 import * as Stream from 'stream';
 import * as fs from "fs";
 import { GatewayVoiceServerUpdateDispatchData, GatewayVoiceStateUpdateDispatchData } from "discord-api-types/v9";
-import { NorthClient, ServerQueue, SoundTrack } from "../classes/NorthClient.js";
+import { NorthClient, ServerQueue, SoundTrack } from "../classes/index.js";
 import { fixGuildRecord, humanDurationToNum, query } from "../function.js";
 const queue = new Discord.Collection<Discord.Snowflake, ServerQueue>();
 const using: { [key: string]: number } = {};

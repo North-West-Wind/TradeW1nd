@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from "discord.js";
 
-import { SlashCommand } from "../../classes/NorthClient.js";
+import { SlashCommand } from "../../classes/index.js";
 import { getQueue, setQueue, updateQueue } from "../../helpers/music.js";
 
 class RandomCommand implements SlashCommand {
