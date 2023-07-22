@@ -116,9 +116,9 @@ class QueueCommand implements SlashCommand {
             if (ended) {
                 await interaction.editReply(embed);
             } else {
-                var msg: Discord.Message;
+                var msg: Discord.Message | Discord.InteractionResponse;
                 if (!int) msg = await interaction.reply(embed);
-                else msg = await int.update(embed);
+                else msg = await int.update(<any>embed);
                 const collected = await msg.awaitMessageComponent({ filter: int => int.user.id === interaction.user.id, time: 60000 }).catch(() => { });
                 if (!collected || !collected.isButton()) {
                     ended = true;
