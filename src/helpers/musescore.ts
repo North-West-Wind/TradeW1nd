@@ -1,5 +1,5 @@
 import { run } from "./puppeteer.js";
-import { Page } from 'puppeteer-core';
+import { Page } from 'puppeteer';
 
 export async function getMP3(url: string): Promise<{ error: boolean, url: string, message: string, timeTaken: number }> {
     return await run(async (page: Page) => {
