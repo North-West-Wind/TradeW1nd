@@ -281,6 +281,6 @@ export async function query(query: string) {
 }
 
 export async function checkN0rthWestW1nd(guild: Discord.Snowflake) {
-    const res = await fetch("http://192.168.1.29:3001/checkGuild/" + guild);
+    const res = await fetch("http://localhost:3001/checkGuild/" + guild);
     return res.ok && (<any> await res.json()).isIn;
 }
