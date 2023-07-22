@@ -94,7 +94,7 @@ class QueueCommand implements SlashCommand {
             const queueEmbed = new Discord.EmbedBuilder()
                 .setColor(color())
                 .setTitle(`Song queue for ${interaction.guild.name} [${page + 1}/${Math.ceil(serverQueue.songs.length / 10)}]`)
-                .setDescription(`There are ${songArray.length} tracks in total.\n\n${songArray.join("\n")}`)
+                .setDescription(`There are ${serverQueue.songs.length} tracks in total.\n\n${songArray.join("\n")}`)
                 .setTimestamp()
                 .setFooter({ text: `Now playing: ${(serverQueue.songs[0] ? serverQueue.songs[0].title : "Nothing")} | LP: ${serverQueue.looping ? "Y" : "N"} | RP: ${serverQueue.repeating ? "Y" : "N"} | RD: ${serverQueue.random ? "Y" : "N"}`, iconURL: interaction.client.user.displayAvatarURL() });
             const response: Discord.InteractionReplyOptions = { embeds: [queueEmbed], fetchReply: true };
