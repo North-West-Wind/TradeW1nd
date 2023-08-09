@@ -283,7 +283,7 @@ class QueueCommand implements SlashCommand {
     async export(interaction: Discord.ChatInputCommandInteraction, serverQueue: ServerQueue) {
         const guild = interaction.guild;
         if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, [], false, false);
-        return await interaction.reply({ files: [new Discord.AttachmentBuilder(JSON.stringify(serverQueue.songs, null, 2), { name: 'queue.json' })] });
+        return await interaction.reply({ files: [new Discord.AttachmentBuilder(Buffer.from(JSON.stringify(serverQueue.songs, null, 2)), { name: 'queue.json' })] });
     }
 }
 
