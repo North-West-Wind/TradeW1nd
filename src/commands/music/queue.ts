@@ -64,6 +64,11 @@ class QueueCommand implements SlashCommand {
                 type: ApplicationCommandOptionType.String
             }]
         },
+        {
+            name: "export",
+            description: "Exports the current server queue as a file.",
+            type: ApplicationCommandOptionType.Subcommand
+        },
     ]
 
 
@@ -77,6 +82,7 @@ class QueueCommand implements SlashCommand {
         if (sub === "delete") return await this.delete(interaction, interaction.options.getString("name"));
         if (sub === "list") return await this.list(interaction);
         if (sub === "sync") return await this.sync(interaction, serverQueue, interaction.options.getString("name"));
+        if (sub === "export") return await this.export(interaction, serverQueue);
         await this.viewQueue(interaction, serverQueue);
     }
 
@@ -272,6 +278,12 @@ class QueueCommand implements SlashCommand {
         else serverQueue.songs = JSON.parse(unescape(results[0].queue));
         updateQueue(guild.id, serverQueue);
         return await interaction.reply(`The queue of this server has been synchronize to the queue of server **${g.name}**.`);
+    }
+
+    async export(interaction: Discord.ChatInputCommandInteraction, serverQueue: ServerQueue) {
+        const guild = interaction.guild;
+        if (!serverQueue || !serverQueue.songs || !Array.isArray(serverQueue.songs)) serverQueue = setQueue(guild.id, [], false, false);
+        return await interaction.reply({ files: [new Discord.AttachmentBuilder(JSON.stringify(serverQueue, null, 2), { name: 'queue.json' })] });
     }
 }
 
